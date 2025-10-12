@@ -96,6 +96,64 @@ export default function Register() {
     }));
   };
 
+    const termsText = `1. Definisi Umum
+Toko merujuk pada New Nasional (Diamond Electronic).
+
+Pelanggan adalah pihak individu atau badan yang melakukan transaksi pembelian produk dari Toko.
+
+Produk adalah segala barang elektronik yang dijual oleh Toko.
+
+2. Produk & Ketersediaan
+Toko berkomitmen menyediakan produk asli, baru, dan berkualitas sesuai dengan deskripsi.
+
+Ketersediaan produk dapat berubah sewaktu-waktu tanpa pemberitahuan terlebih dahulu.
+
+Gambar atau foto produk hanya sebagai ilustrasi, sehingga mungkin terdapat perbedaan dalam warna atau detail fisik.
+
+3. Harga & Pembayaran
+Semua harga yang tercantum dalam Toko sudah termasuk pajak sesuai peraturan yang berlaku, kecuali dinyatakan lain.
+
+Toko berhak mengubah harga produk sewaktu-waktu tanpa pemberitahuan sebelumnya.
+
+Pembayaran wajib diselesaikan sesuai dengan metode yang tersedia dan sah apabila telah diterima penuh oleh Toko.
+
+4. Pemesanan & Konfirmasi
+Pemesanan produk dianggap valid setelah Toko menerima pembayaran.
+
+Toko berhak menolak atau membatalkan pesanan apabila ditemukan adanya kesalahan informasi harga, stok, atau indikasi penyalahgunaan transaksi.
+
+5. Pengiriman & Penyerahan
+Produk akan dikirim ke alamat yang telah ditentukan oleh pelanggan sesuai dengan data pesanan.
+
+Estimasi pengiriman bersifat perkiraan dan dapat bervariasi tergantung lokasi serta layanan logistik yang digunakan.
+
+Risiko kehilangan atau kerusakan produk selama pengiriman menjadi tanggung jawab perusahaan logistik setelah barang diserahkan oleh Toko.
+
+6. Garansi & Layanan Purna Jual
+Produk yang dijual dilengkapi dengan garansi resmi sesuai dengan kebijakan masing-masing merek atau distributor.
+
+Klaim garansi hanya berlaku apabila pelanggan dapat menunjukkan bukti pembelian yang sah.
+
+Layanan perbaikan atau penggantian mengikuti syarat dari pusat layanan resmi produsen.
+
+7. Pengembalian & Penukaran
+Pengembalian atau penukaran hanya dapat dilakukan apabila produk yang diterima dalam keadaan cacat produksi atau tidak sesuai dengan pesanan.
+
+Permintaan pengembalian harus diajukan maksimal 3 x 24 jam setelah produk diterima, disertai bukti foto dan nota pembelian.
+
+Produk harus dikembalikan dalam kondisi asli, lengkap dengan dus, aksesoris, dan segel (jika ada).
+
+8. Pembatasan Tanggung Jawab
+Toko tidak bertanggung jawab atas kerugian yang timbul akibat kelalaian penggunaan produk oleh pelanggan.
+
+Toko tidak menjamin bahwa semua deskripsi produk sepenuhnya bebas dari kesalahan, meskipun telah diupayakan ketelitian maksimal.
+
+9. Perubahan Syarat & Ketentuan
+Toko berhak mengubah atau memperbarui syarat & ketentuan ini kapan saja. Perubahan akan berlaku sejak tanggal diterbitkan pada media resmi Toko.
+
+10. Hukum yang Berlaku
+Syarat & ketentuan ini tunduk dan diatur berdasarkan hukum yang berlaku di Republik Indonesia.`
+
  async function registerHandler(): Promise<EmptyData> {
     try {
         const response = await axios.post<ApiResponse<EmptyData>>(`/register`, {
@@ -127,9 +185,11 @@ export default function Register() {
                     Syarat & Ketentuan
                 </Typography>
                 <div style={{height: "50vh", overflowY: "auto"}}>
-                    <Typography id="modal-modal-description" sx={{ color: "black", mt: 2 }}>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat suscipit, aut nisi tenetur molestiae illo delectus nihil similique illum vel tempora natus necessitatibus aspernatur pariatur ea. Repellat, corporis. Officia, reprehenderit deserunt. Tempore soluta repellendus sed, dolorem harum laudantium voluptate distinctio facilis ratione. Ab totam rem accusantium libero? Corrupti, commodi. Excepturi cum dolor reprehenderit repudiandae impedit atque rem assumenda modi at, doloremque laudantium quidem inventore, delectus ad rerum esse! Fugit dignissimos corporis, suscipit porro debitis magnam natus facere id repellendus quod hic ipsum cum esse, optio nihil voluptatibus minima soluta nulla alias ullam! Dolorum laboriosam distinctio, consectetur asperiores sapiente nobis nihil.
-                    </Typography>
+                    {termsText.split(/\n\n+/).map((para, idx) => (
+                        <Typography key={idx} sx={{ color: "black", mt: idx === 0 ? 2 : 1 }}>
+                            {para}
+                        </Typography>
+                    ))}
                 </div>
             </Box>
         </Modal>

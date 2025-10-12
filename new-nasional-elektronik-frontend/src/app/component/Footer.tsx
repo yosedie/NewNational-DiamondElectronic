@@ -56,13 +56,34 @@ function Footer() {
                 <b>
                   Explore our page
                 </b> {"\n"}
-                <span style={{cursor: "pointer"}} onClick={() => router.push("/products")}>
+                <span
+                  role="link"
+                  tabIndex={0}
+                  aria-label="Products"
+                  style={{cursor: "pointer"}}
+                  onClick={() => router.push("/products")}
+                  onKeyDown={(e) => { if (e.key === 'Enter') router.push('/products') }}
+                >
                   Products
                 </span> {"\n"}
-                <span style={{cursor: "pointer"}}>
+                <span
+                  role="link"
+                  tabIndex={0}
+                  aria-label="Events"
+                  style={{cursor: "pointer"}}
+                  onClick={() => router.push("/events")}
+                  onKeyDown={(e) => { if (e.key === 'Enter') router.push('/events') }}
+                >
                   Events
                 </span> {"\n"}
-                <span style={{cursor: "pointer"}}>
+                <span
+                  role="link"
+                  tabIndex={0}
+                  aria-label="About us"
+                  style={{cursor: "pointer"}}
+                  onClick={() => router.push("/")}
+                  onKeyDown={(e) => { if (e.key === 'Enter') router.push('/') }}
+                >
                   About us
                 </span>
               </Typography>

@@ -30,7 +30,7 @@ const stepsContent = [
     image: Stepper4,
     title: "Secara online",
     description: ` 
-      Mulai dari tahun 2024, kami sudah membuka toko new nasional didalam website ini.
+      Mulai dari tahun 2024, kami sudah membuka toko new nasional (diamond electronic) didalam website ini.
       Fitur online ini adalah fitur terbaru kami yang didesain dengan fitur - fitur baru sehingga bisa menjangkau banyak pelanggan 
     `,
   },

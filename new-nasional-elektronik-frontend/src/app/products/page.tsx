@@ -460,22 +460,26 @@ export default function Products() {
       <button onClick={() => router.push("/admin")}>
         to Admin
       </button> */}
-        {
-            role !== "user" && role !== "" && (
-            <Button 
-                variant='contained'
-                onClick={() => {
-                    router.push(`/editproduct?add=1`)
-                }}
-                sx={{
-                    marginLeft: "26.5%",
-                    marginTop: "1.5%"
-                }}
-            >
-                + Add Product
-            </Button>
-            )
-        }
+    {
+      role !== "user" && role !== "" && (
+      <Button 
+        variant='contained'
+        onClick={() => {
+          router.push(`/editproduct?add=1`)
+        }}
+        sx={{
+          marginLeft: "26.5%",
+          marginTop: "1.5%",
+          backgroundColor: role === 'admin' ? '#cc0000' : undefined,
+          '&:hover': {
+            backgroundColor: role === 'admin' ? '#b20000' : undefined,
+          }
+        }}
+      >
+        + Add Product
+      </Button>
+      )
+    }
         <Grid container>
             <Grid size={3}>
                 <Item>

@@ -147,11 +147,26 @@ export default function ManageUser() {
 }
 
  const formatDateToGMT7 = (dateString: string): string => {
-    const date = new Date(dateString);
-    const gmt7Date = new Date(date.getTime() + 7 * 60 * 60 * 1000);
-    const formattedDate = gmt7Date.toISOString().slice(0, 10);
-    const formattedTime = gmt7Date.toTimeString().slice(0, 8);
-    return `${formattedDate} ${formattedTime}`;
+    try {
+        // Check if dateString is valid
+        if (!dateString || dateString === "Invalid date" || dateString === "undefined" || dateString === "null") {
+            return "Invalid date";
+        }
+        
+        const date = new Date(dateString);
+        
+        // Check if the date is valid
+        if (isNaN(date.getTime())) {
+            return "Invalid date";
+        }
+        
+        const gmt7Date = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+        const formattedDate = gmt7Date.toISOString().slice(0, 10);
+        const formattedTime = gmt7Date.toTimeString().slice(0, 8);
+        return `${formattedDate} ${formattedTime}`;
+    } catch (error) {
+        return "Invalid date";
+    }
  };
 
  async function getUserList(): Promise<GetUserStruct> {
@@ -164,8 +179,16 @@ export default function ManageUser() {
                 password: "",
             }));
             
-            setUserList(updatedUserList)
-            setUserListFiltered(updatedUserList)
+            // Filter out users with invalid dates or empty emails
+            const filteredUserList = updatedUserList.filter((user: UserData) => {
+                return user.tanggal_daftar !== "Invalid date" &&
+                       user.email !== "" &&
+                       user.email !== null &&
+                       user.email !== undefined;
+            });
+            
+            setUserList(filteredUserList)
+            setUserListFiltered(filteredUserList)
         } else {
             execToast(ToastStatus.ERROR, response.data.message)
         }
@@ -193,8 +216,16 @@ export default function ManageUser() {
                 password: "",
             }));
             
-            setUserList(updatedUserList);
-            setUserListFiltered(updatedUserList);
+            // Filter out users with invalid dates or empty emails
+            const filteredUserList = updatedUserList.filter((user: UserData) => {
+                return user.tanggal_daftar !== "Invalid date" &&
+                       user.email !== "" &&
+                       user.email !== null &&
+                       user.email !== undefined;
+            });
+            
+            setUserList(filteredUserList);
+            setUserListFiltered(filteredUserList);
             execToast(ToastStatus.SUCCESS, response.data.message)
         } else {
             execToast(ToastStatus.ERROR, response.data.message)
@@ -220,8 +251,16 @@ export default function ManageUser() {
                 password: "",
             }));
             
-            setUserList(updatedUserList);
-            setUserListFiltered(updatedUserList);
+            // Filter out users with invalid dates or empty emails
+            const filteredUserList = updatedUserList.filter((user: UserData) => {
+                return user.tanggal_daftar !== "Invalid date" &&
+                       user.email !== "" &&
+                       user.email !== null &&
+                       user.email !== undefined;
+            });
+            
+            setUserList(filteredUserList);
+            setUserListFiltered(filteredUserList);
             execToast(ToastStatus.SUCCESS, response.data.message)
         } else {
             execToast(ToastStatus.ERROR, response.data.message)

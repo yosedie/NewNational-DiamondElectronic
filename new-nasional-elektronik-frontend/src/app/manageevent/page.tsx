@@ -95,6 +95,7 @@ export default function ManageEvent() {
   const handleClose = () => setOpen(false);
   const router = useRouter()
   const account = useSelector((state: RootState) => state.user.jwt_token)
+    const role = useSelector((state: RootState) => state.user.role)
   const shoppingCart = useSelector((state: RootState) => state.user.shopping_cart)
   const dispatch = useDispatch()
 
@@ -138,11 +139,26 @@ export default function ManageEvent() {
 }
 
  const formatDateToGMT7 = (dateString: string): string => {
-    const date = new Date(dateString);
-    const gmt7Date = new Date(date.getTime() + 7 * 60 * 60 * 1000);
-    const formattedDate = gmt7Date.toISOString().slice(0, 10);
-    const formattedTime = gmt7Date.toTimeString().slice(0, 8);
-    return `${formattedDate} ${formattedTime}`;
+    try {
+        // Check if dateString is valid
+        if (!dateString || dateString === "Invalid date" || dateString === "undefined" || dateString === "null") {
+            return "Invalid date";
+        }
+        
+        const date = new Date(dateString);
+        
+        // Check if the date is valid
+        if (isNaN(date.getTime())) {
+            return "Invalid date";
+        }
+        
+        const gmt7Date = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+        const formattedDate = gmt7Date.toISOString().slice(0, 10);
+        const formattedTime = gmt7Date.toTimeString().slice(0, 8);
+        return `${formattedDate} ${formattedTime}`;
+    } catch (error) {
+        return "Invalid date";
+    }
  };
 
  async function getEventList(): Promise<GetEventStruct> {
@@ -339,7 +355,11 @@ export default function ManageEvent() {
                     router.push(`/editevent?add=1`)
                 }}
                 sx={{
-                    marginTop: "1.5%"
+                    marginTop: "1.5%",
+                    backgroundColor: role === 'admin' ? '#cc0000' : undefined,
+                    '&:hover': {
+                      backgroundColor: role === 'admin' ? '#b20000' : undefined,
+                    }
                 }}
             >
                 + Add Event

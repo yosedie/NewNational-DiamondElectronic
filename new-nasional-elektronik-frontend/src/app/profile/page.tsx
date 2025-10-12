@@ -369,7 +369,13 @@ export default function DashboardAdmin() {
                         uploadPicture(imageURL as string);
                       }
                     }}
-                    sx={{ marginTop: "3.5%" }}
+                    sx={{
+                      marginTop: "3.5%",
+                      backgroundColor: "#cc0000",
+                      "&:hover": {
+                        backgroundColor: "#aa0000"
+                      }
+                    }}
                   >
                     Ganti Profile Gambar
                   </Button>
@@ -423,6 +429,10 @@ export default function DashboardAdmin() {
                           marginTop: "3.5%",
                           display: "block",
                           borderRadius: 0,
+                          backgroundColor: "#cc0000",
+                          "&:hover": {
+                            backgroundColor: "#aa0000"
+                          }
                       }}
                       variant="contained"
                       color="primary"
@@ -440,6 +450,10 @@ export default function DashboardAdmin() {
                             marginTop: "1.5%",
                             display: "block",
                             borderRadius: 0,
+                            backgroundColor: "#cc0000",
+                            "&:hover": {
+                              backgroundColor: "#aa0000"
+                            }
                         }}
                         variant="contained"
                         color="warning"

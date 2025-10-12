@@ -96,7 +96,7 @@ export default function Home() {
           <iframe 
               width="100%" 
               height="600"
-              src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=-7.639432531767529, 112.90723166818091+(Toko%20Nasional%20Elektronik)&amp;t=&amp;z=20&amp;ie=UTF8&amp;iwloc=B&amp;output=embed">
+              src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=-7.254543013402906, 112.7623816912736+(Toko%Diamond%20Elektronik)&amp;t=&amp;z=20&amp;ie=UTF8&amp;iwloc=B&amp;output=embed">
           </iframe>
       </Box>
       <Footer />
