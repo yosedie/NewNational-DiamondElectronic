@@ -79,8 +79,8 @@ const SearchInput = () => {
   }, []);
 
   return (
-    <div ref={searchRef} className="relative flex w-full">
-      <form className="flex w-full max-w-full" onSubmit={searchProducts}>
+    <div ref={searchRef} className="flex w-full">
+      <form className="relative flex w-full max-w-full" onSubmit={searchProducts}>
         <input
           type="text"
           value={searchInput}
@@ -92,63 +92,63 @@ const SearchInput = () => {
         <button type="submit" className="btn bg-custom-red text-white rounded-l-none rounded-r-xl hover:bg-custom-red">
           Cari
         </button>
-      </form>
 
-      {/* Search Dropdown */}
-      {showDropdown && (
-        <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-lg shadow-xl mt-1 max-h-96 overflow-y-auto">
-          {isLoading ? (
-            <div className="p-4 text-center text-gray-500">
-              <div className="loading loading-spinner loading-sm"></div>
-              <span className="ml-2">Mencari...</span>
-            </div>
-          ) : searchResults.length > 0 ? (
-            searchResults.map((product) => (
-              <Link
-                key={product.id}
-                href={`/product/${product.slug}`}
-                className="flex items-center p-3 hover:bg-gray-100 transition-colors duration-150 border-b border-gray-100 last:border-b-0"
-                onClick={() => {
-                  setShowDropdown(false);
-                  setSearchInput("");
-                }}
-              >
-                <div className="flex-shrink-0 w-12 h-12 mr-3">
-                  <Image
-                    src={
-                      product.mainImage
-                        ? product.mainImage.startsWith('http')
-                          ? product.mainImage
-                          : `/${product.mainImage}`
-                        : "/product_placeholder.jpg"
-                    }
-                    width={48}
-                    height={48}
-                    className="w-full h-full object-cover rounded"
-                    alt={sanitize(product?.title) || "Product image"}
-                    unoptimized={product.mainImage?.startsWith('http')}
-                  />
-                </div>
-                <div className="flex-grow min-w-0">
-                  <h4 className="text-sm font-medium text-gray-900 truncate">
-                    {sanitize(product.title)}
-                  </h4>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-sm font-bold text-custom-red">
-                      ${product.price}
-                    </span>
-                    <ProductItemRating productRating={product?.rating} />
+        {/* Search Dropdown (positioned relative to the form) */}
+        {showDropdown && (
+          <div className="absolute top-full left-0 w-[87%] max-[500px]:w-full z-50 bg-white border border-gray-200 rounded-lg shadow-xl mt-1 max-h-96 overflow-y-auto">
+            {isLoading ? (
+              <div className="p-4 text-center text-gray-500">
+                <div className="loading loading-spinner loading-sm"></div>
+                <span className="ml-2">Mencari...</span>
+              </div>
+            ) : searchResults.length > 0 ? (
+              searchResults.map((product) => (
+                <Link
+                  key={product.id}
+                  href={`/product/${product.slug}`}
+                  className="flex items-center p-3 hover:bg-gray-100 transition-colors duration-150 border-b border-gray-100 last:border-b-0"
+                  onClick={() => {
+                    setShowDropdown(false);
+                    setSearchInput("");
+                  }}
+                >
+                  <div className="flex-shrink-0 w-12 h-12 mr-3">
+                    <Image
+                      src={
+                        product.mainImage
+                          ? product.mainImage.startsWith('http')
+                            ? product.mainImage
+                            : `/${product.mainImage}`
+                          : "/product_placeholder.jpg"
+                      }
+                      width={48}
+                      height={48}
+                      className="w-full h-full object-cover rounded"
+                      alt={sanitize(product?.title) || "Product image"}
+                      unoptimized={product.mainImage?.startsWith('http')}
+                    />
                   </div>
-                </div>
-              </Link>
-            ))
-          ) : searchInput.trim() ? (
-            <div className="p-4 text-center text-gray-500">
-              Tidak ada produk ditemukan untuk "{searchInput}"
-            </div>
-          ) : null}
-        </div>
-      )}
+                  <div className="flex-grow min-w-0">
+                    <h4 className="text-sm font-medium text-gray-900 truncate">
+                      {sanitize(product.title)}
+                    </h4>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-sm font-bold text-custom-red">
+                        ${product.price}
+                      </span>
+                      <ProductItemRating productRating={product?.rating} />
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : searchInput.trim() ? (
+              <div className="p-4 text-center text-gray-500">
+                Tidak ada produk ditemukan untuk "{searchInput}"
+              </div>
+            ) : null}
+          </div>
+        )}
+      </form>
     </div>
   );
 };
