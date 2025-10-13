@@ -143,7 +143,7 @@ const SearchInput = () => {
               ))
             ) : searchInput.trim() ? (
               <div className="p-4 text-center text-gray-500">
-                Tidak ada produk ditemukan untuk "{searchInput}"
+                Tidak ada produk ditemukan untuk &quot;{searchInput}&quot;
               </div>
             ) : null}
           </div>

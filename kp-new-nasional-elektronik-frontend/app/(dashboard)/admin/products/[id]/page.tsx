@@ -268,8 +268,9 @@ const DashboardProductDetails = ({
           <input
             type="file"
             className="file-input file-input-bordered file-input-lg w-full max-w-sm"
-            onChange={(e) => {
-              const selectedFile = e.target.files[0];
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              const fileList = e.target.files;
+              const selectedFile = fileList && fileList.length > 0 ? fileList[0] : null;
 
               if (selectedFile) {
                 uploadFile(selectedFile);

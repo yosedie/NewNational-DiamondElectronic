@@ -14,3 +14,7 @@ node_modules/
 /new-nasional-elektronik-frontend/.next/cache/webpack
 /new-nasional-elektronik-frontend/.next/cache/webpack/client-development
 *.gz
+
+
+.github/instructions/kluster-code-verify.instructions.md
+.kluster

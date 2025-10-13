@@ -3,12 +3,8 @@ import apiClient from "@/lib/api";
 import React from "react";
 import { sanitize } from "@/lib/sanitize";
 
-interface Props {
-  searchParams: { search: string };
-}
-
 // sending api request for search results for a given search text
-const SearchPage = async ({ searchParams }: Props) => {
+const SearchPage = async ({ searchParams }: { searchParams: Promise<{ search?: string }> }) => {
   const sp = await searchParams;
   const data = await apiClient.get(
     `/api/search?query=${sp?.search || ""}`
