@@ -10,7 +10,7 @@ figma.ui.onmessage = async (msg) => {
     try {
       await generateAllPages();
       figma.ui.postMessage({ type: 'generation-complete' });
-      figma.notify('🎉 All 3 pages generated successfully!');
+      figma.notify('🎉 All 5 pages generated successfully!');
     } catch (error) {
       console.error('Error generating pages:', error);
       figma.notify('❌ Error: ' + error.message, { error: true });
@@ -661,7 +661,7 @@ async function generatePages() {
 }
 
 // ==========================================
-// GENERATE ALL PAGES (HOMEPAGE + SHOP PAGE + PRODUCT DETAIL PAGE)
+// GENERATE ALL PAGES (HOMEPAGE + SHOP PAGE + PRODUCT DETAIL PAGE + LOGIN + REGISTER)
 // ==========================================
 async function generateAllPages() {
   try {
@@ -678,7 +678,7 @@ async function generateAllPages() {
     figma.currentPage = page;
 
     // Generate Homepage
-    figma.notify('Generating Homepage... (1/3)');
+    figma.notify('Generating Homepage... (1/5)');
     const homepage = await createHomepageFrame();
     homepage.x = 0;
     homepage.y = 0;
@@ -686,7 +686,7 @@ async function generateAllPages() {
     console.log('Homepage created and appended');
     
     // Generate Shop Page
-    figma.notify('Generating Shop Page... (2/3)');
+    figma.notify('Generating Shop Page... (2/5)');
     const shopPage = await createShopPageFrame();
     shopPage.x = 1600; // Position to the right of homepage
     shopPage.y = 0;
@@ -694,18 +694,34 @@ async function generateAllPages() {
     console.log('Shop Page created and appended');
 
     // Generate Product Detail Page
-    figma.notify('Generating Product Detail Page... (3/3)');
+    figma.notify('Generating Product Detail Page... (3/5)');
     const productDetailPage = await createProductDetailFrame();
     productDetailPage.x = 3200; // Position to the right of shop page
     productDetailPage.y = 0;
     page.appendChild(productDetailPage);
     console.log('Product Detail Page created and appended');
 
+    // Generate Login Page
+    figma.notify('Generating Login Page... (4/5)');
+    const loginPage = await createLoginFrame();
+    loginPage.x = 4800; // Position to the right of product detail page
+    loginPage.y = 0;
+    page.appendChild(loginPage);
+    console.log('Login Page created and appended');
+
+    // Generate Register Page
+    figma.notify('Generating Register Page... (5/5)');
+    const registerPage = await createRegisterFrame();
+    registerPage.x = 6400; // Position to the right of login page
+    registerPage.y = 0;
+    page.appendChild(registerPage);
+    console.log('Register Page created and appended');
+
     // Zoom to fit all pages
     figma.notify('Finalizing...');
-    figma.viewport.scrollAndZoomIntoView([homepage, shopPage, productDetailPage]);
+    figma.viewport.scrollAndZoomIntoView([homepage, shopPage, productDetailPage, loginPage, registerPage]);
     
-    console.log('All 3 pages generated successfully');
+    console.log('All 5 pages generated successfully');
   } catch (error) {
     console.error('Error in generateAllPages:', error);
     throw error;
@@ -1001,6 +1017,351 @@ async function createProductDetailFrame() {
   } catch (error) {
     console.error('Error in createProductDetailFrame:', error);
     throw new Error('Failed to create Product Detail Page: ' + error.message);
+  }
+}
+
+// Create Login Page Frame
+async function createLoginFrame() {
+  try {
+    const loginPage = figma.createFrame();
+    loginPage.name = "Login Page - Desktop";
+    loginPage.resize(1440, 900);
+    loginPage.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    loginPage.layoutMode = 'VERTICAL';
+
+    // Add header
+    const header = await createHeader();
+    loginPage.appendChild(header);
+
+    // Section Title Area
+    const sectionTitle = createSectionTitleComponent("Masuk", "Home | Masuk");
+    loginPage.appendChild(sectionTitle);
+
+    // Main Content Container
+    const mainContent = figma.createFrame();
+    mainContent.name = "Main Content";
+    mainContent.resize(1440, 600);
+    mainContent.fills = [];
+    mainContent.layoutMode = 'VERTICAL';
+    mainContent.primaryAxisAlignItems = 'CENTER';
+    mainContent.counterAxisAlignItems = 'CENTER';
+    mainContent.paddingTop = 48;
+    mainContent.paddingBottom = 48;
+    mainContent.itemSpacing = 20;
+
+    // Page Title
+    const pageTitle = figma.createText();
+    pageTitle.fontName = { family: 'Inter', style: 'Regular' };
+    pageTitle.fontSize = 24;
+    pageTitle.characters = "Masuk ke akun anda";
+    pageTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    mainContent.appendChild(pageTitle);
+
+    // Form Card
+    const formCard = figma.createFrame();
+    formCard.name = "Form Card";
+    formCard.resize(480, 500);
+    formCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    formCard.cornerRadius = 8;
+    formCard.layoutMode = 'VERTICAL';
+    formCard.paddingTop = 48;
+    formCard.paddingBottom = 48;
+    formCard.paddingLeft = 48;
+    formCard.paddingRight = 48;
+    formCard.itemSpacing = 24;
+    formCard.effects = [{
+      type: 'DROP_SHADOW',
+      color: { r: 0, g: 0, b: 0, a: 0.1 },
+      offset: { x: 0, y: 4 },
+      radius: 16,
+      visible: true,
+      blendMode: 'NORMAL'
+    }];
+
+    // Email Input
+    const emailInput = createFormInput("Alamat email", "email", "email");
+    formCard.appendChild(emailInput);
+
+    // Password Input
+    const passwordInput = createFormInput("Password", "password", "password");
+    formCard.appendChild(passwordInput);
+
+    // Remember Me & Forgot Password Row
+    const optionsRow = figma.createFrame();
+    optionsRow.name = "Options Row";
+    optionsRow.resize(384, 24);
+    optionsRow.fills = [];
+    optionsRow.layoutMode = 'HORIZONTAL';
+    optionsRow.primaryAxisSizingMode = 'FIXED';
+    optionsRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+
+    // Remember Me Checkbox
+    const rememberMe = figma.createFrame();
+    rememberMe.name = "Remember Me";
+    rememberMe.resize(150, 24);
+    rememberMe.fills = [];
+    rememberMe.layoutMode = 'HORIZONTAL';
+    rememberMe.itemSpacing = 8;
+
+    const checkbox = figma.createFrame();
+    checkbox.name = "Checkbox";
+    checkbox.resize(16, 16);
+    checkbox.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    checkbox.strokeWeight = 1;
+    checkbox.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+    checkbox.cornerRadius = 4;
+    rememberMe.appendChild(checkbox);
+
+    const rememberText = figma.createText();
+    rememberText.fontName = { family: 'Inter', style: 'Regular' };
+    rememberText.fontSize = 14;
+    rememberText.characters = "Simpan login";
+    rememberText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    rememberMe.appendChild(rememberText);
+
+    optionsRow.appendChild(rememberMe);
+
+    // Forgot Password Link
+    const forgotPassword = figma.createText();
+    forgotPassword.fontName = { family: 'Inter', style: 'Bold' };
+    forgotPassword.fontSize = 14;
+    forgotPassword.characters = "Lupa password?";
+    forgotPassword.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+    optionsRow.appendChild(forgotPassword);
+
+    formCard.appendChild(optionsRow);
+
+    // Submit Button
+    const submitBtn = figma.createFrame();
+    submitBtn.name = "Submit Button";
+    submitBtn.resize(384, 46);
+    submitBtn.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+    submitBtn.cornerRadius = 6;
+    submitBtn.layoutMode = 'HORIZONTAL';
+    submitBtn.primaryAxisAlignItems = 'CENTER';
+    submitBtn.counterAxisAlignItems = 'CENTER';
+
+    const submitText = figma.createText();
+    submitText.fontName = { family: 'Inter', style: 'Bold' };
+    submitText.fontSize = 14;
+    submitText.characters = "Masuk";
+    submitText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    submitBtn.appendChild(submitText);
+
+    formCard.appendChild(submitBtn);
+
+    // Divider with "Atau lanjutkan dengan"
+    const dividerSection = figma.createFrame();
+    dividerSection.name = "Divider Section";
+    dividerSection.resize(384, 40);
+    dividerSection.fills = [];
+    dividerSection.layoutMode = 'HORIZONTAL';
+    dividerSection.primaryAxisAlignItems = 'CENTER';
+    dividerSection.counterAxisAlignItems = 'CENTER';
+    dividerSection.itemSpacing = 12;
+
+    const dividerLeft = figma.createRectangle();
+    dividerLeft.name = "Divider Left";
+    dividerLeft.resize(140, 1);
+    dividerLeft.fills = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+    dividerSection.appendChild(dividerLeft);
+
+    const dividerText = figma.createText();
+    dividerText.fontName = { family: 'Inter', style: 'Medium' };
+    dividerText.fontSize = 14;
+    dividerText.characters = "Atau lanjutkan dengan";
+    dividerText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    dividerSection.appendChild(dividerText);
+
+    const dividerRight = figma.createRectangle();
+    dividerRight.name = "Divider Right";
+    dividerRight.resize(140, 1);
+    dividerRight.fills = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+    dividerSection.appendChild(dividerRight);
+
+    formCard.appendChild(dividerSection);
+
+    // Google Sign In Button
+    const googleBtn = figma.createFrame();
+    googleBtn.name = "Google Sign In";
+    googleBtn.resize(384, 46);
+    googleBtn.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    googleBtn.strokeWeight = 1;
+    googleBtn.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+    googleBtn.cornerRadius = 6;
+    googleBtn.layoutMode = 'HORIZONTAL';
+    googleBtn.primaryAxisAlignItems = 'CENTER';
+    googleBtn.counterAxisAlignItems = 'CENTER';
+    googleBtn.itemSpacing = 12;
+
+    const googleIcon = figma.createText();
+    googleIcon.fontName = { family: 'Inter', style: 'Regular' };
+    googleIcon.fontSize = 20;
+    googleIcon.characters = "G";
+    googleIcon.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+    googleBtn.appendChild(googleIcon);
+
+    const googleText = figma.createText();
+    googleText.fontName = { family: 'Inter', style: 'Bold' };
+    googleText.fontSize = 14;
+    googleText.characters = "Google";
+    googleText.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+    googleBtn.appendChild(googleText);
+
+    formCard.appendChild(googleBtn);
+
+    mainContent.appendChild(formCard);
+    loginPage.appendChild(mainContent);
+
+    // Add footer
+    const footer = await createFooter();
+    loginPage.appendChild(footer);
+
+    console.log('Login Page frame created successfully');
+    return loginPage;
+  } catch (error) {
+    console.error('Error in createLoginFrame:', error);
+    throw new Error('Failed to create Login Page: ' + error.message);
+  }
+}
+
+// Create Register Page Frame
+async function createRegisterFrame() {
+  try {
+    const registerPage = figma.createFrame();
+    registerPage.name = "Register Page - Desktop";
+    registerPage.resize(1440, 1000);
+    registerPage.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    registerPage.layoutMode = 'VERTICAL';
+
+    // Add header
+    const header = await createHeader();
+    registerPage.appendChild(header);
+
+    // Section Title Area
+    const sectionTitle = createSectionTitleComponent("Daftar", "Home | Daftar");
+    registerPage.appendChild(sectionTitle);
+
+    // Main Content Container
+    const mainContent = figma.createFrame();
+    mainContent.name = "Main Content";
+    mainContent.resize(1440, 700);
+    mainContent.fills = [];
+    mainContent.layoutMode = 'VERTICAL';
+    mainContent.primaryAxisAlignItems = 'CENTER';
+    mainContent.counterAxisAlignItems = 'CENTER';
+    mainContent.paddingTop = 48;
+    mainContent.paddingBottom = 48;
+    mainContent.itemSpacing = 20;
+
+    // Page Title
+    const pageTitle = figma.createText();
+    pageTitle.fontName = { family: 'Inter', style: 'Regular' };
+    pageTitle.fontSize = 24;
+    pageTitle.characters = "Daftar dalam website kami";
+    pageTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    mainContent.appendChild(pageTitle);
+
+    // Form Card
+    const formCard = figma.createFrame();
+    formCard.name = "Form Card";
+    formCard.resize(480, 600);
+    formCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    formCard.cornerRadius = 8;
+    formCard.layoutMode = 'VERTICAL';
+    formCard.paddingTop = 48;
+    formCard.paddingBottom = 48;
+    formCard.paddingLeft = 48;
+    formCard.paddingRight = 48;
+    formCard.itemSpacing = 24;
+    formCard.effects = [{
+      type: 'DROP_SHADOW',
+      color: { r: 0, g: 0, b: 0, a: 0.1 },
+      offset: { x: 0, y: 4 },
+      radius: 16,
+      visible: true,
+      blendMode: 'NORMAL'
+    }];
+
+    // First Name Input
+    const firstNameInput = createFormInput("Nama depan", "text", "name");
+    formCard.appendChild(firstNameInput);
+
+    // Last Name Input
+    const lastNameInput = createFormInput("Nama belakang", "text", "lastname");
+    formCard.appendChild(lastNameInput);
+
+    // Email Input
+    const emailInput = createFormInput("Alamat email", "email", "email");
+    formCard.appendChild(emailInput);
+
+    // Password Input
+    const passwordInput = createFormInput("Password", "password", "password");
+    formCard.appendChild(passwordInput);
+
+    // Confirm Password Input
+    const confirmPasswordInput = createFormInput("Ulangi password", "password", "confirmpassword");
+    formCard.appendChild(confirmPasswordInput);
+
+    // Terms Checkbox
+    const termsRow = figma.createFrame();
+    termsRow.name = "Terms Row";
+    termsRow.resize(384, 24);
+    termsRow.fills = [];
+    termsRow.layoutMode = 'HORIZONTAL';
+    termsRow.itemSpacing = 8;
+
+    const checkbox = figma.createFrame();
+    checkbox.name = "Checkbox";
+    checkbox.resize(16, 16);
+    checkbox.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    checkbox.strokeWeight = 1;
+    checkbox.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+    checkbox.cornerRadius = 4;
+    termsRow.appendChild(checkbox);
+
+    const termsText = figma.createText();
+    termsText.fontName = { family: 'Inter', style: 'Regular' };
+    termsText.fontSize = 14;
+    termsText.characters = "Terima persyaratan dan kebijakan privasi kami";
+    termsText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    termsText.resize(350, 24);
+    termsText.textAutoResize = 'HEIGHT';
+    termsRow.appendChild(termsText);
+
+    formCard.appendChild(termsRow);
+
+    // Submit Button
+    const submitBtn = figma.createFrame();
+    submitBtn.name = "Submit Button";
+    submitBtn.resize(384, 46);
+    submitBtn.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+    submitBtn.cornerRadius = 6;
+    submitBtn.layoutMode = 'HORIZONTAL';
+    submitBtn.primaryAxisAlignItems = 'CENTER';
+    submitBtn.counterAxisAlignItems = 'CENTER';
+
+    const submitText = figma.createText();
+    submitText.fontName = { family: 'Inter', style: 'Bold' };
+    submitText.fontSize = 14;
+    submitText.characters = "Daftar";
+    submitText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    submitBtn.appendChild(submitText);
+
+    formCard.appendChild(submitBtn);
+
+    mainContent.appendChild(formCard);
+    registerPage.appendChild(mainContent);
+
+    // Add footer
+    const footer = await createFooter();
+    registerPage.appendChild(footer);
+
+    console.log('Register Page frame created successfully');
+    return registerPage;
+  } catch (error) {
+    console.error('Error in createRegisterFrame:', error);
+    throw new Error('Failed to create Register Page: ' + error.message);
   }
 }
 
@@ -2234,4 +2595,80 @@ function createProductSummaryCard() {
   summaryCard.appendChild(actionsSection);
 
   return summaryCard;
+}
+
+// ==========================================
+// HELPER FUNCTIONS FOR LOGIN & REGISTER PAGES
+// ==========================================
+
+// Create Section Title Component
+function createSectionTitleComponent(title, breadcrumb) {
+  const sectionTitle = figma.createFrame();
+  sectionTitle.name = "Section Title";
+  sectionTitle.resize(1440, 80);
+  sectionTitle.fills = [{ type: 'SOLID', color: { r: 0.98, g: 0.98, b: 0.98 } }];
+  sectionTitle.layoutMode = 'VERTICAL';
+  sectionTitle.primaryAxisAlignItems = 'CENTER';
+  sectionTitle.counterAxisAlignItems = 'CENTER';
+  sectionTitle.itemSpacing = 8;
+
+  const titleText = figma.createText();
+  titleText.fontName = { family: 'Inter', style: 'Bold' };
+  titleText.fontSize = 28;
+  titleText.characters = title;
+  titleText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  sectionTitle.appendChild(titleText);
+
+  const breadcrumbText = figma.createText();
+  breadcrumbText.fontName = { family: 'Inter', style: 'Regular' };
+  breadcrumbText.fontSize = 14;
+  breadcrumbText.characters = breadcrumb;
+  breadcrumbText.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  sectionTitle.appendChild(breadcrumbText);
+
+  return sectionTitle;
+}
+
+// Create Form Input Component
+function createFormInput(label, inputType, name) {
+  const inputGroup = figma.createFrame();
+  inputGroup.name = `${label} Input`;
+  inputGroup.resize(384, 70);
+  inputGroup.fills = [];
+  inputGroup.layoutMode = 'VERTICAL';
+  inputGroup.itemSpacing = 8;
+
+  // Label
+  const labelText = figma.createText();
+  labelText.fontName = { family: 'Inter', style: 'Medium' };
+  labelText.fontSize = 14;
+  labelText.characters = label;
+  labelText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  inputGroup.appendChild(labelText);
+
+  // Input Field
+  const inputField = figma.createFrame();
+  inputField.name = "Input Field";
+  inputField.resize(384, 46);
+  inputField.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  inputField.strokeWeight = 1;
+  inputField.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+  inputField.cornerRadius = 6;
+  inputField.layoutMode = 'HORIZONTAL';
+  inputField.paddingLeft = 12;
+  inputField.paddingRight = 12;
+  inputField.primaryAxisAlignItems = 'MIN';
+  inputField.counterAxisAlignItems = 'CENTER';
+
+  // Placeholder text
+  const placeholder = figma.createText();
+  placeholder.fontName = { family: 'Inter', style: 'Regular' };
+  placeholder.fontSize = 14;
+  placeholder.characters = inputType === 'password' ? '••••••••' : `Enter ${label.toLowerCase()}`;
+  placeholder.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  inputField.appendChild(placeholder);
+
+  inputGroup.appendChild(inputField);
+
+  return inputGroup;
 }
