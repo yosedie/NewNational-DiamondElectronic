@@ -21,6 +21,9 @@ figma.ui.onmessage = async (msg) => {
   } else if (msg.type === 'generate-pages') {
     await generatePages();
     figma.notify('Page templates generated! ✅');
+  } else if (msg.type === 'generate-shop-page') {
+    await generateShopPage();
+    figma.notify('Shop page generated! ✅');
   } else if (msg.type === 'setup-styles') {
     await setupDesignTokens();
     figma.notify('Design tokens and styles created! ✅');
@@ -688,4 +691,471 @@ async function generateAllComponents() {
   figma.notify('Pages created! ✅');
   
   figma.notify('🎉 All components generated successfully!');
+}
+
+// ==========================================
+// GENERATE SHOP PAGE (LISTING PAGE)
+// ==========================================
+async function generateShopPage() {
+  const page = figma.createPage();
+  page.name = "📄 Shop/Listing Page";
+  figma.currentPage = page;
+
+  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
+  await figma.loadFontAsync({ family: 'Inter', style: 'Medium' });
+  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' });
+
+  // Create main shop page frame
+  const shopPage = figma.createFrame();
+  shopPage.name = "Shop Page - Desktop";
+  shopPage.resize(1440, 3000);
+  shopPage.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  shopPage.layoutMode = 'VERTICAL';
+
+  // Add header
+  const header = await createHeader();
+  shopPage.appendChild(header);
+
+  // Create main content container
+  const mainContent = figma.createFrame();
+  mainContent.name = "Main Content";
+  mainContent.resize(1440, 2500);
+  mainContent.fills = [];
+  mainContent.layoutMode = 'VERTICAL';
+  mainContent.paddingLeft = 80;
+  mainContent.paddingRight = 80;
+  mainContent.paddingTop = 40;
+  mainContent.paddingBottom = 60;
+  mainContent.itemSpacing = 20;
+
+  // Add Breadcrumb
+  const breadcrumb = createBreadcrumb();
+  mainContent.appendChild(breadcrumb);
+
+  // Create two-column layout (Filters + Products)
+  const contentGrid = figma.createFrame();
+  contentGrid.name = "Content Grid";
+  contentGrid.resize(1280, 2200);
+  contentGrid.fills = [];
+  contentGrid.layoutMode = 'HORIZONTAL';
+  contentGrid.itemSpacing = 40;
+  contentGrid.primaryAxisSizingMode = 'FIXED';
+
+  // Left sidebar - Filters (200px)
+  const filtersSidebar = createFiltersSidebar();
+  contentGrid.appendChild(filtersSidebar);
+
+  // Right content area
+  const productsArea = figma.createFrame();
+  productsArea.name = "Products Area";
+  productsArea.resize(1040, 2200);
+  productsArea.fills = [];
+  productsArea.layoutMode = 'VERTICAL';
+  productsArea.itemSpacing = 24;
+
+  // Header with title and sort
+  const productsHeader = figma.createFrame();
+  productsHeader.name = "Products Header";
+  productsHeader.resize(1040, 60);
+  productsHeader.fills = [];
+  productsHeader.layoutMode = 'HORIZONTAL';
+  productsHeader.primaryAxisAlignItems = 'CENTER';
+  productsHeader.counterAxisAlignItems = 'CENTER';
+
+  // Title
+  const pageTitle = figma.createText();
+  pageTitle.fontName = { family: 'Inter', style: 'Bold' };
+  pageTitle.fontSize = 24;
+  pageTitle.characters = "SEMUA PRODUK";
+  pageTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  pageTitle.layoutGrow = 1;
+  productsHeader.appendChild(pageTitle);
+
+  // Sort By dropdown
+  const sortBy = createSortByDropdown();
+  productsHeader.appendChild(sortBy);
+
+  productsArea.appendChild(productsHeader);
+
+  // Divider
+  const divider = figma.createRectangle();
+  divider.name = "Divider";
+  divider.resize(1040, 1);
+  divider.fills = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  productsArea.appendChild(divider);
+
+  // Products Grid
+  const productsGrid = figma.createFrame();
+  productsGrid.name = "Products Grid";
+  productsGrid.resize(1040, 1800);
+  productsGrid.fills = [];
+  productsGrid.layoutMode = 'HORIZONTAL';
+  productsGrid.primaryAxisSizingMode = 'FIXED';
+  productsGrid.counterAxisSizingMode = 'AUTO';
+  productsGrid.primaryAxisAlignItems = 'MIN';
+  productsGrid.itemSpacing = 24;
+  productsGrid.counterAxisSpacing = 24;
+  productsGrid.layoutWrap = 'WRAP';
+
+  // Generate 12 product cards (3 columns x 4 rows)
+  for (let i = 0; i < 12; i++) {
+    const productCard = await createProductCard();
+    productCard.resize(320, 420);
+    productsGrid.appendChild(productCard);
+  }
+
+  productsArea.appendChild(productsGrid);
+
+  // Pagination
+  const pagination = createPagination();
+  productsArea.appendChild(pagination);
+
+  contentGrid.appendChild(productsArea);
+  mainContent.appendChild(contentGrid);
+
+  shopPage.appendChild(mainContent);
+
+  // Add footer
+  const footer = await createFooter();
+  shopPage.appendChild(footer);
+
+  figma.viewport.scrollAndZoomIntoView([shopPage]);
+}
+
+// Create Breadcrumb Component
+function createBreadcrumb() {
+  const breadcrumb = figma.createFrame();
+  breadcrumb.name = "Breadcrumb";
+  breadcrumb.resize(1280, 40);
+  breadcrumb.fills = [];
+  breadcrumb.layoutMode = 'HORIZONTAL';
+  breadcrumb.primaryAxisAlignItems = 'CENTER';
+  breadcrumb.itemSpacing = 8;
+
+  const breadcrumbItems = ['🏠 Home', '>', 'Belanja', '>', 'Semua produk'];
+  breadcrumbItems.forEach((item, index) => {
+    const breadcrumbItem = figma.createText();
+    breadcrumbItem.fontName = { family: 'Inter', style: index === breadcrumbItems.length - 1 ? 'Medium' : 'Regular' };
+    breadcrumbItem.fontSize = 16;
+    breadcrumbItem.characters = item;
+    breadcrumbItem.fills = [{ type: 'SOLID', color: item === '>' ? { r: 0.61, g: 0.64, b: 0.69 } : { r: 0.23, g: 0.51, b: 0.96 } }];
+    breadcrumb.appendChild(breadcrumbItem);
+  });
+
+  return breadcrumb;
+}
+
+// Create Filters Sidebar
+function createFiltersSidebar() {
+  const sidebar = figma.createFrame();
+  sidebar.name = "Filters Sidebar";
+  sidebar.resize(200, 600);
+  sidebar.fills = [{ type: 'SOLID', color: { r: 0.98, g: 0.98, b: 0.98 } }];
+  sidebar.cornerRadius = 8;
+  sidebar.paddingLeft = 20;
+  sidebar.paddingRight = 20;
+  sidebar.paddingTop = 24;
+  sidebar.paddingBottom = 24;
+  sidebar.layoutMode = 'VERTICAL';
+  sidebar.itemSpacing = 20;
+
+  // Filters Title
+  const filtersTitle = figma.createText();
+  filtersTitle.fontName = { family: 'Inter', style: 'Bold' };
+  filtersTitle.fontSize = 20;
+  filtersTitle.characters = "Filters";
+  filtersTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  sidebar.appendChild(filtersTitle);
+
+  // Divider 1
+  const divider1 = figma.createRectangle();
+  divider1.name = "Divider";
+  divider1.resize(160, 1);
+  divider1.fills = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+  sidebar.appendChild(divider1);
+
+  // Ketersediaan Section
+  const availabilitySection = figma.createFrame();
+  availabilitySection.name = "Availability Section";
+  availabilitySection.resize(160, 120);
+  availabilitySection.fills = [];
+  availabilitySection.layoutMode = 'VERTICAL';
+  availabilitySection.itemSpacing = 12;
+
+  const availabilityTitle = figma.createText();
+  availabilityTitle.fontName = { family: 'Inter', style: 'Medium' };
+  availabilityTitle.fontSize = 18;
+  availabilityTitle.characters = "Ketersediaan";
+  availabilityTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  availabilitySection.appendChild(availabilityTitle);
+
+  // In Stock checkbox
+  const inStockCheck = createCheckboxItem("☑ Stock tersedia");
+  availabilitySection.appendChild(inStockCheck);
+
+  // Out of Stock checkbox
+  const outStockCheck = createCheckboxItem("☑ Stock habis");
+  availabilitySection.appendChild(outStockCheck);
+
+  sidebar.appendChild(availabilitySection);
+
+  // Divider 2
+  const divider2 = figma.createRectangle();
+  divider2.name = "Divider";
+  divider2.resize(160, 1);
+  divider2.fills = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+  sidebar.appendChild(divider2);
+
+  // Price Filter Section
+  const priceSection = figma.createFrame();
+  priceSection.name = "Price Section";
+  priceSection.resize(160, 100);
+  priceSection.fills = [];
+  priceSection.layoutMode = 'VERTICAL';
+  priceSection.itemSpacing = 12;
+
+  const priceTitle = figma.createText();
+  priceTitle.fontName = { family: 'Inter', style: 'Medium' };
+  priceTitle.fontSize = 18;
+  priceTitle.characters = "Harga";
+  priceTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  priceSection.appendChild(priceTitle);
+
+  const priceSlider = createSlider(160, "Harga maksimal: $3000");
+  priceSection.appendChild(priceSlider);
+
+  sidebar.appendChild(priceSection);
+
+  // Divider 3
+  const divider3 = figma.createRectangle();
+  divider3.name = "Divider";
+  divider3.resize(160, 1);
+  divider3.fills = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+  sidebar.appendChild(divider3);
+
+  // Rating Filter Section
+  const ratingSection = figma.createFrame();
+  ratingSection.name = "Rating Section";
+  ratingSection.resize(160, 120);
+  ratingSection.fills = [];
+  ratingSection.layoutMode = 'VERTICAL';
+  ratingSection.itemSpacing = 12;
+
+  const ratingTitle = figma.createText();
+  ratingTitle.fontName = { family: 'Inter', style: 'Medium' };
+  ratingTitle.fontSize = 18;
+  ratingTitle.characters = "Minimum Rating:";
+  ratingTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  ratingSection.appendChild(ratingTitle);
+
+  const ratingSlider = createRatingSlider(160);
+  ratingSection.appendChild(ratingSlider);
+
+  sidebar.appendChild(ratingSection);
+
+  return sidebar;
+}
+
+// Create Checkbox Item
+function createCheckboxItem(label) {
+  const checkboxItem = figma.createFrame();
+  checkboxItem.name = "Checkbox Item";
+  checkboxItem.resize(160, 28);
+  checkboxItem.fills = [];
+  checkboxItem.layoutMode = 'HORIZONTAL';
+  checkboxItem.primaryAxisAlignItems = 'CENTER';
+  checkboxItem.itemSpacing = 8;
+
+  const checkboxText = figma.createText();
+  checkboxText.fontName = { family: 'Inter', style: 'Regular' };
+  checkboxText.fontSize = 16;
+  checkboxText.characters = label;
+  checkboxText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  checkboxItem.appendChild(checkboxText);
+
+  return checkboxItem;
+}
+
+// Create Slider Component
+function createSlider(width, label) {
+  const sliderContainer = figma.createFrame();
+  sliderContainer.name = "Slider";
+  sliderContainer.resize(width, 50);
+  sliderContainer.fills = [];
+  sliderContainer.layoutMode = 'VERTICAL';
+  sliderContainer.itemSpacing = 8;
+
+  // Slider track
+  const sliderTrack = figma.createFrame();
+  sliderTrack.name = "Slider Track";
+  sliderTrack.resize(width, 6);
+  sliderTrack.fills = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+  sliderTrack.cornerRadius = 3;
+
+  // Slider filled
+  const sliderFilled = figma.createRectangle();
+  sliderFilled.name = "Slider Filled";
+  sliderFilled.resize(width * 0.7, 6);
+  sliderFilled.fills = [{ type: 'SOLID', color: { r: 0.23, g: 0.51, b: 0.96 } }];
+  sliderFilled.cornerRadius = 3;
+  sliderTrack.appendChild(sliderFilled);
+
+  sliderContainer.appendChild(sliderTrack);
+
+  // Label
+  const sliderLabel = figma.createText();
+  sliderLabel.fontName = { family: 'Inter', style: 'Regular' };
+  sliderLabel.fontSize = 14;
+  sliderLabel.characters = label;
+  sliderLabel.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+  sliderContainer.appendChild(sliderLabel);
+
+  return sliderContainer;
+}
+
+// Create Rating Slider with markers
+function createRatingSlider(width) {
+  const sliderContainer = figma.createFrame();
+  sliderContainer.name = "Rating Slider";
+  sliderContainer.resize(width, 60);
+  sliderContainer.fills = [];
+  sliderContainer.layoutMode = 'VERTICAL';
+  sliderContainer.itemSpacing = 8;
+
+  // Slider track
+  const sliderTrack = figma.createFrame();
+  sliderTrack.name = "Slider Track";
+  sliderTrack.resize(width, 6);
+  sliderTrack.fills = [{ type: 'SOLID', color: { r: 0.06, g: 0.72, b: 0.51 } }];
+  sliderTrack.cornerRadius = 3;
+
+  sliderContainer.appendChild(sliderTrack);
+
+  // Rating markers (0-5)
+  const markers = figma.createFrame();
+  markers.name = "Rating Markers";
+  markers.resize(width, 20);
+  markers.fills = [];
+  markers.layoutMode = 'HORIZONTAL';
+  markers.primaryAxisSizingMode = 'FIXED';
+  markers.primaryAxisAlignItems = 'SPACE_BETWEEN';
+
+  const ratings = ['0', '1', '2', '3', '4', '5'];
+  ratings.forEach(rating => {
+    const marker = figma.createText();
+    marker.fontName = { family: 'Inter', style: 'Regular' };
+    marker.fontSize = 12;
+    marker.characters = rating;
+    marker.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    markers.appendChild(marker);
+  });
+
+  sliderContainer.appendChild(markers);
+
+  return sliderContainer;
+}
+
+// Create Sort By Dropdown
+function createSortByDropdown() {
+  const sortByContainer = figma.createFrame();
+  sortByContainer.name = "Sort By";
+  sortByContainer.resize(400, 50);
+  sortByContainer.fills = [];
+  sortByContainer.layoutMode = 'HORIZONTAL';
+  sortByContainer.primaryAxisAlignItems = 'CENTER';
+  sortByContainer.itemSpacing = 20;
+
+  const sortLabel = figma.createText();
+  sortLabel.fontName = { family: 'Inter', style: 'Medium' };
+  sortLabel.fontSize = 18;
+  sortLabel.characters = "Urutkan bedasarkan:";
+  sortLabel.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  sortByContainer.appendChild(sortLabel);
+
+  // Dropdown
+  const dropdown = figma.createFrame();
+  dropdown.name = "Dropdown";
+  dropdown.resize(200, 44);
+  dropdown.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  dropdown.strokes = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  dropdown.strokeWeight = 2;
+  dropdown.cornerRadius = 8;
+  dropdown.paddingLeft = 16;
+  dropdown.paddingRight = 16;
+  dropdown.layoutMode = 'HORIZONTAL';
+  dropdown.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  dropdown.counterAxisAlignItems = 'CENTER';
+
+  const dropdownText = figma.createText();
+  dropdownText.fontName = { family: 'Inter', style: 'Regular' };
+  dropdownText.fontSize = 16;
+  dropdownText.characters = "Default";
+  dropdownText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  dropdown.appendChild(dropdownText);
+
+  const dropdownArrow = figma.createText();
+  dropdownArrow.fontName = { family: 'Inter', style: 'Regular' };
+  dropdownArrow.fontSize = 16;
+  dropdownArrow.characters = "▼";
+  dropdownArrow.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+  dropdown.appendChild(dropdownArrow);
+
+  sortByContainer.appendChild(dropdown);
+
+  return sortByContainer;
+}
+
+// Create Pagination Component
+function createPagination() {
+  const pagination = figma.createFrame();
+  pagination.name = "Pagination";
+  pagination.resize(1040, 80);
+  pagination.fills = [];
+  pagination.layoutMode = 'HORIZONTAL';
+  pagination.primaryAxisAlignItems = 'CENTER';
+  pagination.counterAxisAlignItems = 'CENTER';
+  pagination.itemSpacing = 12;
+
+  // Previous button
+  const prevBtn = createPaginationButton("«");
+  pagination.appendChild(prevBtn);
+
+  // Current page
+  const currentPage = createPaginationButton("Page 1", true);
+  pagination.appendChild(currentPage);
+
+  // Next button
+  const nextBtn = createPaginationButton("»");
+  pagination.appendChild(nextBtn);
+
+  return pagination;
+}
+
+// Create Pagination Button
+function createPaginationButton(label, isCurrent = false) {
+  const button = figma.createFrame();
+  button.name = `Pagination ${label}`;
+  button.resize(label.includes('Page') ? 100 : 50, 50);
+  button.fills = [{ type: 'SOLID', color: isCurrent ? { r: 0.94, g: 0.27, b: 0.27 } : { r: 0.94, g: 0.27, b: 0.27 } }];
+  button.cornerRadius = 8;
+  button.layoutMode = 'HORIZONTAL';
+  button.primaryAxisAlignItems = 'CENTER';
+  button.counterAxisAlignItems = 'CENTER';
+  button.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.1 },
+    offset: { x: 0, y: 2 },
+    radius: 4,
+    visible: true,
+    blendMode: 'NORMAL'
+  }];
+
+  const buttonText = figma.createText();
+  buttonText.fontName = { family: 'Inter', style: 'Bold' };
+  buttonText.fontSize = 16;
+  buttonText.characters = label;
+  buttonText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  button.appendChild(buttonText);
+
+  return button;
 }

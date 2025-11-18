@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Page Wireframe - Nasional Elektronik</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .wireframe-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .header-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 80px;
+            gap: 24px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3B82F6;
+        }
+
+        .search-bar {
+            flex: 1;
+            height: 44px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            color: #9CA3AF;
+        }
+
+        .header-icons {
+            font-size: 20px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .navigation {
+            background: #F8F8F8;
+            padding: 12px 80px;
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-item {
+            color: #374151;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 40px 80px 60px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .breadcrumb a {
+            color: #3B82F6;
+            text-decoration: none;
+        }
+
+        .breadcrumb .separator {
+            color: #9CA3AF;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 40px;
+        }
+
+        /* Filters Sidebar */
+        .filters-sidebar {
+            background: #F8F8F8;
+            padding: 24px 20px;
+            border-radius: 8px;
+            height: fit-content;
+        }
+
+        .filters-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .filter-divider {
+            height: 1px;
+            background: #D1D5DB;
+            margin: 16px 0;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #3B82F6;
+            background: #3B82F6;
+        }
+
+        .slider-container {
+            margin-top: 12px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            background: #D1D5DB;
+            border-radius: 3px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .slider-filled {
+            position: absolute;
+            height: 6px;
+            background: #3B82F6;
+            border-radius: 3px;
+            width: 70%;
+        }
+
+        .slider.rating .slider-filled {
+            background: #10B981;
+        }
+
+        .slider-label {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .rating-markers {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #6B7280;
+            margin-top: 8px;
+        }
+
+        /* Products Area */
+        .products-area {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .sort-by {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .sort-label {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .dropdown {
+            width: 200px;
+            height: 44px;
+            border: 2px solid #9CA3AF;
+            border-radius: 8px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+        }
+
+        .header-divider {
+            height: 1px;
+            background: #E5E7EB;
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 320px);
+            gap: 24px;
+            justify-content: space-between;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 248px;
+            background: #E5E7EB;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9CA3AF;
+            font-size: 14px;
+        }
+
+        .product-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #111827;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #3B82F6;
+            margin-bottom: 12px;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            height: 40px;
+            background: #3B82F6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 40px 0;
+        }
+
+        .pagination-btn {
+            background: #EF4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .pagination-btn.page {
+            min-width: 100px;
+        }
+
+        .pagination-btn.arrow {
+            width: 50px;
+        }
+
+        /* Footer */
+        .footer {
+            background: #111827;
+            color: white;
+            padding: 60px 80px 40px;
+        }
+
+        .footer-main {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h4 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .footer-link {
+            color: #9CA3AF;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .copyright {
+            text-align: center;
+            color: #9CA3AF;
+            font-size: 14px;
+            border-top: 1px solid #374151;
+            padding-top: 24px;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: #EBF8FF;
+            border-left: 4px solid #3B82F6;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box h2 {
+            color: #1E40AF;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #1E3A8A;
+            line-height: 1.6;
+        }
+
+        .info-box ul {
+            margin-top: 10px;
+            margin-left: 20px;
+        }
+
+        .info-box li {
+            color: #1E3A8A;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info-box">
+        <h2>📐 Shop/Listing Page Wireframe</h2>
+        <p><strong>Purpose:</strong> This wireframe represents the exact structure of the /shop route page for Nasional Elektronik e-commerce platform.</p>
+        <p><strong>Features:</strong></p>
+        <ul>
+            <li>Product filtering by stock availability, price range, and rating</li>
+            <li>Product sorting by multiple criteria</li>
+            <li>Responsive product grid (3 columns on desktop)</li>
+            <li>Pagination for browsing multiple pages</li>
+            <li>Breadcrumb navigation</li>
+        </ul>
+        <p><strong>Use this wireframe with the Figma plugin to generate the exact UI components!</strong></p>
+    </div>
+
+    <div class="wireframe-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-main">
+                <div class="logo">LOGO</div>
+                <div class="search-bar">🔍 Search products...</div>
+                <div class="header-icons">❤️ 🛒 👤</div>
+            </div>
+            <div class="navigation">
+                <div class="nav-item">Home</div>
+                <div class="nav-item">Shop</div>
+                <div class="nav-item">Categories</div>
+                <div class="nav-item">Deals</div>
+                <div class="nav-item">About</div>
+                <div class="nav-item">Contact</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="#">🏠 Home</a>
+                <span class="separator">›</span>
+                <a href="#">Belanja</a>
+                <span class="separator">›</span>
+                <span>Semua produk</span>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Filters Sidebar -->
+                <div class="filters-sidebar">
+                    <div class="filters-title">Filters</div>
+                    <div class="filter-divider"></div>
+
+                    <!-- Availability Filter -->
+                    <div class="filter-section">
+                        <h3>Ketersediaan</h3>
+                        <div class="checkbox-item">
+                            <div class="checkbox"></div>
+                            <span>Stock tersedia</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox"></div>
+                            <span>Stock habis</span>
+                        </div>
+                    </div>
+
+                    <div class="filter-divider"></div>
+
+                    <!-- Price Filter -->
+                    <div class="filter-section">
+                        <h3>Harga</h3>
+                        <div class="slider-container">
+                            <div class="slider">
+                                <div class="slider-filled"></div>
+                            </div>
+                            <div class="slider-label">Harga maksimal: $3000</div>
+                        </div>
+                    </div>
+
+                    <div class="filter-divider"></div>
+
+                    <!-- Rating Filter -->
+                    <div class="filter-section">
+                        <h3>Minimum Rating:</h3>
+                        <div class="slider-container">
+                            <div class="slider rating">
+                                <div class="slider-filled"></div>
+                            </div>
+                            <div class="rating-markers">
+                                <span>0</span>
+                                <span>1</span>
+                                <span>2</span>
+                                <span>3</span>
+                                <span>4</span>
+                                <span>5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Area -->
+                <div class="products-area">
+                    <!-- Products Header -->
+                    <div class="products-header">
+                        <div class="page-title">SEMUA PRODUK</div>
+                        <div class="sort-by">
+                            <div class="sort-label">Urutkan bedasarkan:</div>
+                            <div class="dropdown">
+                                <span>Default</span>
+                                <span>▼</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="header-divider"></div>
+
+                    <!-- Products Grid -->
+                    <div class="products-grid">
+                        <!-- Product Card 1 -->
+                        <div class="product-card">
+                            <div class="product-image">Product Image</div>
+                            <div class="product-name">Product Name Here</div>
+                            <div class="product-price">Rp 1.299.000</div>
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+
+                        <!-- Product Card 2 -->
+                        <div class="product-card">
+                            <div class="product-image">Product Image</div>
+                            <div class="product-name">Product Name Here</div>
+                            <div class="product-price">Rp 899.000</div>
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+
+                        <!-- Product Card 3 -->
+                        <div class="product-card">
+                            <div class="product-image">Product Image</div>
+                            <div class="product-name">Product Name Here</div>
+                            <div class="product-price">Rp 1.599.000</div>
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+
+                        <!-- Product Card 4 -->
+                        <div class="product-card">
+                            <div class="product-image">Product Image</div>
+                            <div class="product-name">Product Name Here</div>
+                            <div class="product-price">Rp 2.499.000</div>
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+
+                        <!-- Product Card 5 -->
+                        <div class="product-card">
+                            <div class="product-image">Product Image</div>
+                            <div class="product-name">Product Name Here</div>
+                            <div class="product-price">Rp 1.799.000</div>
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+
+                        <!-- Product Card 6 -->
+                        <div class="product-card">
+                            <div class="product-image">Product Image</div>
+                            <div class="product-name">Product Name Here</div>
+                            <div class="product-price">Rp 3.299.000</div>
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+
+                        <!-- Product Card 7 -->
+                        <div class="product-card">
+                            <div class="product-image">Product Image</div>
+                            <div class="product-name">Product Name Here</div>
+                            <div class="product-price">Rp 999.000</div>
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+
+                        <!-- Product Card 8 -->
+                        <div class="product-card">
+                            <div class="product-image">Product Image</div>
+                            <div class="product-name">Product Name Here</div>
+                            <div class="product-price">Rp 1.499.000</div>
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+
+                        <!-- Product Card 9 -->
+                        <div class="product-card">
+                            <div class="product-image">Product Image</div>
+                            <div class="product-name">Product Name Here</div>
+                            <div class="product-price">Rp 2.199.000</div>
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+
+                        <!-- Product Card 10 -->
+                        <div class="product-card">
+                            <div class="product-image">Product Image</div>
+                            <div class="product-name">Product Name Here</div>
+                            <div class="product-price">Rp 1.999.000</div>
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+
+                        <!-- Product Card 11 -->
+                        <div class="product-card">
+                            <div class="product-image">Product Image</div>
+                            <div class="product-name">Product Name Here</div>
+                            <div class="product-price">Rp 2.799.000</div>
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+
+                        <!-- Product Card 12 -->
+                        <div class="product-card">
+                            <div class="product-image">Product Image</div>
+                            <div class="product-name">Product Name Here</div>
+                            <div class="product-price">Rp 1.399.000</div>
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <button class="pagination-btn arrow">«</button>
+                        <button class="pagination-btn page">Page 1</button>
+                        <button class="pagination-btn arrow">»</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-main">
+                <div class="footer-column">
+                    <h4>About Us</h4>
+                    <div class="footer-link">Company Info</div>
+                    <div class="footer-link">Our Story</div>
+                    <div class="footer-link">Careers</div>
+                </div>
+                <div class="footer-column">
+                    <h4>Customer Service</h4>
+                    <div class="footer-link">Contact Us</div>
+                    <div class="footer-link">Shipping Info</div>
+                    <div class="footer-link">Returns</div>
+                </div>
+                <div class="footer-column">
+                    <h4>Quick Links</h4>
+                    <div class="footer-link">Track Order</div>
+                    <div class="footer-link">My Account</div>
+                    <div class="footer-link">FAQ</div>
+                </div>
+                <div class="footer-column">
+                    <h4>Follow Us</h4>
+                    <div class="footer-link">Facebook</div>
+                    <div class="footer-link">Instagram</div>
+                    <div class="footer-link">Twitter</div>
+                </div>
+            </div>
+            <div class="copyright">
+                © 2025 Nasional Elektronik. All rights reserved.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

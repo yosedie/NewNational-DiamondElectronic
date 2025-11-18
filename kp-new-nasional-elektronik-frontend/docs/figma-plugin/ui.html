@@ -234,6 +234,12 @@
         <span class="icon">📄</span>
         <span>5. Generate Page Templates</span>
       </button>
+
+      <button class="btn-success" id="generate-shop-page">
+        <span class="icon">🛍️</span>
+        <span>6. Generate Shop/Listing Page</span>
+        <span class="badge">NEW</span>
+      </button>
     </div>
 
     <div class="divider"></div>
@@ -250,6 +256,7 @@
         <li>Search Bar</li>
         <li>Header & Footer</li>
         <li>Homepage Template</li>
+        <li>Shop/Listing Page (NEW)</li>
       </ul>
     </div>
 
@@ -292,6 +299,11 @@
 
     document.getElementById('generate-pages').onclick = () => {
       parent.postMessage({ pluginMessage: { type: 'generate-pages' } }, '*');
+    };
+
+    document.getElementById('generate-shop-page').onclick = () => {
+      showLoading();
+      parent.postMessage({ pluginMessage: { type: 'generate-shop-page' } }, '*');
     };
 
     document.getElementById('cancel').onclick = () => {
