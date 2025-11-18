@@ -10,7 +10,7 @@ figma.ui.onmessage = async (msg) => {
     try {
       await generateAllPages();
       figma.ui.postMessage({ type: 'generation-complete' });
-      figma.notify('🎉 Both pages generated successfully!');
+      figma.notify('🎉 All 3 pages generated successfully!');
     } catch (error) {
       console.error('Error generating pages:', error);
       figma.notify('❌ Error: ' + error.message, { error: true });
@@ -661,7 +661,7 @@ async function generatePages() {
 }
 
 // ==========================================
-// GENERATE ALL PAGES (HOMEPAGE + SHOP PAGE)
+// GENERATE ALL PAGES (HOMEPAGE + SHOP PAGE + PRODUCT DETAIL PAGE)
 // ==========================================
 async function generateAllPages() {
   try {
@@ -678,7 +678,7 @@ async function generateAllPages() {
     figma.currentPage = page;
 
     // Generate Homepage
-    figma.notify('Generating Homepage... (1/2)');
+    figma.notify('Generating Homepage... (1/3)');
     const homepage = await createHomepageFrame();
     homepage.x = 0;
     homepage.y = 0;
@@ -686,18 +686,26 @@ async function generateAllPages() {
     console.log('Homepage created and appended');
     
     // Generate Shop Page
-    figma.notify('Generating Shop Page... (2/2)');
+    figma.notify('Generating Shop Page... (2/3)');
     const shopPage = await createShopPageFrame();
     shopPage.x = 1600; // Position to the right of homepage
     shopPage.y = 0;
     page.appendChild(shopPage);
     console.log('Shop Page created and appended');
 
-    // Zoom to fit both pages
+    // Generate Product Detail Page
+    figma.notify('Generating Product Detail Page... (3/3)');
+    const productDetailPage = await createProductDetailFrame();
+    productDetailPage.x = 3200; // Position to the right of shop page
+    productDetailPage.y = 0;
+    page.appendChild(productDetailPage);
+    console.log('Product Detail Page created and appended');
+
+    // Zoom to fit all pages
     figma.notify('Finalizing...');
-    figma.viewport.scrollAndZoomIntoView([homepage, shopPage]);
+    figma.viewport.scrollAndZoomIntoView([homepage, shopPage, productDetailPage]);
     
-    console.log('Both pages generated successfully');
+    console.log('All 3 pages generated successfully');
   } catch (error) {
     console.error('Error in generateAllPages:', error);
     throw error;
@@ -906,6 +914,93 @@ async function createShopPageFrame() {
   } catch (error) {
     console.error('Error in createShopPageFrame:', error);
     throw new Error('Failed to create Shop Page: ' + error.message);
+  }
+}
+
+// Create Product Detail Page Frame
+async function createProductDetailFrame() {
+  try {
+    const productDetailPage = figma.createFrame();
+    productDetailPage.name = "Product Detail - Desktop";
+    productDetailPage.resize(1440, 3500);
+    productDetailPage.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    productDetailPage.layoutMode = 'VERTICAL';
+
+    // Add header
+    const header = await createHeader();
+    productDetailPage.appendChild(header);
+
+    // Main Content Container
+    const mainContent = figma.createFrame();
+    mainContent.name = "Main Content";
+    mainContent.resize(1440, 3100);
+    mainContent.fills = [];
+    mainContent.layoutMode = 'VERTICAL';
+    mainContent.paddingLeft = 80;
+    mainContent.paddingRight = 80;
+    mainContent.paddingTop = 40;
+    mainContent.paddingBottom = 40;
+    mainContent.itemSpacing = 32;
+
+    // Product Grid (3 columns - 2 for left, 1 for right)
+    const productGrid = figma.createFrame();
+    productGrid.name = "Product Grid";
+    productGrid.resize(1280, 2800);
+    productGrid.fills = [];
+    productGrid.layoutMode = 'HORIZONTAL';
+    productGrid.primaryAxisAlignItems = 'MIN';
+    productGrid.itemSpacing = 32;
+
+    // Left Side (2/3 width) - Product Images and Details
+    const leftSide = figma.createFrame();
+    leftSide.name = "Left Side - Product Details";
+    leftSide.resize(840, 2800);
+    leftSide.fills = [];
+    leftSide.layoutMode = 'VERTICAL';
+    leftSide.itemSpacing = 32;
+
+    // Product Images Section
+    const imagesSection = createProductImageSection();
+    leftSide.appendChild(imagesSection);
+
+    // Product Info Section
+    const infoSection = createProductInfoSection();
+    leftSide.appendChild(infoSection);
+
+    // Reviews Card
+    const reviewsCard = createReviewsCard();
+    leftSide.appendChild(reviewsCard);
+
+    // Description Card
+    const descriptionCard = createDescriptionCard();
+    leftSide.appendChild(descriptionCard);
+
+    productGrid.appendChild(leftSide);
+
+    // Right Sidebar (1/3 width) - Product Summary
+    const rightSidebar = figma.createFrame();
+    rightSidebar.name = "Right Sidebar - Summary";
+    rightSidebar.resize(408, 600);
+    rightSidebar.fills = [];
+    rightSidebar.layoutMode = 'VERTICAL';
+
+    const summaryCard = createProductSummaryCard();
+    rightSidebar.appendChild(summaryCard);
+
+    productGrid.appendChild(rightSidebar);
+
+    mainContent.appendChild(productGrid);
+    productDetailPage.appendChild(mainContent);
+
+    // Add footer
+    const footer = await createFooter();
+    productDetailPage.appendChild(footer);
+
+    console.log('Product Detail Page frame created successfully');
+    return productDetailPage;
+  } catch (error) {
+    console.error('Error in createProductDetailFrame:', error);
+    throw new Error('Failed to create Product Detail Page: ' + error.message);
   }
 }
 
@@ -1249,4 +1344,894 @@ function createPaginationButton(label, isCurrent = false) {
   button.appendChild(buttonText);
 
   return button;
+}
+
+// ==========================================
+// HELPER FUNCTIONS FOR PRODUCT DETAIL PAGE
+// ==========================================
+
+// Create Product Image Section
+function createProductImageSection() {
+  const imagesSection = figma.createFrame();
+  imagesSection.name = "Product Images";
+  imagesSection.resize(840, 480);
+  imagesSection.fills = [];
+  imagesSection.layoutMode = 'HORIZONTAL';
+  imagesSection.primaryAxisAlignItems = 'MIN';
+  imagesSection.itemSpacing = 32;
+
+  // Images Container (left)
+  const imagesContainer = figma.createFrame();
+  imagesContainer.name = "Images Container";
+  imagesContainer.resize(400, 480);
+  imagesContainer.fills = [];
+  imagesContainer.layoutMode = 'VERTICAL';
+  imagesContainer.itemSpacing = 20;
+
+  // Main Product Image
+  const mainImage = figma.createFrame();
+  mainImage.name = "Main Product Image";
+  mainImage.resize(350, 350);
+  mainImage.fills = [{ type: 'SOLID', color: { r: 0.95, g: 0.96, b: 0.96 } }];
+  mainImage.cornerRadius = 8;
+  mainImage.layoutMode = 'VERTICAL';
+  mainImage.primaryAxisAlignItems = 'CENTER';
+  mainImage.counterAxisAlignItems = 'CENTER';
+
+  const imageLabel = figma.createText();
+  imageLabel.fontName = { family: 'Inter', style: 'Medium' };
+  imageLabel.fontSize = 14;
+  imageLabel.characters = "PRODUCT IMAGE\n350x350";
+  imageLabel.textAlignHorizontal = 'CENTER';
+  imageLabel.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  mainImage.appendChild(imageLabel);
+
+  imagesContainer.appendChild(mainImage);
+
+  // Thumbnail Images
+  const thumbnails = figma.createFrame();
+  thumbnails.name = "Thumbnails";
+  thumbnails.resize(350, 100);
+  thumbnails.fills = [];
+  thumbnails.layoutMode = 'HORIZONTAL';
+  thumbnails.itemSpacing = 10;
+
+  for (let i = 0; i < 3; i++) {
+    const thumb = figma.createFrame();
+    thumb.name = `Thumbnail ${i + 1}`;
+    thumb.resize(100, 100);
+    thumb.fills = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+    thumb.cornerRadius = 4;
+    thumbnails.appendChild(thumb);
+  }
+
+  imagesContainer.appendChild(thumbnails);
+  imagesSection.appendChild(imagesContainer);
+
+  // Product Basic Info (right)
+  const basicInfo = figma.createFrame();
+  basicInfo.name = "Product Basic Info";
+  basicInfo.resize(408, 480);
+  basicInfo.fills = [];
+  basicInfo.layoutMode = 'VERTICAL';
+  basicInfo.itemSpacing = 16;
+
+  // Product Title
+  const title = figma.createText();
+  title.fontName = { family: 'Inter', style: 'Bold' };
+  title.fontSize = 24;
+  title.characters = "Smart Phone Demo";
+  title.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+  title.resize(408, 60);
+  title.textAutoResize = 'HEIGHT';
+  basicInfo.appendChild(title);
+
+  // Rating
+  const rating = figma.createFrame();
+  rating.name = "Rating";
+  rating.resize(408, 24);
+  rating.fills = [];
+  rating.layoutMode = 'HORIZONTAL';
+  rating.itemSpacing = 12;
+
+  const stars = figma.createText();
+  stars.fontName = { family: 'Inter', style: 'Regular' };
+  stars.fontSize = 18;
+  stars.characters = "★★★★☆";
+  stars.fills = [{ type: 'SOLID', color: { r: 0.96, g: 0.75, b: 0.17 } }];
+  rating.appendChild(stars);
+
+  const ratingText = figma.createText();
+  ratingText.fontName = { family: 'Inter', style: 'Regular' };
+  ratingText.fontSize = 14;
+  ratingText.characters = "(4.0)";
+  ratingText.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  rating.appendChild(ratingText);
+
+  basicInfo.appendChild(rating);
+
+  // Price
+  const price = figma.createText();
+  price.fontName = { family: 'Inter', style: 'Bold' };
+  price.fontSize = 20;
+  price.characters = "Rp 5,000,000";
+  price.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  basicInfo.appendChild(price);
+
+  // Wishlist Button
+  const wishlistBtn = figma.createFrame();
+  wishlistBtn.name = "Wishlist Button";
+  wishlistBtn.resize(200, 40);
+  wishlistBtn.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  wishlistBtn.strokeWeight = 1;
+  wishlistBtn.strokes = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  wishlistBtn.cornerRadius = 8;
+  wishlistBtn.layoutMode = 'HORIZONTAL';
+  wishlistBtn.primaryAxisAlignItems = 'CENTER';
+  wishlistBtn.counterAxisAlignItems = 'CENTER';
+  wishlistBtn.itemSpacing = 8;
+  wishlistBtn.paddingLeft = 16;
+  wishlistBtn.paddingRight = 16;
+
+  const heartIcon = figma.createText();
+  heartIcon.fontName = { family: 'Inter', style: 'Regular' };
+  heartIcon.fontSize = 16;
+  heartIcon.characters = "♥";
+  heartIcon.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  wishlistBtn.appendChild(heartIcon);
+
+  const wishlistText = figma.createText();
+  wishlistText.fontName = { family: 'Inter', style: 'Medium' };
+  wishlistText.fontSize = 14;
+  wishlistText.characters = "Add to Wishlist";
+  wishlistText.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  wishlistBtn.appendChild(wishlistText);
+
+  basicInfo.appendChild(wishlistBtn);
+
+  // Divider
+  const divider1 = figma.createRectangle();
+  divider1.name = "Divider";
+  divider1.resize(408, 1);
+  divider1.fills = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  basicInfo.appendChild(divider1);
+
+  // Product Info Details
+  const infoDetails = figma.createFrame();
+  infoDetails.name = "Product Info";
+  infoDetails.resize(408, 120);
+  infoDetails.fills = [];
+  infoDetails.layoutMode = 'VERTICAL';
+  infoDetails.itemSpacing = 12;
+
+  const infoTitle = figma.createText();
+  infoTitle.fontName = { family: 'Inter', style: 'Bold' };
+  infoTitle.fontSize = 14;
+  infoTitle.characters = "Informasi Produk";
+  infoTitle.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+  infoDetails.appendChild(infoTitle);
+
+  const infoItems = [
+    { label: "Manufacturer:", value: "Diamond Electronic" },
+    { label: "Category:", value: "Elektronik" },
+    { label: "Color:", value: "Silver, Blue" }
+  ];
+
+  infoItems.forEach(item => {
+    const infoRow = figma.createFrame();
+    infoRow.name = item.label;
+    infoRow.resize(408, 20);
+    infoRow.fills = [];
+    infoRow.layoutMode = 'HORIZONTAL';
+    infoRow.itemSpacing = 8;
+
+    const label = figma.createText();
+    label.fontName = { family: 'Inter', style: 'Regular' };
+    label.fontSize = 14;
+    label.characters = item.label;
+    label.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+    infoRow.appendChild(label);
+
+    const value = figma.createText();
+    value.fontName = { family: 'Inter', style: 'Regular' };
+    value.fontSize = 14;
+    value.characters = item.value;
+    value.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+    infoRow.appendChild(value);
+
+    infoDetails.appendChild(infoRow);
+  });
+
+  basicInfo.appendChild(infoDetails);
+
+  // Divider
+  const divider2 = figma.createRectangle();
+  divider2.name = "Divider";
+  divider2.resize(408, 1);
+  divider2.fills = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  basicInfo.appendChild(divider2);
+
+  // Social Share
+  const socialShare = figma.createFrame();
+  socialShare.name = "Social Share";
+  socialShare.resize(408, 40);
+  socialShare.fills = [];
+  socialShare.layoutMode = 'HORIZONTAL';
+  socialShare.itemSpacing = 12;
+
+  const shareText = figma.createText();
+  shareText.fontName = { family: 'Inter', style: 'Medium' };
+  shareText.fontSize = 14;
+  shareText.characters = "Bagikan:";
+  shareText.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+  socialShare.appendChild(shareText);
+
+  const socialIcons = ['FB', 'TW', 'IG', 'WA'];
+  socialIcons.forEach(icon => {
+    const socialBtn = figma.createFrame();
+    socialBtn.name = icon;
+    socialBtn.resize(40, 40);
+    socialBtn.fills = [{ type: 'SOLID', color: { r: 0.95, g: 0.96, b: 0.96 } }];
+    socialBtn.cornerRadius = 20;
+    socialBtn.layoutMode = 'VERTICAL';
+    socialBtn.primaryAxisAlignItems = 'CENTER';
+    socialBtn.counterAxisAlignItems = 'CENTER';
+
+    const iconText = figma.createText();
+    iconText.fontName = { family: 'Inter', style: 'Bold' };
+    iconText.fontSize = 12;
+    iconText.characters = icon;
+    iconText.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    socialBtn.appendChild(iconText);
+
+    socialShare.appendChild(socialBtn);
+  });
+
+  basicInfo.appendChild(socialShare);
+
+  imagesSection.appendChild(basicInfo);
+
+  return imagesSection;
+}
+
+// Create Product Info Section (additional content)
+function createProductInfoSection() {
+  const infoSection = figma.createFrame();
+  infoSection.name = "Additional Info Section";
+  infoSection.resize(840, 1);
+  infoSection.fills = [];
+  
+  return infoSection;
+}
+
+// Create Reviews Card
+function createReviewsCard() {
+  const reviewsCard = figma.createFrame();
+  reviewsCard.name = "Reviews Card";
+  reviewsCard.resize(840, 350);
+  reviewsCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  reviewsCard.strokeWeight = 1;
+  reviewsCard.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  reviewsCard.cornerRadius = 8;
+  reviewsCard.layoutMode = 'VERTICAL';
+  reviewsCard.paddingTop = 24;
+  reviewsCard.paddingBottom = 24;
+  reviewsCard.paddingLeft = 24;
+  reviewsCard.paddingRight = 24;
+  reviewsCard.itemSpacing = 16;
+
+  // Card Title
+  const cardTitle = figma.createText();
+  cardTitle.fontName = { family: 'Inter', style: 'Bold' };
+  cardTitle.fontSize = 18;
+  cardTitle.characters = "Ulasan Pelanggan";
+  cardTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  reviewsCard.appendChild(cardTitle);
+
+  // Overall Rating
+  const overallRating = figma.createFrame();
+  overallRating.name = "Overall Rating";
+  overallRating.resize(792, 24);
+  overallRating.fills = [];
+  overallRating.layoutMode = 'HORIZONTAL';
+  overallRating.itemSpacing = 8;
+
+  const starsOverall = figma.createText();
+  starsOverall.fontName = { family: 'Inter', style: 'Regular' };
+  starsOverall.fontSize = 16;
+  starsOverall.characters = "★★★★☆";
+  starsOverall.fills = [{ type: 'SOLID', color: { r: 0.96, g: 0.75, b: 0.17 } }];
+  overallRating.appendChild(starsOverall);
+
+  const ratingNum = figma.createText();
+  ratingNum.fontName = { family: 'Inter', style: 'Regular' };
+  ratingNum.fontSize = 14;
+  ratingNum.characters = "4.0 dari 5";
+  ratingNum.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  overallRating.appendChild(ratingNum);
+
+  reviewsCard.appendChild(overallRating);
+
+  // Review Count
+  const reviewCount = figma.createText();
+  reviewCount.fontName = { family: 'Inter', style: 'Regular' };
+  reviewCount.fontSize = 14;
+  reviewCount.characters = "Berdasarkan 127 ulasan";
+  reviewCount.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  reviewsCard.appendChild(reviewCount);
+
+  // Sample Review 1
+  const review1 = createSingleReview(
+    "★★★★★",
+    "2 hari lalu",
+    "Produk berkualitas bagus, sesuai deskripsi. Pengiriman cepat dan packing aman.",
+    "Budi Santoso"
+  );
+  reviewsCard.appendChild(review1);
+
+  // Sample Review 2
+  const review2 = createSingleReview(
+    "★★★★☆",
+    "1 minggu lalu",
+    "Harga terjangkau, kualitas memuaskan. Recommended seller!",
+    "Siti Rahayu"
+  );
+  reviewsCard.appendChild(review2);
+
+  return reviewsCard;
+}
+
+// Create Single Review Component
+function createSingleReview(stars, time, comment, author) {
+  const review = figma.createFrame();
+  review.name = "Review";
+  review.resize(792, 80);
+  review.fills = [];
+  review.layoutMode = 'VERTICAL';
+  review.itemSpacing = 8;
+  review.paddingTop = 12;
+  review.strokeTopWeight = 1;
+  review.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+
+  // Review Header
+  const reviewHeader = figma.createFrame();
+  reviewHeader.name = "Review Header";
+  reviewHeader.resize(792, 20);
+  reviewHeader.fills = [];
+  reviewHeader.layoutMode = 'HORIZONTAL';
+  reviewHeader.itemSpacing = 8;
+
+  const reviewStars = figma.createText();
+  reviewStars.fontName = { family: 'Inter', style: 'Regular' };
+  reviewStars.fontSize = 14;
+  reviewStars.characters = stars;
+  reviewStars.fills = [{ type: 'SOLID', color: { r: 0.96, g: 0.75, b: 0.17 } }];
+  reviewHeader.appendChild(reviewStars);
+
+  const reviewTime = figma.createText();
+  reviewTime.fontName = { family: 'Inter', style: 'Regular' };
+  reviewTime.fontSize = 12;
+  reviewTime.characters = time;
+  reviewTime.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  reviewHeader.appendChild(reviewTime);
+
+  review.appendChild(reviewHeader);
+
+  // Review Comment
+  const reviewComment = figma.createText();
+  reviewComment.fontName = { family: 'Inter', style: 'Regular' };
+  reviewComment.fontSize = 14;
+  reviewComment.characters = comment;
+  reviewComment.fills = [{ type: 'SOLID', color: { r: 0.22, g: 0.26, b: 0.31 } }];
+  reviewComment.resize(792, 40);
+  reviewComment.textAutoResize = 'HEIGHT';
+  review.appendChild(reviewComment);
+
+  // Review Author
+  const reviewAuthor = figma.createText();
+  reviewAuthor.fontName = { family: 'Inter', style: 'Regular' };
+  reviewAuthor.fontSize = 12;
+  reviewAuthor.characters = `- ${author}`;
+  reviewAuthor.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+  review.appendChild(reviewAuthor);
+
+  return review;
+}
+
+// Create Description Card
+function createDescriptionCard() {
+  const descCard = figma.createFrame();
+  descCard.name = "Description Card";
+  descCard.resize(840, 800);
+  descCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  descCard.strokeWeight = 1;
+  descCard.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  descCard.cornerRadius = 8;
+  descCard.layoutMode = 'VERTICAL';
+
+  // Description Section
+  const descSection = figma.createFrame();
+  descSection.name = "Description Section";
+  descSection.resize(840, 200);
+  descSection.fills = [];
+  descSection.layoutMode = 'VERTICAL';
+  descSection.paddingTop = 24;
+  descSection.paddingBottom = 24;
+  descSection.paddingLeft = 24;
+  descSection.paddingRight = 24;
+  descSection.itemSpacing = 16;
+  descSection.strokeBottomWeight = 1;
+  descSection.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+
+  const descTitle = figma.createText();
+  descTitle.fontName = { family: 'Inter', style: 'Bold' };
+  descTitle.fontSize = 20;
+  descTitle.characters = "Deskripsi Produk";
+  descTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  descSection.appendChild(descTitle);
+
+  const descText = figma.createText();
+  descText.fontName = { family: 'Inter', style: 'Regular' };
+  descText.fontSize = 14;
+  descText.characters = "Produk berkualitas tinggi dari Diamond Electronic. Sempurna untuk memenuhi\nkebutuhan rumah tangga Anda dengan desain modern dan teknologi terkini.";
+  descText.fills = [{ type: 'SOLID', color: { r: 0.22, g: 0.26, b: 0.31 } }];
+  descText.resize(792, 60);
+  descText.textAutoResize = 'HEIGHT';
+  descSection.appendChild(descText);
+
+  descCard.appendChild(descSection);
+
+  // Specifications Section
+  const specsSection = figma.createFrame();
+  specsSection.name = "Specifications Section";
+  specsSection.resize(840, 200);
+  specsSection.fills = [];
+  specsSection.layoutMode = 'VERTICAL';
+  specsSection.paddingTop = 24;
+  specsSection.paddingBottom = 24;
+  specsSection.paddingLeft = 24;
+  specsSection.paddingRight = 24;
+  specsSection.itemSpacing = 16;
+  specsSection.strokeBottomWeight = 1;
+  specsSection.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+
+  const specsTitle = figma.createText();
+  specsTitle.fontName = { family: 'Inter', style: 'Bold' };
+  specsTitle.fontSize = 20;
+  specsTitle.characters = "Spesifikasi Produk";
+  specsTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  specsSection.appendChild(specsTitle);
+
+  const specsGrid = figma.createFrame();
+  specsGrid.name = "Specs Grid";
+  specsGrid.resize(792, 120);
+  specsGrid.fills = [];
+  specsGrid.layoutMode = 'HORIZONTAL';
+  specsGrid.itemSpacing = 32;
+
+  // Column 1
+  const specsCol1 = figma.createFrame();
+  specsCol1.name = "Specs Column 1";
+  specsCol1.resize(380, 120);
+  specsCol1.fills = [];
+  specsCol1.layoutMode = 'VERTICAL';
+  specsCol1.itemSpacing = 8;
+
+  const col1Title = figma.createText();
+  col1Title.fontName = { family: 'Inter', style: 'Medium' };
+  col1Title.fontSize = 14;
+  col1Title.characters = "Spesifikasi Umum";
+  col1Title.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  specsCol1.appendChild(col1Title);
+
+  const specs1 = [
+    { label: "Merek", value: "Diamond Electronic" },
+    { label: "Model", value: "DE-2024" },
+    { label: "Garansi", value: "1 Tahun" }
+  ];
+
+  specs1.forEach(spec => {
+    const specRow = createSpecRow(spec.label, spec.value);
+    specsCol1.appendChild(specRow);
+  });
+
+  specsGrid.appendChild(specsCol1);
+
+  // Column 2
+  const specsCol2 = figma.createFrame();
+  specsCol2.name = "Specs Column 2";
+  specsCol2.resize(380, 120);
+  specsCol2.fills = [];
+  specsCol2.layoutMode = 'VERTICAL';
+  specsCol2.itemSpacing = 8;
+
+  const col2Title = figma.createText();
+  col2Title.fontName = { family: 'Inter', style: 'Medium' };
+  col2Title.fontSize = 14;
+  col2Title.characters = "Dimensi";
+  col2Title.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  specsCol2.appendChild(col2Title);
+
+  const specs2 = [
+    { label: "Panjang", value: "30 cm" },
+    { label: "Lebar", value: "20 cm" },
+    { label: "Tinggi", value: "15 cm" }
+  ];
+
+  specs2.forEach(spec => {
+    const specRow = createSpecRow(spec.label, spec.value);
+    specsCol2.appendChild(specRow);
+  });
+
+  specsGrid.appendChild(specsCol2);
+
+  specsSection.appendChild(specsGrid);
+  descCard.appendChild(specsSection);
+
+  // Shipping Section
+  const shippingSection = figma.createFrame();
+  shippingSection.name = "Shipping Section";
+  shippingSection.resize(840, 150);
+  shippingSection.fills = [];
+  shippingSection.layoutMode = 'VERTICAL';
+  shippingSection.paddingTop = 24;
+  shippingSection.paddingBottom = 24;
+  shippingSection.paddingLeft = 24;
+  shippingSection.paddingRight = 24;
+  shippingSection.itemSpacing = 12;
+  shippingSection.strokeBottomWeight = 1;
+  shippingSection.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+
+  const shippingTitle = figma.createText();
+  shippingTitle.fontName = { family: 'Inter', style: 'Bold' };
+  shippingTitle.fontSize = 20;
+  shippingTitle.characters = "Informasi Pengiriman";
+  shippingTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  shippingSection.appendChild(shippingTitle);
+
+  const shipping1 = createShippingItem("📦", "Pengiriman Lokal", "Estimasi 2-3 hari kerja untuk Surabaya");
+  shippingSection.appendChild(shipping1);
+
+  const shipping2 = createShippingItem("✓", "Pengiriman Nasional", "Estimasi 5-7 hari kerja untuk luar kota");
+  shippingSection.appendChild(shipping2);
+
+  descCard.appendChild(shippingSection);
+
+  // Return Policy Section
+  const returnSection = figma.createFrame();
+  returnSection.name = "Return Policy Section";
+  returnSection.resize(840, 150);
+  returnSection.fills = [];
+  returnSection.layoutMode = 'VERTICAL';
+  returnSection.paddingTop = 24;
+  returnSection.paddingBottom = 24;
+  returnSection.paddingLeft = 24;
+  returnSection.paddingRight = 24;
+  returnSection.itemSpacing = 16;
+
+  const returnTitle = figma.createText();
+  returnTitle.fontName = { family: 'Inter', style: 'Bold' };
+  returnTitle.fontSize = 20;
+  returnTitle.characters = "Kebijakan Pengembalian";
+  returnTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  returnSection.appendChild(returnTitle);
+
+  const returnAlert = figma.createFrame();
+  returnAlert.name = "Return Alert";
+  returnAlert.resize(792, 70);
+  returnAlert.fills = [{ type: 'SOLID', color: { r: 0.99, g: 0.97, b: 0.88 } }];
+  returnAlert.strokeWeight = 1;
+  returnAlert.strokes = [{ type: 'SOLID', color: { r: 0.98, g: 0.87, b: 0.57 } }];
+  returnAlert.cornerRadius = 6;
+  returnAlert.layoutMode = 'HORIZONTAL';
+  returnAlert.paddingTop = 16;
+  returnAlert.paddingBottom = 16;
+  returnAlert.paddingLeft = 16;
+  returnAlert.paddingRight = 16;
+  returnAlert.itemSpacing = 12;
+
+  const alertIcon = figma.createText();
+  alertIcon.fontName = { family: 'Inter', style: 'Bold' };
+  alertIcon.fontSize = 20;
+  alertIcon.characters = "⚠";
+  alertIcon.fills = [{ type: 'SOLID', color: { r: 0.72, g: 0.54, b: 0.05 } }];
+  returnAlert.appendChild(alertIcon);
+
+  const alertText = figma.createText();
+  alertText.fontName = { family: 'Inter', style: 'Regular' };
+  alertText.fontSize = 14;
+  alertText.characters = "Perhatian: Produk dapat dikembalikan dalam 7 hari jika ada cacat\npabrik atau tidak sesuai deskripsi.";
+  alertText.fills = [{ type: 'SOLID', color: { r: 0.72, g: 0.54, b: 0.05 } }];
+  alertText.resize(720, 40);
+  alertText.textAutoResize = 'HEIGHT';
+  returnAlert.appendChild(alertText);
+
+  returnSection.appendChild(returnAlert);
+  descCard.appendChild(returnSection);
+
+  return descCard;
+}
+
+// Create Spec Row Component
+function createSpecRow(label, value) {
+  const specRow = figma.createFrame();
+  specRow.name = `Spec ${label}`;
+  specRow.resize(380, 20);
+  specRow.fills = [];
+  specRow.layoutMode = 'HORIZONTAL';
+  specRow.primaryAxisSizingMode = 'FIXED';
+  specRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+
+  const specLabel = figma.createText();
+  specLabel.fontName = { family: 'Inter', style: 'Regular' };
+  specLabel.fontSize = 14;
+  specLabel.characters = label;
+  specLabel.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  specRow.appendChild(specLabel);
+
+  const specValue = figma.createText();
+  specValue.fontName = { family: 'Inter', style: 'Regular' };
+  specValue.fontSize = 14;
+  specValue.characters = value;
+  specValue.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+  specRow.appendChild(specValue);
+
+  return specRow;
+}
+
+// Create Shipping Item Component
+function createShippingItem(icon, title, description) {
+  const item = figma.createFrame();
+  item.name = title;
+  item.resize(792, 40);
+  item.fills = [];
+  item.layoutMode = 'HORIZONTAL';
+  item.itemSpacing = 12;
+
+  const iconCircle = figma.createFrame();
+  iconCircle.name = "Icon";
+  iconCircle.resize(32, 32);
+  iconCircle.fills = [{ type: 'SOLID', color: { r: 0.86, g: 0.93, b: 0.99 } }];
+  iconCircle.cornerRadius = 16;
+  iconCircle.layoutMode = 'VERTICAL';
+  iconCircle.primaryAxisAlignItems = 'CENTER';
+  iconCircle.counterAxisAlignItems = 'CENTER';
+
+  const iconText = figma.createText();
+  iconText.fontName = { family: 'Inter', style: 'Regular' };
+  iconText.fontSize = 16;
+  iconText.characters = icon;
+  iconText.fills = [{ type: 'SOLID', color: { r: 0.23, g: 0.51, b: 0.96 } }];
+  iconCircle.appendChild(iconText);
+
+  item.appendChild(iconCircle);
+
+  const textContent = figma.createFrame();
+  textContent.name = "Text Content";
+  textContent.resize(748, 40);
+  textContent.fills = [];
+  textContent.layoutMode = 'VERTICAL';
+  textContent.itemSpacing = 4;
+
+  const titleText = figma.createText();
+  titleText.fontName = { family: 'Inter', style: 'Medium' };
+  titleText.fontSize = 14;
+  titleText.characters = title;
+  titleText.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+  textContent.appendChild(titleText);
+
+  const descText = figma.createText();
+  descText.fontName = { family: 'Inter', style: 'Regular' };
+  descText.fontSize = 12;
+  descText.characters = description;
+  descText.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  textContent.appendChild(descText);
+
+  item.appendChild(textContent);
+
+  return item;
+}
+
+// Create Product Summary Card (Right Sidebar)
+function createProductSummaryCard() {
+  const summaryCard = figma.createFrame();
+  summaryCard.name = "Product Summary Card";
+  summaryCard.resize(408, 600);
+  summaryCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  summaryCard.strokeWeight = 1;
+  summaryCard.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  summaryCard.cornerRadius = 8;
+  summaryCard.layoutMode = 'VERTICAL';
+
+  // Summary Section
+  const summarySection = figma.createFrame();
+  summarySection.name = "Summary Section";
+  summarySection.resize(408, 280);
+  summarySection.fills = [];
+  summarySection.layoutMode = 'VERTICAL';
+  summarySection.paddingTop = 24;
+  summarySection.paddingBottom = 24;
+  summarySection.paddingLeft = 24;
+  summarySection.paddingRight = 24;
+  summarySection.itemSpacing = 12;
+  summarySection.strokeBottomWeight = 1;
+  summarySection.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+
+  const summaryTitle = figma.createText();
+  summaryTitle.fontName = { family: 'Inter', style: 'Bold' };
+  summaryTitle.fontSize = 20;
+  summaryTitle.characters = "Ringkasan Produk";
+  summaryTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  summarySection.appendChild(summaryTitle);
+
+  const summaryItems = [
+    { label: "Kategori", value: "Elektronik" },
+    { label: "Kondisi", value: "Baru" },
+    { label: "Stok", value: "94 unit" },
+    { label: "Garansi", value: "1 Tahun" }
+  ];
+
+  summaryItems.forEach(item => {
+    const summaryRow = figma.createFrame();
+    summaryRow.name = item.label;
+    summaryRow.resize(360, 32);
+    summaryRow.fills = [];
+    summaryRow.layoutMode = 'HORIZONTAL';
+    summaryRow.primaryAxisSizingMode = 'FIXED';
+    summaryRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+    summaryRow.paddingTop = 8;
+    summaryRow.paddingBottom = 8;
+
+    const label = figma.createText();
+    label.fontName = { family: 'Inter', style: 'Regular' };
+    label.fontSize = 14;
+    label.characters = item.label;
+    label.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+    summaryRow.appendChild(label);
+
+    const value = figma.createText();
+    value.fontName = { family: 'Inter', style: 'Medium' };
+    value.fontSize = 14;
+    value.characters = item.value;
+    value.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+    summaryRow.appendChild(value);
+
+    summarySection.appendChild(summaryRow);
+  });
+
+  summaryCard.appendChild(summarySection);
+
+  // Action Buttons Section
+  const actionsSection = figma.createFrame();
+  actionsSection.name = "Action Buttons";
+  actionsSection.resize(408, 320);
+  actionsSection.fills = [];
+  actionsSection.layoutMode = 'VERTICAL';
+  actionsSection.paddingTop = 24;
+  actionsSection.paddingBottom = 24;
+  actionsSection.paddingLeft = 24;
+  actionsSection.paddingRight = 24;
+  actionsSection.itemSpacing = 16;
+
+  // Quantity Selector
+  const quantitySection = figma.createFrame();
+  quantitySection.name = "Quantity";
+  quantitySection.resize(360, 80);
+  quantitySection.fills = [];
+  quantitySection.layoutMode = 'VERTICAL';
+  quantitySection.itemSpacing = 8;
+
+  const quantityLabel = figma.createText();
+  quantityLabel.fontName = { family: 'Inter', style: 'Medium' };
+  quantityLabel.fontSize = 14;
+  quantityLabel.characters = "Jumlah";
+  quantityLabel.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+  quantitySection.appendChild(quantityLabel);
+
+  const quantityInput = figma.createFrame();
+  quantityInput.name = "Quantity Input";
+  quantityInput.resize(120, 40);
+  quantityInput.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  quantityInput.strokeWeight = 1;
+  quantityInput.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  quantityInput.cornerRadius = 8;
+  quantityInput.layoutMode = 'HORIZONTAL';
+  quantityInput.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  quantityInput.counterAxisAlignItems = 'CENTER';
+  quantityInput.paddingLeft = 12;
+  quantityInput.paddingRight = 12;
+
+  const minusBtn = figma.createText();
+  minusBtn.fontName = { family: 'Inter', style: 'Bold' };
+  minusBtn.fontSize = 18;
+  minusBtn.characters = "−";
+  minusBtn.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  quantityInput.appendChild(minusBtn);
+
+  const quantityValue = figma.createText();
+  quantityValue.fontName = { family: 'Inter', style: 'Medium' };
+  quantityValue.fontSize = 16;
+  quantityValue.characters = "1";
+  quantityValue.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+  quantityInput.appendChild(quantityValue);
+
+  const plusBtn = figma.createText();
+  plusBtn.fontName = { family: 'Inter', style: 'Bold' };
+  plusBtn.fontSize = 18;
+  plusBtn.characters = "+";
+  plusBtn.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  quantityInput.appendChild(plusBtn);
+
+  quantitySection.appendChild(quantityInput);
+  actionsSection.appendChild(quantitySection);
+
+  // Add to Cart Button
+  const addToCartBtn = figma.createFrame();
+  addToCartBtn.name = "Add to Cart Button";
+  addToCartBtn.resize(360, 50);
+  addToCartBtn.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  addToCartBtn.strokeWeight = 2;
+  addToCartBtn.strokes = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  addToCartBtn.cornerRadius = 8;
+  addToCartBtn.layoutMode = 'HORIZONTAL';
+  addToCartBtn.primaryAxisAlignItems = 'CENTER';
+  addToCartBtn.counterAxisAlignItems = 'CENTER';
+  addToCartBtn.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.1 },
+    offset: { x: 0, y: 2 },
+    radius: 4,
+    visible: true,
+    blendMode: 'NORMAL'
+  }];
+
+  const addToCartText = figma.createText();
+  addToCartText.fontName = { family: 'Inter', style: 'Bold' };
+  addToCartText.fontSize = 16;
+  addToCartText.characters = "🛒 Tambah ke Keranjang";
+  addToCartText.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  addToCartBtn.appendChild(addToCartText);
+
+  actionsSection.appendChild(addToCartBtn);
+
+  // Buy Now Button
+  const buyNowBtn = figma.createFrame();
+  buyNowBtn.name = "Buy Now Button";
+  buyNowBtn.resize(360, 50);
+  buyNowBtn.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  buyNowBtn.cornerRadius = 8;
+  buyNowBtn.layoutMode = 'HORIZONTAL';
+  buyNowBtn.primaryAxisAlignItems = 'CENTER';
+  buyNowBtn.counterAxisAlignItems = 'CENTER';
+  buyNowBtn.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.15 },
+    offset: { x: 0, y: 2 },
+    radius: 8,
+    visible: true,
+    blendMode: 'NORMAL'
+  }];
+
+  const buyNowText = figma.createText();
+  buyNowText.fontName = { family: 'Inter', style: 'Bold' };
+  buyNowText.fontSize = 16;
+  buyNowText.characters = "⚡ Beli Sekarang";
+  buyNowText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  buyNowBtn.appendChild(buyNowText);
+
+  actionsSection.appendChild(buyNowBtn);
+
+  // Additional Info
+  const additionalInfo = figma.createText();
+  additionalInfo.fontName = { family: 'Inter', style: 'Regular' };
+  additionalInfo.fontSize = 12;
+  additionalInfo.characters = "💳 Tersedia berbagai metode pembayaran\n🚚 Gratis ongkir untuk pembelian di atas Rp 500.000";
+  additionalInfo.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+  additionalInfo.resize(360, 40);
+  additionalInfo.textAutoResize = 'HEIGHT';
+  actionsSection.appendChild(additionalInfo);
+
+  summaryCard.appendChild(actionsSection);
+
+  return summaryCard;
 }
