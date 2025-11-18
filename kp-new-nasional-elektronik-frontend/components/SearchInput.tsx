@@ -6,6 +6,7 @@ import Link from "next/link";
 import { sanitize } from "@/lib/sanitize";
 import apiClient from "@/lib/api";
 import ProductItemRating from "./ProductItemRating";
+import { formatCurrency } from "@/utils/currencyFormatter";
 
 interface Product {
   id: string;
@@ -134,7 +135,7 @@ const SearchInput = () => {
                     </h4>
                     <div className="flex items-center justify-between mt-1">
                       <span className="text-sm font-bold text-custom-red">
-                        ${product.price}
+                        Rp {formatCurrency(product.price)}
                       </span>
                       <ProductItemRating productRating={product?.rating} />
                     </div>

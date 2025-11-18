@@ -37,9 +37,16 @@ export const CartModule = () => {
                 <Image
                   width={192}
                   height={192}
-                  src={product?.image ? `/${product.image}` : "/product_placeholder.jpg"}
+                  src={
+                    product?.image
+                      ? product.image.startsWith('http')
+                        ? product.image
+                        : `/${product.image}`
+                      : "/product_placeholder.jpg"
+                  }
                   alt="laptop image"
                   className="h-24 w-24 rounded-lg object-cover object-center sm:h-48 sm:w-48"
+                  unoptimized={product?.image?.startsWith('http')}
                 />
               </div>
 

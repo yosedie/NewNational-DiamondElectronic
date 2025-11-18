@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Nasional Elektronik - Component Generator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 8px;
+      color: #1a202c;
+    }
+
+    p {
+      font-size: 13px;
+      color: #718096;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4a5568;
+      margin-bottom: 12px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-secondary {
+      background: #edf2f7;
+      color: #2d3748;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+      transform: translateY(-1px);
+    }
+
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #38a169;
+      transform: translateY(-1px);
+    }
+
+    .btn-cancel {
+      background: transparent;
+      color: #718096;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn-cancel:hover {
+      background: #f7fafc;
+    }
+
+    .icon {
+      font-size: 16px;
+    }
+
+    .divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin: 20px 0;
+    }
+
+    .info-box {
+      background: #ebf8ff;
+      border-left: 3px solid #4299e1;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: #2c5282;
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      background: #fed7d7;
+      color: #c53030;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: #718096;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      border: 3px solid #e2e8f0;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .feature-list {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+
+    .feature-list li {
+      padding: 8px 0;
+      font-size: 13px;
+      color: #4a5568;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feature-list li::before {
+      content: "✓";
+      color: #48bb78;
+      font-weight: bold;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Component Generator</h1>
+    <p>Automatically generate e-commerce UI components for Nasional Elektronik</p>
+
+    <div class="info-box">
+      <strong>⚡ Quick Start:</strong> Click "Generate All" to create complete design system with atoms, molecules, organisms, and page templates.
+    </div>
+
+    <!-- Main Actions -->
+    <div class="section">
+      <button class="btn-primary" id="generate-all">
+        <span class="icon">🚀</span>
+        <span>Generate All Components</span>
+        <span class="badge">RECOMMENDED</span>
+      </button>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Step by Step -->
+    <div class="section">
+      <div class="section-title">Step-by-Step Generation</div>
+      
+      <button class="btn-secondary" id="setup-styles">
+        <span class="icon">🎨</span>
+        <span>1. Setup Design Tokens</span>
+      </button>
+
+      <button class="btn-secondary" id="generate-atoms">
+        <span class="icon">⚛️</span>
+        <span>2. Generate Atoms</span>
+      </button>
+
+      <button class="btn-secondary" id="generate-molecules">
+        <span class="icon">🧬</span>
+        <span>3. Generate Molecules</span>
+      </button>
+
+      <button class="btn-secondary" id="generate-organisms">
+        <span class="icon">🏛️</span>
+        <span>4. Generate Organisms</span>
+      </button>
+
+      <button class="btn-secondary" id="generate-pages">
+        <span class="icon">📄</span>
+        <span>5. Generate Page Templates</span>
+      </button>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- What Will Be Generated -->
+    <div class="section">
+      <div class="section-title">What Will Be Generated:</div>
+      <ul class="feature-list">
+        <li>Design Tokens (Colors, Typography, Effects)</li>
+        <li>Button Component (4 variants)</li>
+        <li>Input Field Component</li>
+        <li>Badge Component</li>
+        <li>Product Card</li>
+        <li>Search Bar</li>
+        <li>Header & Footer</li>
+        <li>Homepage Template</li>
+      </ul>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Cancel Button -->
+    <button class="btn-cancel" id="cancel">
+      <span>Close</span>
+    </button>
+
+    <!-- Loading State -->
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Generating components...</p>
+    </div>
+  </div>
+
+  <script>
+    // Button event listeners
+    document.getElementById('generate-all').onclick = () => {
+      showLoading();
+      parent.postMessage({ pluginMessage: { type: 'generate-all' } }, '*');
+    };
+
+    document.getElementById('setup-styles').onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'setup-styles' } }, '*');
+    };
+
+    document.getElementById('generate-atoms').onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'generate-atoms' } }, '*');
+    };
+
+    document.getElementById('generate-molecules').onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'generate-molecules' } }, '*');
+    };
+
+    document.getElementById('generate-organisms').onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'generate-organisms' } }, '*');
+    };
+
+    document.getElementById('generate-pages').onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'generate-pages' } }, '*');
+    };
+
+    document.getElementById('cancel').onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*');
+    };
+
+    // Listen for messages from plugin
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (msg.type === 'generation-complete') {
+        hideLoading();
+      }
+    };
+
+    function showLoading() {
+      document.querySelector('.container').style.display = 'none';
+      document.getElementById('loading').classList.add('active');
+    }
+
+    function hideLoading() {
+      document.querySelector('.container').style.display = 'block';
+      document.getElementById('loading').classList.remove('active');
+    }
+  </script>
+</body>
+</html>

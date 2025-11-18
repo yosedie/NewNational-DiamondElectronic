@@ -27,13 +27,19 @@ const AddToWishlistBtn = ({ product, slug }: AddToWishlistBtnProps) => {
           cache: "no-store",
         });
         const userData = await userResponse.json();
-        
+
+        // Validate that we have a valid user ID
+        if (!userData?.id) {
+          toast.error("User tidak ditemukan. Silakan logout dan login kembali.");
+          return;
+        }
+
         // Add product to wishlist
         const wishlistResponse = await apiClient.post("/api/wishlist", {
           productId: product?.id,
-          userId: userData?.id
+          userId: userData.id
         });
-        
+
         if (wishlistResponse.ok) {
           addToWishlist({
             id: product?.id,
@@ -50,10 +56,10 @@ const AddToWishlistBtn = ({ product, slug }: AddToWishlistBtnProps) => {
         }
       } catch (error) {
         console.error("Error adding to wishlist:", error);
-  toast.error("Gagal menambahkan produk ke daftar keinginan");
+        toast.error("Gagal menambahkan produk ke daftar keinginan");
       }
     } else {
-  toast.error("Anda harus masuk untuk menambahkan produk ke daftar keinginan");
+      toast.error("Anda harus masuk untuk menambahkan produk ke daftar keinginan");
     }
   };
 
@@ -65,12 +71,18 @@ const AddToWishlistBtn = ({ product, slug }: AddToWishlistBtnProps) => {
           cache: "no-store",
         });
         const userData = await userResponse.json();
-        
+
+        // Validate that we have a valid user ID
+        if (!userData?.id) {
+          toast.error("User tidak ditemukan. Silakan logout dan login kembali.");
+          return;
+        }
+
         // Remove product from wishlist
         const deleteResponse = await apiClient.delete(
-          `/api/wishlist/${userData?.id}/${product?.id}`
+          `/api/wishlist/${userData.id}/${product?.id}`
         );
-        
+
         if (deleteResponse.ok) {
           removeFromWishlist(product?.id);
           toast.success("Produk berhasil dihapus dari daftar keinginan");
@@ -80,7 +92,7 @@ const AddToWishlistBtn = ({ product, slug }: AddToWishlistBtnProps) => {
         }
       } catch (error) {
         console.error("Error removing from wishlist:", error);
-  toast.error("Gagal menghapus produk dari daftar keinginan");
+        toast.error("Gagal menghapus produk dari daftar keinginan");
       }
     }
   };
@@ -93,13 +105,19 @@ const AddToWishlistBtn = ({ product, slug }: AddToWishlistBtnProps) => {
           cache: "no-store",
         });
         const userData = await userResponse.json();
-        
+
+        // Validate that we have a valid user ID
+        if (!userData?.id) {
+          setIsProductInWishlist(false);
+          return;
+        }
+
         // checking is product in wishlist
         const wishlistResponse = await apiClient.get(
-          `/api/wishlist/${userData?.id}/${product?.id}`
+          `/api/wishlist/${userData.id}/${product?.id}`
         );
         const wishlistData = await wishlistResponse.json();
-        
+
         if (wishlistData[0]?.id) {
           setIsProductInWishlist(true);
         } else {

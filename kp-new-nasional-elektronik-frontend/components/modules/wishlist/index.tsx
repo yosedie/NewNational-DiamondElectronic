@@ -32,12 +32,24 @@ export const WishlistModule = () => {
 
   const getUserByEmail = async () => {
     if (session?.user?.email) {
+      console.log("Looking up user by email:", session.user.email);
       apiClient.get(`/api/users/email/${session?.user?.email}`, {
         cache: "no-store",
       })
-        .then((response) => response.json())
+        .then((response) => {
+          console.log("User lookup response status:", response.status);
+          return response.json();
+        })
         .then((data) => {
-          getWishlistByUserId(data?.id);
+          console.log("User lookup response data:", data);
+          if (data?.id) {
+            getWishlistByUserId(data.id);
+          } else {
+            console.error("User ID not found in response. Full response:", data);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching user by email:", error);
         });
     }
   };

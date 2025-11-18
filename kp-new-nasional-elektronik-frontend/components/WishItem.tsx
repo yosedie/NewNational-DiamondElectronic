@@ -39,7 +39,14 @@ const WishItem = ({
       })
         .then((response) => response.json())
         .then((data) => {
-          setUserId(data?.id);
+          if (data?.id) {
+            setUserId(data.id);
+          } else {
+            console.error("User ID not found in response");
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching user by email:", error);
         });
     }
   };
@@ -68,13 +75,20 @@ const WishItem = ({
         {id}
       </th>
       <th>
-        <div className="w-12 h-12 mx-auto" onClick={() => openProduct(slug)}>
+        <div className="w-20 h-20 mx-auto" onClick={() => openProduct(slug)}>
           <Image
-            src={`/${image}`}
+            src={
+              image
+                ? image.startsWith('http')
+                  ? image
+                  : `/${image}`
+                : "/product_placeholder.jpg"
+            }
             width={200}
             height={200}
-            className="w-auto h-auto"
+            className="w-full h-full object-cover rounded-lg"
             alt={sanitize(title)}
+            unoptimized={image?.startsWith('http')}
           />
         </div>
       </th>

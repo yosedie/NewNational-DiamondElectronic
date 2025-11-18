@@ -336,11 +336,18 @@ const CheckoutPage = () => {
               {products.map((product) => (
                 <li key={product?.id} className="flex items-start space-x-4 py-6">
                   <Image
-                    src={product?.image ? `/${product?.image}` : "/product_placeholder.jpg"}
+                    src={
+                      product?.image
+                        ? product.image.startsWith('http')
+                          ? product.image
+                          : `/${product.image}`
+                        : "/product_placeholder.jpg"
+                    }
                     alt={product?.title}
                     width={80}
                     height={80}
                     className="h-20 w-20 flex-none rounded-lg object-cover object-center"
+                    unoptimized={product?.image?.startsWith('http')}
                   />
                   <div className="flex-auto space-y-1">
                     <h3>{product?.title}</h3>
