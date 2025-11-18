@@ -7,9 +7,15 @@ figma.showUI(__html__, { width: 400, height: 500 });
 // Listen for messages from UI
 figma.ui.onmessage = async (msg) => {
   if (msg.type === 'generate-all-pages') {
-    await generateAllPages();
-    figma.ui.postMessage({ type: 'generation-complete' });
-    figma.notify('🎉 Homepage and Shop page generated successfully!');
+    try {
+      await generateAllPages();
+      figma.ui.postMessage({ type: 'generation-complete' });
+      figma.notify('🎉 Both pages generated successfully!');
+    } catch (error) {
+      console.error('Error generating pages:', error);
+      figma.notify('❌ Error: ' + error.message, { error: true });
+      figma.ui.postMessage({ type: 'generation-complete' });
+    }
   } else if (msg.type === 'cancel') {
     figma.closePlugin();
   }
@@ -658,223 +664,249 @@ async function generatePages() {
 // GENERATE ALL PAGES (HOMEPAGE + SHOP PAGE)
 // ==========================================
 async function generateAllPages() {
-  // Load fonts first
-  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
-  await figma.loadFontAsync({ family: 'Inter', style: 'Medium' });
-  await figma.loadFontAsync({ family: 'Inter', style: 'Bold' });
+  try {
+    // Load fonts first
+    figma.notify('Loading fonts...');
+    await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
+    await figma.loadFontAsync({ family: 'Inter', style: 'Medium' });
+    await figma.loadFontAsync({ family: 'Inter', style: 'Bold' });
 
-  // Create main page
-  const page = figma.createPage();
-  page.name = "📄 Pages - Nasional Elektronik";
-  figma.currentPage = page;
+    // Create main page
+    figma.notify('Creating page...');
+    const page = figma.createPage();
+    page.name = "📄 Pages - Nasional Elektronik";
+    figma.currentPage = page;
 
-  // Generate Homepage
-  const homepage = await createHomepageFrame();
-  homepage.x = 0;
-  homepage.y = 0;
-  figma.currentPage.appendChild(homepage);
-  
-  // Generate Shop Page
-  const shopPage = await createShopPageFrame();
-  shopPage.x = 1600; // Position to the right of homepage
-  shopPage.y = 0;
-  figma.currentPage.appendChild(shopPage);
+    // Generate Homepage
+    figma.notify('Generating Homepage... (1/2)');
+    const homepage = await createHomepageFrame();
+    homepage.x = 0;
+    homepage.y = 0;
+    page.appendChild(homepage);
+    console.log('Homepage created and appended');
+    
+    // Generate Shop Page
+    figma.notify('Generating Shop Page... (2/2)');
+    const shopPage = await createShopPageFrame();
+    shopPage.x = 1600; // Position to the right of homepage
+    shopPage.y = 0;
+    page.appendChild(shopPage);
+    console.log('Shop Page created and appended');
 
-  // Zoom to fit both pages
-  figma.viewport.scrollAndZoomIntoView([homepage, shopPage]);
+    // Zoom to fit both pages
+    figma.notify('Finalizing...');
+    figma.viewport.scrollAndZoomIntoView([homepage, shopPage]);
+    
+    console.log('Both pages generated successfully');
+  } catch (error) {
+    console.error('Error in generateAllPages:', error);
+    throw error;
+  }
 }
 
 // Create Homepage Frame
 async function createHomepageFrame() {
-  const homepage = figma.createFrame();
-  homepage.name = "Homepage - Desktop";
-  homepage.resize(1440, 4000);
-  homepage.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  homepage.layoutMode = 'VERTICAL';
+  try {
+    const homepage = figma.createFrame();
+    homepage.name = "Homepage - Desktop";
+    homepage.resize(1440, 4000);
+    homepage.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    homepage.layoutMode = 'VERTICAL';
 
-  // Add header
-  const header = await createHeader();
-  homepage.appendChild(header);
+    // Add header
+    const header = await createHeader();
+    homepage.appendChild(header);
 
-  // Add hero section
-  const hero = figma.createFrame();
-  hero.name = "Hero Section";
-  hero.resize(1440, 500);
-  hero.fills = [{
-    type: 'SOLID',
-    color: { r: 0.95, g: 0.96, b: 0.96 }
-  }];
-  hero.layoutMode = 'VERTICAL';
-  hero.primaryAxisAlignItems = 'CENTER';
-  hero.counterAxisAlignItems = 'CENTER';
+    // Add hero section
+    const hero = figma.createFrame();
+    hero.name = "Hero Section";
+    hero.resize(1440, 500);
+    hero.fills = [{
+      type: 'SOLID',
+      color: { r: 0.95, g: 0.96, b: 0.96 }
+    }];
+    hero.layoutMode = 'VERTICAL';
+    hero.primaryAxisAlignItems = 'CENTER';
+    hero.counterAxisAlignItems = 'CENTER';
 
-  const heroTitle = figma.createText();
-  heroTitle.fontName = { family: 'Inter', style: 'Bold' };
-  heroTitle.fontSize = 48;
-  heroTitle.characters = "HERO SECTION";
-  heroTitle.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
-  hero.appendChild(heroTitle);
+    const heroTitle = figma.createText();
+    heroTitle.fontName = { family: 'Inter', style: 'Bold' };
+    heroTitle.fontSize = 48;
+    heroTitle.characters = "HERO SECTION";
+    heroTitle.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    hero.appendChild(heroTitle);
 
-  homepage.appendChild(hero);
+    homepage.appendChild(hero);
 
-  // Add product grid placeholder
-  const productsSection = figma.createFrame();
-  productsSection.name = "Featured Products";
-  productsSection.resize(1440, 600);
-  productsSection.fills = [];
-  productsSection.layoutMode = 'VERTICAL';
-  productsSection.paddingLeft = 80;
-  productsSection.paddingRight = 80;
-  productsSection.paddingTop = 60;
-  productsSection.paddingBottom = 60;
-  productsSection.itemSpacing = 40;
+    // Add product grid placeholder
+    const productsSection = figma.createFrame();
+    productsSection.name = "Featured Products";
+    productsSection.resize(1440, 600);
+    productsSection.fills = [];
+    productsSection.layoutMode = 'VERTICAL';
+    productsSection.paddingLeft = 80;
+    productsSection.paddingRight = 80;
+    productsSection.paddingTop = 60;
+    productsSection.paddingBottom = 60;
+    productsSection.itemSpacing = 40;
 
-  const sectionTitle = figma.createText();
-  sectionTitle.fontName = { family: 'Inter', style: 'Bold' };
-  sectionTitle.fontSize = 32;
-  sectionTitle.characters = "Featured Products";
-  sectionTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
-  productsSection.appendChild(sectionTitle);
+    const sectionTitle = figma.createText();
+    sectionTitle.fontName = { family: 'Inter', style: 'Bold' };
+    sectionTitle.fontSize = 32;
+    sectionTitle.characters = "Featured Products";
+    sectionTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    productsSection.appendChild(sectionTitle);
 
-  // Product grid
-  const productGrid = figma.createFrame();
-  productGrid.name = "Product Grid";
-  productGrid.resize(1280, 450);
-  productGrid.fills = [];
-  productGrid.layoutMode = 'HORIZONTAL';
-  productGrid.itemSpacing = 24;
+    // Product grid
+    const productGrid = figma.createFrame();
+    productGrid.name = "Product Grid";
+    productGrid.resize(1280, 450);
+    productGrid.fills = [];
+    productGrid.layoutMode = 'HORIZONTAL';
+    productGrid.itemSpacing = 24;
 
-  for (let i = 0; i < 4; i++) {
-    const productCard = await createProductCard();
-    productGrid.appendChild(productCard);
+    for (let i = 0; i < 4; i++) {
+      const productCard = await createProductCard();
+      productGrid.appendChild(productCard);
+    }
+
+    productsSection.appendChild(productGrid);
+    homepage.appendChild(productsSection);
+
+    // Add footer
+    const footer = await createFooter();
+    homepage.appendChild(footer);
+
+    console.log('Homepage frame created successfully');
+    return homepage;
+  } catch (error) {
+    console.error('Error in createHomepageFrame:', error);
+    throw new Error('Failed to create Homepage: ' + error.message);
   }
-
-  productsSection.appendChild(productGrid);
-  homepage.appendChild(productsSection);
-
-  // Add footer
-  const footer = await createFooter();
-  homepage.appendChild(footer);
-
-  return homepage;
 }
 
 // Create Shop Page Frame
 async function createShopPageFrame() {
-  const shopPage = figma.createFrame();
-  shopPage.name = "Shop Page - Desktop";
-  shopPage.resize(1440, 3000);
-  shopPage.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
-  shopPage.layoutMode = 'VERTICAL';
+  try {
+    const shopPage = figma.createFrame();
+    shopPage.name = "Shop Page - Desktop";
+    shopPage.resize(1440, 3000);
+    shopPage.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    shopPage.layoutMode = 'VERTICAL';
 
-  // Add header
-  const header = await createHeader();
-  shopPage.appendChild(header);
+    // Add header
+    const header = await createHeader();
+    shopPage.appendChild(header);
 
-  // Create main content container
-  const mainContent = figma.createFrame();
-  mainContent.name = "Main Content";
-  mainContent.resize(1440, 2500);
-  mainContent.fills = [];
-  mainContent.layoutMode = 'VERTICAL';
-  mainContent.paddingLeft = 80;
-  mainContent.paddingRight = 80;
-  mainContent.paddingTop = 40;
-  mainContent.paddingBottom = 60;
-  mainContent.itemSpacing = 20;
+    // Create main content container
+    const mainContent = figma.createFrame();
+    mainContent.name = "Main Content";
+    mainContent.resize(1440, 2500);
+    mainContent.fills = [];
+    mainContent.layoutMode = 'VERTICAL';
+    mainContent.paddingLeft = 80;
+    mainContent.paddingRight = 80;
+    mainContent.paddingTop = 40;
+    mainContent.paddingBottom = 60;
+    mainContent.itemSpacing = 20;
 
-  // Add Breadcrumb
-  const breadcrumb = createBreadcrumb();
-  mainContent.appendChild(breadcrumb);
+    // Add Breadcrumb
+    const breadcrumb = createBreadcrumb();
+    mainContent.appendChild(breadcrumb);
 
-  // Create two-column layout (Filters + Products)
-  const contentGrid = figma.createFrame();
-  contentGrid.name = "Content Grid";
-  contentGrid.resize(1280, 2200);
-  contentGrid.fills = [];
-  contentGrid.layoutMode = 'HORIZONTAL';
-  contentGrid.itemSpacing = 40;
-  contentGrid.primaryAxisSizingMode = 'FIXED';
+    // Create two-column layout (Filters + Products)
+    const contentGrid = figma.createFrame();
+    contentGrid.name = "Content Grid";
+    contentGrid.resize(1280, 2200);
+    contentGrid.fills = [];
+    contentGrid.layoutMode = 'HORIZONTAL';
+    contentGrid.itemSpacing = 40;
+    contentGrid.primaryAxisSizingMode = 'FIXED';
 
-  // Left sidebar - Filters (200px)
-  const filtersSidebar = createFiltersSidebar();
-  contentGrid.appendChild(filtersSidebar);
+    // Left sidebar - Filters (200px)
+    const filtersSidebar = createFiltersSidebar();
+    contentGrid.appendChild(filtersSidebar);
 
-  // Right content area
-  const productsArea = figma.createFrame();
-  productsArea.name = "Products Area";
-  productsArea.resize(1040, 2200);
-  productsArea.fills = [];
-  productsArea.layoutMode = 'VERTICAL';
-  productsArea.itemSpacing = 24;
+    // Right content area
+    const productsArea = figma.createFrame();
+    productsArea.name = "Products Area";
+    productsArea.resize(1040, 2200);
+    productsArea.fills = [];
+    productsArea.layoutMode = 'VERTICAL';
+    productsArea.itemSpacing = 24;
 
-  // Header with title and sort
-  const productsHeader = figma.createFrame();
-  productsHeader.name = "Products Header";
-  productsHeader.resize(1040, 60);
-  productsHeader.fills = [];
-  productsHeader.layoutMode = 'HORIZONTAL';
-  productsHeader.primaryAxisAlignItems = 'CENTER';
-  productsHeader.counterAxisAlignItems = 'CENTER';
+    // Header with title and sort
+    const productsHeader = figma.createFrame();
+    productsHeader.name = "Products Header";
+    productsHeader.resize(1040, 60);
+    productsHeader.fills = [];
+    productsHeader.layoutMode = 'HORIZONTAL';
+    productsHeader.primaryAxisAlignItems = 'CENTER';
+    productsHeader.counterAxisAlignItems = 'CENTER';
 
-  // Title
-  const pageTitle = figma.createText();
-  pageTitle.fontName = { family: 'Inter', style: 'Bold' };
-  pageTitle.fontSize = 24;
-  pageTitle.characters = "SEMUA PRODUK";
-  pageTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
-  pageTitle.layoutGrow = 1;
-  productsHeader.appendChild(pageTitle);
+    // Title
+    const pageTitle = figma.createText();
+    pageTitle.fontName = { family: 'Inter', style: 'Bold' };
+    pageTitle.fontSize = 24;
+    pageTitle.characters = "SEMUA PRODUK";
+    pageTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    pageTitle.layoutGrow = 1;
+    productsHeader.appendChild(pageTitle);
 
-  // Sort By dropdown
-  const sortBy = createSortByDropdown();
-  productsHeader.appendChild(sortBy);
+    // Sort By dropdown
+    const sortBy = createSortByDropdown();
+    productsHeader.appendChild(sortBy);
 
-  productsArea.appendChild(productsHeader);
+    productsArea.appendChild(productsHeader);
 
-  // Divider
-  const divider = figma.createRectangle();
-  divider.name = "Divider";
-  divider.resize(1040, 1);
-  divider.fills = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
-  productsArea.appendChild(divider);
+    // Divider
+    const divider = figma.createRectangle();
+    divider.name = "Divider";
+    divider.resize(1040, 1);
+    divider.fills = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+    productsArea.appendChild(divider);
 
-  // Products Grid
-  const productsGrid = figma.createFrame();
-  productsGrid.name = "Products Grid";
-  productsGrid.resize(1040, 1800);
-  productsGrid.fills = [];
-  productsGrid.layoutMode = 'HORIZONTAL';
-  productsGrid.primaryAxisSizingMode = 'FIXED';
-  productsGrid.counterAxisSizingMode = 'AUTO';
-  productsGrid.primaryAxisAlignItems = 'MIN';
-  productsGrid.itemSpacing = 24;
-  productsGrid.counterAxisSpacing = 24;
-  productsGrid.layoutWrap = 'WRAP';
+    // Products Grid
+    const productsGrid = figma.createFrame();
+    productsGrid.name = "Products Grid";
+    productsGrid.resize(1040, 1800);
+    productsGrid.fills = [];
+    productsGrid.layoutMode = 'HORIZONTAL';
+    productsGrid.primaryAxisSizingMode = 'FIXED';
+    productsGrid.counterAxisSizingMode = 'AUTO';
+    productsGrid.primaryAxisAlignItems = 'MIN';
+    productsGrid.itemSpacing = 24;
+    productsGrid.counterAxisSpacing = 24;
+    productsGrid.layoutWrap = 'WRAP';
 
-  // Generate 12 product cards (3 columns x 4 rows)
-  for (let i = 0; i < 12; i++) {
-    const productCard = await createProductCard();
-    productCard.resize(320, 420);
-    productsGrid.appendChild(productCard);
+    // Generate 12 product cards (3 columns x 4 rows)
+    for (let i = 0; i < 12; i++) {
+      const productCard = await createProductCard();
+      productCard.resize(320, 420);
+      productsGrid.appendChild(productCard);
+    }
+
+    productsArea.appendChild(productsGrid);
+
+    // Pagination
+    const pagination = createPagination();
+    productsArea.appendChild(pagination);
+
+    contentGrid.appendChild(productsArea);
+    mainContent.appendChild(contentGrid);
+
+    shopPage.appendChild(mainContent);
+
+    // Add footer
+    const footer = await createFooter();
+    shopPage.appendChild(footer);
+
+    console.log('Shop Page frame created successfully');
+    return shopPage;
+  } catch (error) {
+    console.error('Error in createShopPageFrame:', error);
+    throw new Error('Failed to create Shop Page: ' + error.message);
   }
-
-  productsArea.appendChild(productsGrid);
-
-  // Pagination
-  const pagination = createPagination();
-  productsArea.appendChild(pagination);
-
-  contentGrid.appendChild(productsArea);
-  mainContent.appendChild(contentGrid);
-
-  shopPage.appendChild(mainContent);
-
-  // Add footer
-  const footer = await createFooter();
-  shopPage.appendChild(footer);
-
-  return shopPage;
 }
 
 // ==========================================
