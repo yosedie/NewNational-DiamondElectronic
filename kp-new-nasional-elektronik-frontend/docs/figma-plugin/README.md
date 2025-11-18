@@ -1,6 +1,6 @@
-# Figma Plugin - Nasional Elektronik Component Generator
+# Figma Plugin - Nasional Elektronik Page Generator
 
-Plugin Figma untuk auto-generate UI components untuk e-commerce platform Nasional Elektronik.
+Plugin Figma untuk auto-generate wireframe pages untuk e-commerce platform Nasional Elektronik.
 
 ## 🚀 Cara Install Plugin
 
@@ -10,7 +10,7 @@ Plugin Figma untuk auto-generate UI components untuk e-commerce platform Nasiona
 
 2. **Buat folder plugin** di komputer Anda:
    ```
-   C:\Users\Richcie\Documents\Figma Plugins\nasional-elektronik-generator\
+   C:\Users\[YourName]\Documents\Figma Plugins\nasional-elektronik-generator\
    ```
 
 3. **Copy 3 file ini** ke folder tersebut:
@@ -24,107 +24,43 @@ Plugin Figma untuk auto-generate UI components untuk e-commerce platform Nasiona
 5. **Navigate ke folder plugin** dan pilih file `manifest.json`
 
 6. **Plugin siap digunakan!** Akses via:
-   - `Plugins` → `Development` → `Nasional Elektronik - Component Generator`
-
----
-
-### Method 2: Quick Test
-
-1. **Buka Figma**
-2. **Create new file**
-3. **Buka Console:** `Plugins` → `Development` → `Open Console`
-4. **Copy-paste code dari `code.js`** ke console
-5. **Run!**
+   - `Plugins` → `Development` → `Nasional Elektronik - Page Generator`
 
 ---
 
 ## 🎨 Cara Menggunakan Plugin
 
-### Quick Start (Otomatis)
+### Simple & Easy (Otomatis)
 
 1. **Jalankan plugin** dari menu Plugins
-2. **Klik "Generate All Components"**
-3. **Tunggu 10-30 detik**
-4. **Done!** Semua components sudah dibuat
-
-### Step by Step (Manual)
-
-Jika ingin generate satu per satu:
-
-1. **Setup Design Tokens** → Membuat color styles, text styles, effect styles
-2. **Generate Atoms** → Buttons, Inputs, Badges
-3. **Generate Molecules** → Product Cards, Search Bar
-4. **Generate Organisms** → Header, Footer
-5. **Generate Pages** → Homepage template
+2. **Klik "Generate Pages"**
+3. **Tunggu 5-10 detik**
+4. **Done!** Kedua pages (Homepage dan Shop Page) sudah dibuat side-by-side
 
 ---
 
 ## 📦 Yang Di-Generate oleh Plugin
 
-### 1. Design Tokens & Styles
+### Pages Generated:
 
-**Color Styles:**
-- Primary colors (Blue)
-- Secondary colors (Green)
-- Neutral colors (Gray scale)
-- Semantic colors (Success, Warning, Error, Info)
+**1. Homepage (Left)**
+- Header dengan logo, search bar, dan navigation
+- Hero section dengan placeholder
+- Featured products grid (4 produk)
+- Footer dengan 4 kolom
 
-**Text Styles:**
-- Heading 1-6
-- Body Large/Regular/Small
-- Caption
-
-**Effect Styles:**
-- Shadows (sm, md, lg, xl)
-
-### 2. Atomic Components
-
-**Button Component:**
-- Variants: Primary, Secondary, Outline, Ghost
-- States: Default, Hover, Active, Disabled
-- Sizes: Small, Medium, Large
-
-**Input Component:**
-- Types: Text, Email, Password, Search
-- States: Default, Focused, Error, Disabled
-
-**Badge Component:**
-- Variants: New, Sale, Popular
-- Colors: Blue, Red, Green
-
-### 3. Molecular Components
-
-**Product Card:**
-- Product image placeholder
-- Product name
-- Price display
-- Add to cart button
-- Wishlist button
-
-**Search Bar:**
-- Search icon
-- Input field
-- Search button
-
-### 4. Organism Components
-
-**Header:**
-- Logo
-- Search bar
-- Navigation menu
-- Icons (Wishlist, Cart, User)
-
-**Footer:**
-- 4 columns layout
-- Links sections
-- Copyright
-
-### 5. Page Templates
-
-**Homepage:**
-- Header (sticky)
-- Hero section
-- Featured products grid
+**2. Shop/Listing Page (Right)**
+- Header (sama seperti homepage)
+- Breadcrumb navigation (Home > Belanja > Semua produk)
+- **Filters Sidebar (200px):**
+  - Ketersediaan (Stock tersedia/habis checkboxes)
+  - Harga filter (Range slider 0-3000)
+  - Minimum Rating (Range slider 0-5 stars)
+- **Main Products Area:**
+  - Page title "SEMUA PRODUK"
+  - Sort dropdown (Urutkan bedasarkan)
+  - Product grid (3 kolom x 4 baris = 12 produk)
+  - Pagination (Previous, Page 1, Next)
 - Footer
 
 ---
@@ -192,7 +128,7 @@ button.resize(140, 44); // Width, Height
 
 ### Phase 5: Templates ✅
 - [x] Homepage
-- [ ] Shop/Listing page (TODO)
+- [x] Shop/Listing page ✅ NEW!
 - [ ] Product detail page (TODO)
 - [ ] Cart page (TODO)
 - [ ] Checkout page (TODO)
@@ -200,7 +136,159 @@ button.resize(140, 44); // Width, Height
 
 ---
 
-## 🚧 TODO - Future Enhancements
+## � Shop/Listing Page Structure (DETAILED)
+
+The Shop/Listing page is a complete e-commerce product listing page with filters and sorting capabilities.
+
+### Layout Structure:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         HEADER                               │
+│  Logo | Search Bar          | Wishlist | Cart | User        │
+│  Home | Shop | Categories | Deals | About | Contact         │
+└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│  🏠 Home > Belanja > Semua produk       (Breadcrumb)        │
+└─────────────────────────────────────────────────────────────┘
+┌──────────────┬──────────────────────────────────────────────┐
+│              │  SEMUA PRODUK       Urutkan bedasarkan: [▼] │
+│  FILTERS     │  ─────────────────────────────────────────── │
+│              │                                               │
+│ Ketersediaan │  ┌────────┐ ┌────────┐ ┌────────┐          │
+│ ☑ Stock ada  │  │Product │ │Product │ │Product │          │
+│ ☑ Stock habis│  │ Card 1 │ │ Card 2 │ │ Card 3 │          │
+│              │  └────────┘ └────────┘ └────────┘          │
+│ ─────────    │                                               │
+│              │  ┌────────┐ ┌────────┐ ┌────────┐          │
+│ Harga        │  │Product │ │Product │ │Product │          │
+│ [━━━━━━━━]   │  │ Card 4 │ │ Card 5 │ │ Card 6 │          │
+│ Max: $3000   │  └────────┘ └────────┘ └────────┘          │
+│              │                                               │
+│ ─────────    │  ┌────────┐ ┌────────┐ ┌────────┐          │
+│              │  │Product │ │Product │ │Product │          │
+│ Rating       │  │ Card 7 │ │ Card 8 │ │ Card 9 │          │
+│ [━━━━━━━━]   │  └────────┘ └────────┘ └────────┘          │
+│ 0 1 2 3 4 5  │                                               │
+│              │  ┌────────┐ ┌────────┐ ┌────────┐          │
+└──────────────┤  │Product │ │Product │ │Product │          │
+               │  │Card 10 │ │Card 11 │ │Card 12 │          │
+               │  └────────┘ └────────┘ └────────┘          │
+               │                                               │
+               │        [«] [Page 1] [»]      (Pagination)    │
+               └──────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                         FOOTER                               │
+│   About Us | Customer Service | Quick Links | Follow Us     │
+│   © 2025 Nasional Elektronik. All rights reserved.          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Components Breakdown:
+
+#### 1. **Breadcrumb Component**
+- **Size:** 1280px x 40px
+- **Elements:** Home icon, separators (>), navigation links
+- **Colors:** Primary blue for links, gray for separators
+- **Font:** Inter Regular 16px
+
+#### 2. **Filters Sidebar**
+- **Size:** 200px x 600px
+- **Background:** Light gray (#F8F8F8)
+- **Padding:** 20px
+- **Border Radius:** 8px
+
+**Filter Sections:**
+
+a. **Ketersediaan (Availability)**
+   - Title: "Ketersediaan" (Inter Medium 18px)
+   - Checkbox: "☑ Stock tersedia" (In Stock)
+   - Checkbox: "☑ Stock habis" (Out of Stock)
+   - Divider below
+
+b. **Harga (Price Filter)**
+   - Title: "Harga" (Inter Medium 18px)
+   - Range slider: 0-3000
+   - Slider color: Primary blue
+   - Label: "Harga maksimal: $3000"
+   - Divider below
+
+c. **Rating Filter**
+   - Title: "Minimum Rating:" (Inter Medium 18px)
+   - Range slider: 0-5 stars
+   - Slider color: Green (#10B981)
+   - Markers: 0, 1, 2, 3, 4, 5
+
+#### 3. **Main Content Area**
+- **Size:** 1040px width (flexible height)
+
+**Header Section:**
+- Title: "SEMUA PRODUK" (Inter Bold 24px)
+- Sort dropdown: 200px x 44px
+  - Label: "Urutkan bedasarkan:"
+  - Options: Default, A-Z, Z-A, Lowest Price, Highest Price
+  - Border: 2px gray
+  - Dropdown arrow: ▼
+
+#### 4. **Products Grid**
+- **Layout:** 3 columns
+- **Gap:** 24px horizontal, 24px vertical
+- **Product Cards:** 320px x 420px each
+- **Total:** 12 products (4 rows x 3 columns)
+
+**Each Product Card includes:**
+- Product image placeholder (248px x 248px)
+- Product name (Inter Medium 16px)
+- Price (Inter Bold 20px, primary blue)
+- "Add to Cart" button
+
+#### 5. **Pagination Component**
+- **Size:** 1040px x 80px
+- **Centered layout**
+- **Buttons:**
+  - Previous: « (50px x 50px)
+  - Current Page: "Page 1" (100px x 50px)
+  - Next: » (50px x 50px)
+- **Colors:** Custom red (#EF4444)
+- **Text:** White, Inter Bold 16px
+- **Shadow:** 0px 2px 4px rgba(0,0,0,0.1)
+
+### Design Tokens Used:
+
+**Colors:**
+- Primary Blue: #3B82F6 (links, sliders, prices)
+- Custom Red: #EF4444 (pagination buttons)
+- Success Green: #10B981 (rating slider)
+- Gray 50: #F8F8F8 (sidebar background)
+- Gray 200: #E5E7EB (dividers)
+- Gray 400: #9CA3AF (borders)
+- Gray 900: #111827 (text)
+- White: #FFFFFF (cards, backgrounds)
+
+**Typography:**
+- Headings: Inter Bold (24px, 20px, 18px)
+- Body: Inter Medium (16px)
+- Labels: Inter Regular (16px, 14px, 12px)
+
+**Spacing:**
+- Container padding: 80px (left/right)
+- Section spacing: 40px
+- Component spacing: 24px
+- Item spacing: 12px, 8px
+
+**Shadows:**
+- Card shadow: 0px 4px 6px rgba(0,0,0,0.1)
+- Button shadow: 0px 2px 4px rgba(0,0,0,0.1)
+
+### Responsive Breakpoints (for reference):
+
+- **Desktop:** 1440px
+- **Tablet:** < 1300px (3 columns → 2 columns)
+- **Mobile:** < 500px (2 columns → 1 column)
+
+---
+
+## �🚧 TODO - Future Enhancements
 
 ### Components Tambahan:
 - [ ] Icon library (50+ icons)

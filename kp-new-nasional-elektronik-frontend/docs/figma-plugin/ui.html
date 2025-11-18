@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Nasional Elektronik - Component Generator</title>
+  <title>Nasional Elektronik - Page Generator</title>
   <style>
     * {
       margin: 0;
@@ -14,135 +14,131 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       padding: 20px;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .container {
       background: white;
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 360px;
+      width: 100%;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .icon-large {
+      font-size: 48px;
+      margin-bottom: 16px;
     }
 
     h1 {
-      font-size: 20px;
+      font-size: 24px;
       margin-bottom: 8px;
       color: #1a202c;
     }
 
     p {
-      font-size: 13px;
+      font-size: 14px;
       color: #718096;
-      margin-bottom: 24px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
-    .section {
-      margin-bottom: 20px;
+    .info-box {
+      background: #f0f9ff;
+      border-left: 4px solid #3b82f6;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 24px 0;
+      font-size: 13px;
+      color: #1e40af;
+      line-height: 1.6;
     }
 
-    .section-title {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #4a5568;
-      margin-bottom: 12px;
+    .info-box strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #1e3a8a;
+    }
+
+    .info-box ul {
+      margin: 8px 0 0 20px;
+      padding: 0;
+    }
+
+    .info-box li {
+      margin: 4px 0;
     }
 
     button {
       width: 100%;
-      padding: 12px 16px;
+      padding: 16px 24px;
       border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
     .btn-primary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+      box-shadow: 0 12px 28px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
     }
 
     .btn-secondary {
-      background: #edf2f7;
-      color: #2d3748;
+      background: transparent;
+      color: #718096;
+      border: 2px solid #e2e8f0;
     }
 
     .btn-secondary:hover {
-      background: #e2e8f0;
-      transform: translateY(-1px);
-    }
-
-    .btn-success {
-      background: #48bb78;
-      color: white;
-    }
-
-    .btn-success:hover {
-      background: #38a169;
-      transform: translateY(-1px);
-    }
-
-    .btn-cancel {
-      background: transparent;
-      color: #718096;
-      border: 1px solid #e2e8f0;
-    }
-
-    .btn-cancel:hover {
       background: #f7fafc;
+      border-color: #cbd5e0;
     }
 
     .icon {
-      font-size: 16px;
-    }
-
-    .divider {
-      height: 1px;
-      background: #e2e8f0;
-      margin: 20px 0;
-    }
-
-    .info-box {
-      background: #ebf8ff;
-      border-left: 3px solid #4299e1;
-      padding: 12px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-      font-size: 12px;
-      color: #2c5282;
-      line-height: 1.5;
+      font-size: 20px;
     }
 
     .badge {
       display: inline-block;
-      padding: 4px 8px;
-      background: #fed7d7;
-      color: #c53030;
-      border-radius: 4px;
+      padding: 4px 10px;
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 6px;
       font-size: 11px;
-      font-weight: 600;
-      margin-left: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .loading {
       display: none;
       text-align: center;
-      padding: 20px;
-      color: #718096;
+      padding: 40px 20px;
     }
 
     .loading.active {
@@ -150,13 +146,13 @@
     }
 
     .spinner {
-      border: 3px solid #e2e8f0;
-      border-top: 3px solid #667eea;
+      border: 4px solid #e2e8f0;
+      border-top: 4px solid #667eea;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       animation: spin 1s linear infinite;
-      margin: 0 auto 12px;
+      margin: 0 auto 20px;
     }
 
     @keyframes spin {
@@ -164,168 +160,127 @@
       100% { transform: rotate(360deg); }
     }
 
-    .feature-list {
-      list-style: none;
-      margin-bottom: 20px;
-    }
-
-    .feature-list li {
-      padding: 8px 0;
-      font-size: 13px;
+    .loading-text {
       color: #4a5568;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
     }
 
-    .feature-list li::before {
-      content: "✓";
-      color: #48bb78;
-      font-weight: bold;
-      font-size: 16px;
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+      margin: 24px 0;
+    }
+
+    .success-message {
+      display: none;
+      background: #d1fae5;
+      border-left: 4px solid #10b981;
+      padding: 16px;
+      border-radius: 8px;
+      color: #065f46;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .success-message.active {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎨 Component Generator</h1>
-    <p>Automatically generate e-commerce UI components for Nasional Elektronik</p>
+    <div class="header">
+      <div class="icon-large">🎨</div>
+      <h1>Page Generator</h1>
+      <p>Nasional Elektronik E-Commerce</p>
+    </div>
+
+    <div class="success-message" id="success-message">
+      ✅ Pages generated successfully!
+    </div>
 
     <div class="info-box">
-      <strong>⚡ Quick Start:</strong> Click "Generate All" to create complete design system with atoms, molecules, organisms, and page templates.
-    </div>
-
-    <!-- Main Actions -->
-    <div class="section">
-      <button class="btn-primary" id="generate-all">
-        <span class="icon">🚀</span>
-        <span>Generate All Components</span>
-        <span class="badge">RECOMMENDED</span>
-      </button>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Step by Step -->
-    <div class="section">
-      <div class="section-title">Step-by-Step Generation</div>
-      
-      <button class="btn-secondary" id="setup-styles">
-        <span class="icon">🎨</span>
-        <span>1. Setup Design Tokens</span>
-      </button>
-
-      <button class="btn-secondary" id="generate-atoms">
-        <span class="icon">⚛️</span>
-        <span>2. Generate Atoms</span>
-      </button>
-
-      <button class="btn-secondary" id="generate-molecules">
-        <span class="icon">🧬</span>
-        <span>3. Generate Molecules</span>
-      </button>
-
-      <button class="btn-secondary" id="generate-organisms">
-        <span class="icon">🏛️</span>
-        <span>4. Generate Organisms</span>
-      </button>
-
-      <button class="btn-secondary" id="generate-pages">
-        <span class="icon">📄</span>
-        <span>5. Generate Page Templates</span>
-      </button>
-
-      <button class="btn-success" id="generate-shop-page">
-        <span class="icon">🛍️</span>
-        <span>6. Generate Shop/Listing Page</span>
-        <span class="badge">NEW</span>
-      </button>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- What Will Be Generated -->
-    <div class="section">
-      <div class="section-title">What Will Be Generated:</div>
-      <ul class="feature-list">
-        <li>Design Tokens (Colors, Typography, Effects)</li>
-        <li>Button Component (4 variants)</li>
-        <li>Input Field Component</li>
-        <li>Badge Component</li>
-        <li>Product Card</li>
-        <li>Search Bar</li>
-        <li>Header & Footer</li>
-        <li>Homepage Template</li>
-        <li>Shop/Listing Page (NEW)</li>
+      <strong>📄 What will be generated:</strong>
+      <ul>
+        <li><strong>Homepage</strong> - Hero section + Featured products</li>
+        <li><strong>Shop Page</strong> - Filters + Product grid + Pagination</li>
       </ul>
     </div>
 
-    <div class="divider"></div>
+    <div class="content" id="content">
+      <button class="btn-primary" id="generate-pages">
+        <span class="icon">🚀</span>
+        <span>Generate Pages</span>
+        <span class="badge">Start Here</span>
+      </button>
 
-    <!-- Cancel Button -->
-    <button class="btn-cancel" id="cancel">
-      <span>Close</span>
-    </button>
+      <div class="divider"></div>
 
-    <!-- Loading State -->
+      <button class="btn-secondary" id="cancel">
+        <span>Close</span>
+      </button>
+    </div>
+
     <div class="loading" id="loading">
       <div class="spinner"></div>
-      <p>Generating components...</p>
+      <p class="loading-text">Generating pages...</p>
+      <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">This may take a few seconds</p>
     </div>
   </div>
 
   <script>
-    // Button event listeners
-    document.getElementById('generate-all').onclick = () => {
+    const generateBtn = document.getElementById('generate-pages');
+    const cancelBtn = document.getElementById('cancel');
+    const content = document.getElementById('content');
+    const loading = document.getElementById('loading');
+    const successMessage = document.getElementById('success-message');
+
+    generateBtn.onclick = () => {
       showLoading();
-      parent.postMessage({ pluginMessage: { type: 'generate-all' } }, '*');
+      parent.postMessage({ pluginMessage: { type: 'generate-all-pages' } }, '*');
     };
 
-    document.getElementById('setup-styles').onclick = () => {
-      parent.postMessage({ pluginMessage: { type: 'setup-styles' } }, '*');
-    };
-
-    document.getElementById('generate-atoms').onclick = () => {
-      parent.postMessage({ pluginMessage: { type: 'generate-atoms' } }, '*');
-    };
-
-    document.getElementById('generate-molecules').onclick = () => {
-      parent.postMessage({ pluginMessage: { type: 'generate-molecules' } }, '*');
-    };
-
-    document.getElementById('generate-organisms').onclick = () => {
-      parent.postMessage({ pluginMessage: { type: 'generate-organisms' } }, '*');
-    };
-
-    document.getElementById('generate-pages').onclick = () => {
-      parent.postMessage({ pluginMessage: { type: 'generate-pages' } }, '*');
-    };
-
-    document.getElementById('generate-shop-page').onclick = () => {
-      showLoading();
-      parent.postMessage({ pluginMessage: { type: 'generate-shop-page' } }, '*');
-    };
-
-    document.getElementById('cancel').onclick = () => {
+    cancelBtn.onclick = () => {
       parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*');
     };
 
-    // Listen for messages from plugin
     window.onmessage = (event) => {
       const msg = event.data.pluginMessage;
       if (msg.type === 'generation-complete') {
         hideLoading();
+        showSuccess();
       }
     };
 
     function showLoading() {
-      document.querySelector('.container').style.display = 'none';
-      document.getElementById('loading').classList.add('active');
+      content.style.display = 'none';
+      loading.classList.add('active');
+      successMessage.classList.remove('active');
     }
 
     function hideLoading() {
-      document.querySelector('.container').style.display = 'block';
-      document.getElementById('loading').classList.remove('active');
+      content.style.display = 'block';
+      loading.classList.remove('active');
+    }
+
+    function showSuccess() {
+      successMessage.classList.add('active');
+      setTimeout(() => {
+        successMessage.classList.remove('active');
+      }, 3000);
     }
   </script>
 </body>
