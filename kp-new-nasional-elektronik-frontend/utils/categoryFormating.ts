@@ -1,8 +1,10 @@
 // helper function for converting URL category name to friendly and more readable name
-// For example "smart-watches" after this function will be "smart watches"
+// For example "smart-watches" after this function will be "Smart Watches"
 const formatCategoryName = (categoryName: string) => {
   const categoryNameArray = categoryName.split("-");
-  return categoryNameArray.join(" ");
+  return categoryNameArray
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
 };
 
 // helper function for converting category name to URL category name

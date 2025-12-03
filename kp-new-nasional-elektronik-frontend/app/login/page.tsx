@@ -57,6 +57,7 @@ const LoginPage = () => {
     } else {
       setError("");
   toast.success("Berhasil masuk");
+      router.push("/shop");
     }
   };
 

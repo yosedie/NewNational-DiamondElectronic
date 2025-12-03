@@ -97,9 +97,17 @@ const Header = () => {
             <img src="/logo v1 svg.svg" width={200} height={200} alt="Diamond Electronic logo" className="relative right-5 max-[1023px]:w-40" />
           </Link>
           <SearchInput />
-          <div className="flex gap-x-10">
-            <HeartElement wishQuantity={wishQuantity} />
-            <CartElement />
+          <div className="flex gap-x-10 items-center">
+            {userData?.role === "admin" ? (
+              <Link href="/admin" className="bg-red-600 text-white px-6 py-2 rounded font-semibold hover:bg-red-700 transition-colors whitespace-nowrap">
+                Admin Menu
+              </Link>
+            ) : (
+              <>
+                <HeartElement wishQuantity={wishQuantity} />
+                <CartElement />
+              </>
+            )}
           </div>
         </div>
       )}

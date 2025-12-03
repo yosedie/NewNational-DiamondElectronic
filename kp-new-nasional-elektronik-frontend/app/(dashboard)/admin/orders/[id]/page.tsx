@@ -1,12 +1,15 @@
 "use client";
 import { DashboardSidebar } from "@/components";
+import { InvoiceTemplate } from "@/components/InvoiceTemplate";
 import apiClient from "@/lib/api";
 import { isValidEmailAddressFormat, isValidNameOrLastname } from "@/lib/utils";
+import { formatCurrency } from "@/utils/currencyFormatter";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useReactToPrint } from "react-to-print";
 
 interface OrderProduct {
   id: string;
@@ -49,6 +52,12 @@ const AdminSingleOrder = () => {
   const params = useParams<{ id: string }>();
 
   const router = useRouter();
+  const invoiceRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = useReactToPrint({
+    contentRef: invoiceRef,
+    documentTitle: `Invoice-${order?.id}`,
+  });
 
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -359,35 +368,51 @@ const AdminSingleOrder = () => {
                   {product?.product?.title}
                 </Link>
                 <p>
-                  ${product?.product?.price} * {product?.quantity} items
+                  Rp. {formatCurrency(product?.product?.price)} * {product?.quantity} items
                 </p>
               </div>
             </div>
           ))}
           <div className="flex flex-col gap-y-2 mt-10">
-            <p className="text-2xl">Subtotal: ${order?.total}</p>
-            <p className="text-2xl">Pajak 20%: ${order?.total / 5}</p>
-            <p className="text-2xl">Pengiriman: $5</p>
+            <p className="text-2xl">Subtotal: Rp. {formatCurrency(order?.total)}</p>
+            <p className="text-2xl">Pajak 20%: Rp. {formatCurrency(order?.total / 5)}</p>
+            <p className="text-2xl">Pengiriman: Rp. {formatCurrency(5)}</p>
             <p className="text-3xl font-semibold">
-              Total: ${order?.total + order?.total / 5 + 5}
+              Total: Rp. {formatCurrency(order?.total + order?.total / 5 + 5)}
             </p>
           </div>
           <div className="flex gap-x-2 max-sm:flex-col mt-5">
             <button
               type="button"
-              className="uppercase bg-custom-red px-10 py-5 text-lg border border-black border-gray-300 font-bold text-white shadow-sm hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2"
+              className="uppercase bg-blue-600 px-10 py-5 text-lg border border-gray-300 font-bold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2"
+              onClick={handlePrint}
+            >
+              Print Invoice
+            </button>
+            <button
+              type="button"
+              className="uppercase bg-custom-red px-10 py-5 text-lg border border-gray-300 font-bold text-white shadow-sm hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2"
               onClick={updateOrder}
             >
               Update order
             </button>
             <button
               type="button"
-              className="uppercase bg-red-600 px-10 py-5 text-lg border border-black border-gray-300 font-bold text-white shadow-sm hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2"
+              className="uppercase bg-red-600 px-10 py-5 text-lg border border-gray-300 font-bold text-white shadow-sm hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2"
               onClick={deleteOrder}
             >
               Delete order
             </button>
           </div>
+        </div>
+        
+        {/* Hidden Invoice Template for Printing */}
+        <div className="hidden">
+          <InvoiceTemplate 
+            ref={invoiceRef}
+            order={order}
+            orderProducts={orderProducts || []}
+          />
         </div>
       </div>
     </div>

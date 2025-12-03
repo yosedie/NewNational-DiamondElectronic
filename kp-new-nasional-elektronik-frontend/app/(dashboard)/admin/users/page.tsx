@@ -1,5 +1,5 @@
 "use client";
-import { CustomButton, DashboardSidebar } from "@/components";
+import { CustomButton } from "@/components";
 import apiClient from "@/lib/api";
 import { nanoid } from "nanoid";
 import Link from "next/link";
@@ -20,42 +20,47 @@ const DashboardUsers = () => {
   }, []);
 
   return (
-    <div className="bg-white flex justify-start max-w-screen-2xl mx-auto h-full max-xl:flex-col max-xl:h-fit max-xl:gap-y-4">
-      <DashboardSidebar />
-      <div className="w-full">
-        <h1 className="text-3xl font-semibold text-center mb-5">All users</h1>
-        <div className="flex justify-end mb-5">
-          <Link href="/admin/users/new">
-            <CustomButton
-              buttonType="button"
-              customWidth="110px"
-              paddingX={10}
-              paddingY={5}
-              textSize="base"
-              text="Add new user"
-            />
-          </Link>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
+          <p className="text-sm text-gray-600 mt-1">Manage all system users</p>
         </div>
-        <div className="xl:ml-5 w-full max-xl:mt-5 overflow-auto w-full h-[80vh]">
-          <table className="table table-md table-pin-cols">
+        <Link href="/admin/users/new">
+          <CustomButton
+            buttonType="button"
+            customWidth="140px"
+            paddingX={10}
+            paddingY={5}
+            textSize="sm"
+            text="+ Add New User"
+          />
+        </Link>
+      </div>
+
+      {/* Users Table Container */}
+      <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="table table-md table-pin-cols w-full">
             {/* head */}
-            <thead>
+            <thead className="bg-gray-50">
               <tr>
-                <th>
+                <th className="bg-gray-50">
                   <label>
                     <input type="checkbox" className="checkbox" />
                   </label>
                 </th>
-                <th>Email</th>
-                <th>Role</th>
-                <th></th>
+                <th className="bg-gray-50">Email</th>
+                <th className="bg-gray-50">Role</th>
+                <th className="bg-gray-50"></th>
               </tr>
             </thead>
             <tbody>
               {/* row 1 */}
               {users &&
                 users.map((user) => (
-                  <tr key={nanoid()}>
+                  <tr key={nanoid()} className="hover:bg-gray-50">
                     <th>
                       <label>
                         <input type="checkbox" className="checkbox" />
@@ -68,12 +73,14 @@ const DashboardUsers = () => {
                       </div>
                     </td>
                     <td>
-                      <p>{user?.role}</p>
+                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {user?.role}
+                      </span>
                     </td>
                     <th>
                       <Link
                         href={`/admin/users/${user?.id}`}
-                        className="btn btn-ghost btn-xs"
+                        className="btn btn-ghost btn-xs hover:bg-custom-red hover:text-white"
                       >
                         details
                       </Link>
@@ -82,12 +89,12 @@ const DashboardUsers = () => {
                 ))}
             </tbody>
             {/* foot */}
-            <tfoot>
+            <tfoot className="bg-gray-50">
               <tr>
-                <th></th>
-                <th>Email</th>
-                <th>Role</th>
-                <th></th>
+                <th className="bg-gray-50"></th>
+                <th className="bg-gray-50">Email</th>
+                <th className="bg-gray-50">Role</th>
+                <th className="bg-gray-50"></th>
               </tr>
             </tfoot>
           </table>

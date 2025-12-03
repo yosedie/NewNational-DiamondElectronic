@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import CustomButton from "./CustomButton";
 import apiClient from "@/lib/api";
 import { sanitize } from "@/lib/sanitize";
+import { formatCurrency } from "@/utils/currencyFormatter";
 
 const DashboardProductTable = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -22,7 +23,6 @@ const DashboardProductTable = () => {
 
   return (
     <div className="w-full">
-      <h1 className="text-3xl font-semibold text-center mb-5">Semua produk</h1>
       <div className="flex justify-end mb-5">
         <Link href="/admin/products/new">
           <CustomButton
@@ -70,9 +70,16 @@ const DashboardProductTable = () => {
                           <Image
                             width={48}
                             height={48}
-                            src={product?.mainImage ? `/${product?.mainImage}` : "/product_placeholder.jpg"}
+                            src={
+                              product?.mainImage
+                                ? product.mainImage.startsWith('http')
+                                  ? product.mainImage
+                                  : `/${product.mainImage}`
+                                : "/product_placeholder.jpg"
+                            }
                             alt={sanitize(product?.title) || "Product image"}
                             className="w-auto h-auto"
+                            unoptimized={product?.mainImage?.startsWith('http')}
                           />
                         </div>
                       </div>
@@ -93,7 +100,7 @@ const DashboardProductTable = () => {
                     </span>) }
                     
                   </td>
-                  <td>${product?.price}</td>
+                  <td>Rp {formatCurrency(product?.price)}</td>
                   <th>
                     <Link
                       href={`/admin/products/${product.id}`}

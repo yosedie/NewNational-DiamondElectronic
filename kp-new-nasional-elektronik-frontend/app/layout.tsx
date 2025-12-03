@@ -4,10 +4,9 @@ import "./globals.css";
 import { getServerSession } from "next-auth/next";
 import 'svgmap/dist/svgMap.min.css';
 import SessionProvider from "@/utils/SessionProvider";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import Providers from "@/Providers";
 import SessionTimeoutWrapper from "@/components/SessionTimeoutWrapper";
+import RootLayoutClient from "@/app/layout-client";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,11 +27,7 @@ export default async function RootLayout({
         <SessionProvider session={session}>
           <SessionTimeoutWrapper />
           <Providers>
-            <Header />
-            <main className="mt-44"> {/* Add margin-top to account for fixed header height (top-10 + h-32 = 168px ≈ 11rem) */}
-              {children}
-            </main>
-            <Footer />
+            <RootLayoutClient>{children}</RootLayoutClient>
           </Providers>
         </SessionProvider>
       </body>
