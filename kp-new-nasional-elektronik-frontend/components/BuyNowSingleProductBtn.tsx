@@ -23,20 +23,20 @@ const BuyNowSingleProductBtn = ({
       price: product?.price,
       image: product?.mainImage,
       amount: quantityCount,
+      slug: product?.slug,
     });
     calculateTotals();
-  toast.success("Produk berhasil ditambahkan ke keranjang");
+    toast.success("Produk berhasil ditambahkan ke keranjang");
     router.push("/checkout");
   };
   return (
     <button
       onClick={handleAddToCart}
       disabled={disabled}
-      className={`btn flex-1 min-w-0 text-sm border border-1 font-normal uppercase ease-in max-[500px]:w-full transition-all ${
-        disabled
+      className={`btn flex-1 min-w-0 text-sm border border-1 font-normal uppercase ease-in max-[500px]:w-full transition-all ${disabled
           ? 'bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed opacity-60'
           : 'bg-custom-red text-white border-custom-red hover:bg-white hover:scale-110 hover:text-custom-red hover:border-custom-red'
-      }`}
+        }`}
     >
       Buy Now
     </button>

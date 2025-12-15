@@ -17,7 +17,7 @@ export const CartModule = () => {
   const handleRemoveItem = (id: string) => {
     removeFromCart(id);
     calculateTotals();
-  toast.success("Produk berhasil dihapus dari keranjang");
+    toast.success("Produk berhasil dihapus dari keranjang");
   };
   return (
 
@@ -56,7 +56,7 @@ export const CartModule = () => {
                     <div className="flex justify-between">
                       <h3 className="text-sm">
                         <Link
-                          href={`#`}
+                          href={`/product/${product.slug}`}
                           className="font-medium text-gray-700 hover:text-gray-800"
                         >
                           {sanitize(product.title)}

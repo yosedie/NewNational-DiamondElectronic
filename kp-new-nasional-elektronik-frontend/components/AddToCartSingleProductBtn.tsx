@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 
 
 
-const AddToCartSingleProductBtn = ({ product, quantityCount, disabled = false } : SingleProductBtnProps & { disabled?: boolean }) => {
+const AddToCartSingleProductBtn = ({ product, quantityCount, disabled = false }: SingleProductBtnProps & { disabled?: boolean }) => {
   const { addToCart, calculateTotals } = useProductStore();
 
   const handleAddToCart = () => {
@@ -21,20 +21,20 @@ const AddToCartSingleProductBtn = ({ product, quantityCount, disabled = false } 
       title: product?.title,
       price: product?.price,
       image: product?.mainImage,
-      amount: quantityCount
+      amount: quantityCount,
+      slug: product?.slug
     });
     calculateTotals();
-  toast.success("Produk berhasil ditambahkan ke keranjang");
+    toast.success("Produk berhasil ditambahkan ke keranjang");
   };
   return (
     <button
       onClick={handleAddToCart}
       disabled={disabled}
-      className={`btn flex-1 min-w-0 text-sm border border-1 font-normal uppercase ease-in max-[500px]:w-full transition-all ${
-        disabled
+      className={`btn flex-1 min-w-0 text-sm border border-1 font-normal uppercase ease-in max-[500px]:w-full transition-all ${disabled
           ? 'bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed opacity-60'
           : 'bg-white text-custom-red border-gray-300 hover:bg-custom-red hover:text-white hover:border-custom-red hover:scale-110'
-      }`}
+        }`}
     >
       Add to cart
     </button>

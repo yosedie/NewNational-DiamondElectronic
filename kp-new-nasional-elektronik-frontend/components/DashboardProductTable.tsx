@@ -12,7 +12,7 @@ const DashboardProductTable = () => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    apiClient.get("/api/products?mode=admin", {cache: "no-store"})
+    apiClient.get("/api/products?mode=admin", { cache: "no-store" })
       .then((res) => {
         return res.json();
       })
@@ -22,7 +22,7 @@ const DashboardProductTable = () => {
   }, []);
 
   return (
-    <div className="w-full">
+    <div className="w-full p-4">
       <div className="flex justify-end mb-5">
         <Link href="/admin/products/new">
           <CustomButton
@@ -36,16 +36,11 @@ const DashboardProductTable = () => {
         </Link>
       </div>
 
-      <div className="xl:ml-5 w-full max-xl:mt-5 overflow-auto w-full h-[80vh]">
+      <div className="overflow-x-auto max-h-[70vh]">
         <table className="table table-md table-pin-cols">
           {/* head */}
           <thead>
             <tr>
-              <th>
-                <label>
-                  <input type="checkbox" className="checkbox" />
-                </label>
-              </th>
               <th>Product</th>
               <th>Ketersediaan Stock</th>
               <th>Harga</th>
@@ -57,12 +52,6 @@ const DashboardProductTable = () => {
             {products &&
               products.map((product) => (
                 <tr key={nanoid()}>
-                  <th>
-                    <label>
-                      <input type="checkbox" className="checkbox" />
-                    </label>
-                  </th>
-
                   <td>
                     <div className="flex items-center gap-3">
                       <div className="avatar">
@@ -93,12 +82,12 @@ const DashboardProductTable = () => {
                   </td>
 
                   <td>
-                    { !product.inStock ? (<span className="badge badge-success text-white badge-sm">
+                    {!product.inStock ? (<span className="badge badge-success text-white badge-sm">
                       Stock tersedia
                     </span>) : (<span className="badge badge-error text-white badge-sm">
                       Stock habis
-                    </span>) }
-                    
+                    </span>)}
+
                   </td>
                   <td>Rp {formatCurrency(product?.price)}</td>
                   <th>
@@ -106,7 +95,7 @@ const DashboardProductTable = () => {
                       href={`/admin/products/${product.id}`}
                       className="btn btn-ghost btn-xs"
                     >
-                      details
+                      Edit
                     </Link>
                   </th>
                 </tr>
@@ -115,7 +104,6 @@ const DashboardProductTable = () => {
           {/* foot */}
           <tfoot>
             <tr>
-              <th></th>
               <th>Product</th>
               <th>Ketersediaan Stock</th>
               <th>Harga</th>

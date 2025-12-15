@@ -27,12 +27,13 @@ const AdminOrders = () => {
   }, []);
 
   return (
-    <div className="xl:ml-5 w-full max-xl:mt-5 ">
+    <div className="w-full p-4">
       {/* Print Button */}
-      <div className="mb-4 flex justify-end">
+      <div className="mb-5 flex justify-end">
         <button
+          type="button"
           onClick={handlePrint}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-colors m-2"
+          className="uppercase bg-white px-6 py-3 text-base border border-gray-300 font-bold text-custom-red shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 flex items-center gap-2"
         >
           <HiPrinter className="w-5 h-5" />
           Print All Orders
@@ -44,11 +45,6 @@ const AdminOrders = () => {
           {/* head */}
           <thead>
             <tr>
-              <th>
-                <label>
-                  <input type="checkbox" className="checkbox" />
-                </label>
-              </th>
               <th>Order ID</th>
               <th>Name</th>
               <th>Status</th>
@@ -62,12 +58,6 @@ const AdminOrders = () => {
             {orders && orders.length > 0 &&
               orders.map((order) => (
                 <tr key={order?.id}>
-                  <th>
-                    <label>
-                      <input type="checkbox" className="checkbox" />
-                    </label>
-                  </th>
-
                   <td>
                     <div>
                       <p className="font-bold">#{order?.id}</p>
@@ -102,7 +92,7 @@ const AdminOrders = () => {
                       href={`/admin/orders/${order?.id}`}
                       className="btn btn-ghost btn-xs"
                     >
-                      details
+                      Details
                     </Link>
                   </th>
                 </tr>
@@ -111,7 +101,6 @@ const AdminOrders = () => {
           {/* foot */}
           <tfoot>
             <tr>
-              <th></th>
               <th>Order ID</th>
               <th>Name</th>
               <th>Status</th>
