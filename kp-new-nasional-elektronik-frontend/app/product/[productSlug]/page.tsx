@@ -22,7 +22,7 @@ interface ImageItem {
 }
 
 interface SingleProductPageProps {
-  params: Promise<{  productSlug: string, id: string }>;
+  params: Promise<{ productSlug: string, id: string }>;
 }
 
 const SingleProductPage = async ({ params }: SingleProductPageProps) => {
@@ -126,38 +126,6 @@ const SingleProductPage = async ({ params }: SingleProductPageProps) => {
                 </div>
               </div>
 
-              {/* Reviews Section */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Ulasan Pelanggan</h3>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="flex text-yellow-400">
-                    {'★'.repeat(Math.round(product?.rating || 4))}{'☆'.repeat(5 - Math.round(product?.rating || 4))}
-                  </div>
-                  <span className="text-sm text-gray-600">{product?.rating || 4.0} dari 5</span>
-                </div>
-                <p className="text-sm text-gray-600">Berdasarkan {Math.floor(Math.random() * 200) + 50} ulasan</p>
-
-                {/* Sample Reviews */}
-                <div className="mt-4 space-y-3">
-                  <div className="border-t pt-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="flex text-yellow-400 text-sm">★★★★★</div>
-                      <span className="text-xs text-gray-600">2 hari lalu</span>
-                    </div>
-                    <p className="text-sm text-gray-700">Produk berkualitas bagus, sesuai deskripsi. Pengiriman cepat dan packing aman.</p>
-                    <p className="text-xs text-gray-500 mt-1">- Budi Santoso</p>
-                  </div>
-                  <div className="border-t pt-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="flex text-yellow-400 text-sm">★★★★☆</div>
-                      <span className="text-xs text-gray-600">1 minggu lalu</span>
-                    </div>
-                    <p className="text-sm text-gray-700">Harga terjangkau, kualitas memuaskan. Recommended seller!</p>
-                    <p className="text-xs text-gray-500 mt-1">- Siti Rahayu</p>
-                  </div>
-                </div>
-              </div>
-
               {/* Product Description (without Ringkasan Produk section) */}
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 {/* Product Description Section */}
@@ -183,7 +151,7 @@ const SingleProductPage = async ({ params }: SingleProductPageProps) => {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Model</span>
-                          <span>DE-2024</span>
+                          <span>DE-2025</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Garansi</span>

@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { formatCurrency } from "@/utils/currencyFormatter";
 
 interface OrderProduct {
@@ -37,10 +36,19 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
       <div ref={ref} className="p-8 bg-white">
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">INVOICE</h1>
-            <p className="text-gray-600 mt-2">Order ID: #{order?.id}</p>
-            <p className="text-gray-600">Date: {new Date(Date.parse(order?.dateTime)).toLocaleDateString('id-ID')}</p>
+          <div className="flex items-center gap-4">
+            {/* Company Logo */}
+            <img
+              src="/logo v1.png"
+              alt="Diamond Electronic logo"
+              width={200}
+              height={200}
+            />
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800">INVOICE</h1>
+              <p className="text-gray-600 mt-2">Order ID: #{order?.id}</p>
+              <p className="text-gray-600">Date: {new Date(Date.parse(order?.dateTime)).toLocaleDateString('id-ID')}</p>
+            </div>
           </div>
           <div className="text-right">
             <h2 className="text-xl font-bold text-gray-800">Nasional Elektronik</h2>
@@ -70,12 +78,11 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
         <div className="mb-6">
           <p className="text-gray-700">
             <span className="font-bold">Status: </span>
-            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-              order?.status === 'delivered' ? 'bg-green-100 text-green-800' :
+            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${order?.status === 'delivered' ? 'bg-green-100 text-green-800' :
               order?.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-red-100 text-red-800'
-            }`}>
-              {order?.status.toUpperCase()}
+                'bg-red-100 text-red-800'
+              }`}>
+              {order?.status?.toUpperCase() || 'PENDING'}
             </span>
           </p>
         </div>
@@ -95,13 +102,19 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
               <tr key={product?.id} className="border-b border-gray-200">
                 <td className="py-3 px-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-16 h-16 relative">
-                      <Image
-                        src={product?.product?.mainImage ? `/${product?.product?.mainImage}` : "/product_placeholder.jpg"}
+                    <div className="w-8 h-8">
+                      <img
+                        src={
+                          product?.product?.mainImage
+                            ? product?.product?.mainImage.startsWith('http')
+                              ? product?.product?.mainImage
+                              : `/${product?.product?.mainImage}`
+                            : "/product_placeholder.jpg"
+                        }
                         alt={product?.product?.title}
-                        width={64}
-                        height={64}
-                        className="object-cover"
+                        width={30}
+                        height={30}
+                        className="object-cover rounded"
                       />
                     </div>
                     <div>

@@ -12,6 +12,7 @@ const slugRouter = require("./routes/slugs");
 const orderProductRouter = require('./routes/customer_order_product');
 const wishlistRouter = require('./routes/wishlist');
 const dashboardRouter = require('./routes/dashboard');
+const midtransRouter = require('./routes/midtrans');
 var cors = require("cors");
 
 // Import logging middleware
@@ -127,6 +128,7 @@ app.use('/api/order-product', orderProductRouter);
 app.use("/api/slugs", slugRouter);
 app.use("/api/wishlist", wishlistRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/midtrans", midtransRouter);
 
 // Health check endpoint (no rate limiting)
 app.get('/health', (req, res) => {

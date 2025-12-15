@@ -8,6 +8,21 @@ import { useRouter } from "next/navigation";
 import apiClient from "@/lib/api";
 import { formatCurrency } from "@/utils/currencyFormatter";
 import PaymentMethods from "@/components/PaymentMethods";
+import Script from "next/script";
+
+// Declare Midtrans Snap type
+declare global {
+  interface Window {
+    snap: {
+      pay: (token: string, options: {
+        onSuccess: (result: any) => void;
+        onPending: (result: any) => void;
+        onError: (result: any) => void;
+        onClose: () => void;
+      }) => void;
+    };
+  }
+}
 
 const CheckoutPage = () => {
   const [checkoutForm, setCheckoutForm] = useState({
@@ -15,9 +30,7 @@ const CheckoutPage = () => {
     lastname: "",
     phone: "",
     email: "",
-    company: "",
     adress: "",
-    apartment: "",
     city: "",
     country: "",
     postalCode: "",
@@ -26,6 +39,7 @@ const CheckoutPage = () => {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
+  const [snapLoaded, setSnapLoaded] = useState(false);
   const { products, total, clearCart } = useProductStore();
   const router = useRouter();
 
@@ -55,19 +69,9 @@ const CheckoutPage = () => {
       errors.push("Phone number must be at least 10 digits");
     }
     
-    // Company validation
-    if (!checkoutForm.company.trim() || checkoutForm.company.trim().length < 5) {
-      errors.push("Company must be at least 5 characters");
-    }
-    
     // Address validation
     if (!checkoutForm.adress.trim() || checkoutForm.adress.trim().length < 5) {
       errors.push("Address must be at least 5 characters");
-    }
-    
-    // Apartment validation (updated to 1 character minimum)
-    if (!checkoutForm.apartment.trim() || checkoutForm.apartment.trim().length < 1) {
-      errors.push("Apartment is required");
     }
     
     // City validation
@@ -93,15 +97,15 @@ const CheckoutPage = () => {
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
       validationErrors.forEach(error => {
-  toast.error(error);
+        toast.error(error);
       });
       return;
     }
 
     // Basic client-side checks for required fields (UX only)
     const requiredFields = [
-      'name', 'lastname', 'phone', 'email', 'company', 
-      'adress', 'apartment', 'city', 'country', 'postalCode'
+      'name', 'lastname', 'phone', 'email', 
+      'adress', 'city', 'country', 'postalCode'
     ];
     
     const missingFields = requiredFields.filter(field => 
@@ -109,17 +113,17 @@ const CheckoutPage = () => {
     );
 
     if (missingFields.length > 0) {
-  toast.error("Silakan isi semua field yang diperlukan");
+      toast.error("Silakan isi semua field yang diperlukan");
       return;
     }
 
     if (products.length === 0) {
-  toast.error("Keranjang Anda kosong");
+      toast.error("Keranjang Anda kosong");
       return;
     }
 
     if (total <= 0) {
-  toast.error("Total pesanan tidak valid");
+      toast.error("Total pesanan tidak valid");
       return;
     }
 
@@ -128,10 +132,16 @@ const CheckoutPage = () => {
       return;
     }
 
+    // Check if Snap is loaded
+    if (!snapLoaded || !window.snap) {
+      toast.error("Payment system is loading, please wait...");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      console.log("🚀 Starting order creation...");
+      console.log("🚀 Starting Midtrans transaction...");
       
       // Prepare the order data
       const orderData = {
@@ -139,9 +149,7 @@ const CheckoutPage = () => {
         lastname: checkoutForm.lastname.trim(),
         phone: checkoutForm.phone.trim(),
         email: checkoutForm.email.trim().toLowerCase(),
-        company: checkoutForm.company.trim(),
         adress: checkoutForm.adress.trim(),
-        apartment: checkoutForm.apartment.trim(),
         postalCode: checkoutForm.postalCode.trim(),
         status: "pending",
         total: total,
@@ -150,102 +158,115 @@ const CheckoutPage = () => {
         orderNotice: checkoutForm.orderNotice.trim(),
       };
 
-      console.log("📋 Order data being sent:", orderData);
+      // Prepare items for Midtrans
+      const items = products.map(product => ({
+        id: product.id,
+        name: product.title,
+        price: product.price,
+        quantity: product.amount
+      }));
 
-      // Send order data to server for validation and processing
-      const response = await apiClient.post("/api/orders", orderData);
+      console.log("📋 Transaction data being sent:", { orderData, items });
 
-      console.log("📡 API Response received:");
-      console.log("  Status:", response.status);
-      console.log("  Status Text:", response.statusText);
-      console.log("  Response OK:", response.ok);
+      // Create Midtrans transaction
+      const response = await apiClient.post("/api/midtrans/transaction", {
+        orderData,
+        items
+      });
+
+      console.log("📡 Midtrans API Response:", response);
       
-      // Check if response is ok before parsing
       if (!response.ok) {
         console.error("❌ Response not OK:", response.status, response.statusText);
         const errorText = await response.text();
         console.error("Error response body:", errorText);
         
-        // Try to parse as JSON to get detailed error info
         try {
           const errorData = JSON.parse(errorText);
           console.error("Parsed error data:", errorData);
           
-          // Show specific validation errors
           if (errorData.details && Array.isArray(errorData.details)) {
             errorData.details.forEach((detail: any) => {
               toast.error(`${detail.field}: ${detail.message}`);
             });
           } else {
-            toast.error(errorData.error || "Validasi gagal");
+            toast.error(errorData.error || "Gagal membuat transaksi");
           }
         } catch (parseError) {
-          console.error("Could not parse error as JSON:", parseError);
-          toast.error("Validasi gagal");
+          toast.error("Gagal membuat transaksi");
         }
         
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log("✅ Parsed response data:", data);
+      console.log("✅ Transaction created:", data);
       
-      const orderId: string = data.id;
-      console.log("🆔 Extracted order ID:", orderId);
+      const { snapToken, orderId } = data;
 
-      if (!orderId) {
-        console.error("❌ Order ID is missing or falsy!");
-        console.error("Full response data:", JSON.stringify(data, null, 2));
-        throw new Error("Order ID not received from server");
+      if (!snapToken) {
+        console.error("❌ Snap token is missing!");
+        throw new Error("Snap token not received from server");
       }
 
-      console.log("✅ Order ID validation passed, proceeding with product addition...");
+      console.log("🎫 Snap token received, opening payment popup...");
 
-      // Add products to order
-      for (let i = 0; i < products.length; i++) {
-        console.log(`🛍️ Adding product ${i + 1}/${products.length}:`, {
-          orderId,
-          productId: products[i].id,
-          quantity: products[i].amount
-        });
-        
-        await addOrderProduct(orderId, products[i].id, products[i].amount);
-        console.log(`✅ Product ${i + 1} sukses ditambahkan`);
-      }
-
-      console.log(" Semua produk sukses ditambahkan!");
-
-      // Clear form and cart
-      setCheckoutForm({
-        name: "",
-        lastname: "",
-        phone: "",
-        email: "",
-        company: "",
-        adress: "",
-        apartment: "",
-        city: "",
-        country: "",
-        postalCode: "",
-        orderNotice: "",
+      // Open Midtrans Snap popup
+      window.snap.pay(snapToken, {
+        onSuccess: function(result: any) {
+          console.log("✅ Payment success:", result);
+          toast.success("Pembayaran berhasil!");
+          
+          // Clear form and cart
+          setCheckoutForm({
+            name: "",
+            lastname: "",
+            phone: "",
+            email: "",
+            adress: "",
+            city: "",
+            country: "",
+            postalCode: "",
+            orderNotice: "",
+          });
+          clearCart();
+          
+          // Redirect to success page
+          setTimeout(() => {
+            router.push(`/payment/success?order_id=${orderId}`);
+          }, 1000);
+        },
+        onPending: function(result: any) {
+          console.log("⏳ Payment pending:", result);
+          toast.success("Pembayaran pending! Silakan selesaikan pembayaran Anda.");
+          
+          // Clear cart but keep form
+          clearCart();
+          
+          // Redirect to pending page
+          setTimeout(() => {
+            router.push(`/payment/pending?order_id=${orderId}`);
+          }, 1000);
+        },
+        onError: function(result: any) {
+          console.error("❌ Payment error:", result);
+          toast.error("Pembayaran gagal. Silakan coba lagi.");
+        },
+        onClose: function() {
+          console.log("⚠️ Payment popup closed");
+          toast.error("Anda menutup popup pembayaran sebelum menyelesaikan transaksi.");
+        }
       });
-      clearCart();
-      
-  toast.success("Pesanan berhasil dibuat! Anda akan dihubungi untuk pembayaran.");
-      setTimeout(() => {
-        router.push("/");
-      }, 1000);
+
     } catch (error: any) {
       console.error("💥 Error in makePurchase:", error);
       
-      // Handle server validation errors
       if (error.response?.status === 400) {
-        console.log(" Handling 400 error...");
+        console.log("❌ Handling 400 error...");
         try {
           const errorData = await error.response.json();
           console.log("Error data:", errorData);
           if (errorData.details && Array.isArray(errorData.details)) {
-            // Show specific validation errors
             errorData.details.forEach((detail: any) => {
               toast.error(`${detail.field}: ${detail.message}`);
             });
@@ -254,63 +275,43 @@ const CheckoutPage = () => {
           }
         } catch (parseError) {
           console.error("Failed to parse error response:", parseError);
-    toast.error("Validasi gagal");
+          toast.error("Validasi gagal");
         }
       } else if (error.response?.status === 409) {
-  toast.error("Terdeteksi pesanan duplikat. Silakan tunggu sebelum membuat pesanan lain.");
+        toast.error("Terdeteksi pesanan duplikat. Silakan tunggu sebelum membuat pesanan lain.");
       } else {
         console.log("🔍 Handling generic error...");
-  toast.error("Gagal membuat pesanan. Silakan coba lagi.");
+        toast.error("Gagal membuat pesanan. Silakan coba lagi.");
       }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const addOrderProduct = async (
-    orderId: string,
-    productId: string,
-    productQuantity: number
-  ) => {
-    try {
-      console.log("️ Adding product to order:", {
-        customerOrderId: orderId,
-        productId,
-        quantity: productQuantity
-      });
-      
-      const response = await apiClient.post("/api/order-product", {
-        customerOrderId: orderId,
-        productId: productId,
-        quantity: productQuantity,
-      });
-
-      console.log("📡 Product order response:", response);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("❌ Product order failed:", response.status, errorText);
-        throw new Error(`Product order failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("✅ Product order successful:", data);
-      
-    } catch (error) {
-      console.error("💥 Error creating product order:", error);
-      throw error;
-    }
-  };
-
   useEffect(() => {
     if (products.length === 0) {
-  toast.error("Anda tidak memiliki item di keranjang");
+      toast.error("Anda tidak memiliki item di keranjang");
       router.push("/cart");
     }
   }, []);
 
   return (
     <div className="bg-white">
+      {/* Load Midtrans Snap script */}
+      <Script
+        src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+        strategy="lazyOnload"
+        onLoad={() => {
+          console.log("✅ Midtrans Snap script loaded");
+          setSnapLoaded(true);
+        }}
+        onError={() => {
+          console.error("❌ Failed to load Midtrans Snap script");
+          toast.error("Failed to load payment system");
+        }}
+      />
+      
       <SectionTitle title="Checkout" path="Home | Cart | Checkout" />
       
       <div className="hidden h-full w-1/2 bg-white lg:block" aria-hidden="true" />
@@ -523,32 +524,6 @@ const CheckoutPage = () => {
               <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-3">
                 <div className="sm:col-span-3">
                   <label
-                    htmlFor="company"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Company *
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="company"
-                      name="company"
-                      required
-                      disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-custom-red focus:ring-custom-red sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      value={checkoutForm.company}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          company: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label
                     htmlFor="address"
                     className="block text-sm font-medium text-gray-700"
                   >
@@ -568,32 +543,6 @@ const CheckoutPage = () => {
                         setCheckoutForm({
                           ...checkoutForm,
                           adress: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="apartment"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Apartment, suite, etc. * (required)
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="apartment"
-                      name="apartment"
-                      required
-                      disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-custom-red focus:ring-custom-red sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      value={checkoutForm.apartment}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          apartment: e.target.value,
                         })
                       }
                     />

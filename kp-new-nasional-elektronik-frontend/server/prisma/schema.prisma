@@ -49,9 +49,7 @@ model Customer_order {
   lastname    String
   phone       String
   email       String
-  company     String
   adress      String
-  apartment   String
   postalCode  String
   dateTime    DateTime?                @default(now())
   status      String

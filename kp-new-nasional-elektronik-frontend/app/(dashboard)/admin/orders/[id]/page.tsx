@@ -31,7 +31,7 @@ interface OrderProduct {
 }
 
 const AdminSingleOrder = () => {
-  const [orderProducts, setOrderProducts] = useState<OrderProduct[]>();
+  const [orderProducts, setOrderProducts] = useState<OrderProduct[]>([]);
   const [order, setOrder] = useState<Order>({
     id: "",
     adress: "",
@@ -73,7 +73,8 @@ const AdminSingleOrder = () => {
         `/api/order-product/${params?.id}`
       );
       const data: OrderProduct[] = await response.json();
-      setOrderProducts(data);
+      // Ensure data is always an array to prevent "map is not a function" errors
+      setOrderProducts(Array.isArray(data) ? data : []);
     };
 
     fetchOrderData();
@@ -82,39 +83,31 @@ const AdminSingleOrder = () => {
 
   const updateOrder = async () => {
     if (
-      order?.name.length > 0 &&
-      order?.lastname.length > 0 &&
-      order?.phone.length > 0 &&
-      order?.email.length > 0 &&
-      order?.company.length > 0 &&
-      order?.adress.length > 0 &&
-      order?.apartment.length > 0 &&
-      order?.city.length > 0 &&
-      order?.country.length > 0 &&
-      order?.postalCode.length > 0
+      order?.name?.length > 0 &&
+      order?.lastname?.length > 0 &&
+      order?.phone?.length > 0 &&
+      order?.email?.length > 0 &&
+      order?.adress?.length > 0 &&
+      order?.city?.length > 0 &&
+      order?.country?.length > 0 &&
+      order?.postalCode?.length > 0
     ) {
       if (!isValidNameOrLastname(order?.name)) {
-  toast.error("Format nama yang Anda masukkan tidak valid");
+        toast.error("Format nama yang Anda masukkan tidak valid");
         return;
       }
 
       if (!isValidNameOrLastname(order?.lastname)) {
-  toast.error("Format nama belakang yang Anda masukkan tidak valid");
+        toast.error("Format nama belakang yang Anda masukkan tidak valid");
         return;
       }
 
       if (!isValidEmailAddressFormat(order?.email)) {
-  toast.error("Format email yang Anda masukkan tidak valid");
+        toast.error("Format email yang Anda masukkan tidak valid");
         return;
       }
 
-      apiClient.put(`/api/orders/${order?.id}`, {
-        method: "PUT", // or 'PUT'
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(order),
-      })
+      apiClient.put(`/api/orders/${order?.id}`, order)
         .then((response) => {
           if (response.status === 200) {
             toast.success("Pesanan berhasil diperbarui");
@@ -126,7 +119,7 @@ const AdminSingleOrder = () => {
           toast.error("Terjadi kesalahan saat memperbarui pesanan")
         );
     } else {
-  toast.error("Silakan isi semua field");
+      toast.error("Silakan isi semua field");
     }
   };
 
@@ -143,7 +136,7 @@ const AdminSingleOrder = () => {
         `/api/orders/${order?.id}`,
         requestOptions
       ).then((response) => {
-  toast.success("Pesanan berhasil dihapus");
+        toast.success("Pesanan berhasil dihapus");
         router.push("/admin/orders");
       });
     });
@@ -171,7 +164,7 @@ const AdminSingleOrder = () => {
               <input
                 type="text"
                 className="input input-bordered w-full max-w-xs"
-                value={order?.name}
+                value={order?.name || ""}
                 onChange={(e) => setOrder({ ...order, name: e.target.value })}
               />
             </label>
@@ -184,7 +177,7 @@ const AdminSingleOrder = () => {
               <input
                 type="text"
                 className="input input-bordered w-full max-w-xs"
-                value={order?.lastname}
+                value={order?.lastname || ""}
                 onChange={(e) =>
                   setOrder({ ...order, lastname: e.target.value })
                 }
@@ -201,7 +194,7 @@ const AdminSingleOrder = () => {
             <input
               type="text"
               className="input input-bordered w-full max-w-xs"
-              value={order?.phone}
+              value={order?.phone || ""}
               onChange={(e) => setOrder({ ...order, phone: e.target.value })}
             />
           </label>
@@ -215,7 +208,7 @@ const AdminSingleOrder = () => {
             <input
               type="email"
               className="input input-bordered w-full max-w-xs"
-              value={order?.email}
+              value={order?.email || ""}
               onChange={(e) => setOrder({ ...order, email: e.target.value })}
             />
           </label>
@@ -229,7 +222,7 @@ const AdminSingleOrder = () => {
             <input
               type="text"
               className="input input-bordered w-full max-w-xs"
-              value={order?.company}
+              value={order?.company || ""}
               onChange={(e) => setOrder({ ...order, company: e.target.value })}
             />
           </label>
@@ -244,7 +237,7 @@ const AdminSingleOrder = () => {
               <input
                 type="text"
                 className="input input-bordered w-full max-w-xs"
-                value={order?.adress}
+                value={order?.adress || ""}
                 onChange={(e) => setOrder({ ...order, adress: e.target.value })}
               />
             </label>
@@ -258,7 +251,7 @@ const AdminSingleOrder = () => {
               <input
                 type="text"
                 className="input input-bordered w-full max-w-xs"
-                value={order?.apartment}
+                value={order?.apartment || ""}
                 onChange={(e) =>
                   setOrder({ ...order, apartment: e.target.value })
                 }
@@ -276,7 +269,7 @@ const AdminSingleOrder = () => {
               <input
                 type="text"
                 className="input input-bordered w-full max-w-xs"
-                value={order?.city}
+                value={order?.city || ""}
                 onChange={(e) => setOrder({ ...order, city: e.target.value })}
               />
             </label>
@@ -290,7 +283,7 @@ const AdminSingleOrder = () => {
               <input
                 type="text"
                 className="input input-bordered w-full max-w-xs"
-                value={order?.country}
+                value={order?.country || ""}
                 onChange={(e) =>
                   setOrder({ ...order, country: e.target.value })
                 }
@@ -306,7 +299,7 @@ const AdminSingleOrder = () => {
               <input
                 type="text"
                 className="input input-bordered w-full max-w-xs"
-                value={order?.postalCode}
+                value={order?.postalCode || ""}
                 onChange={(e) =>
                   setOrder({ ...order, postalCode: e.target.value })
                 }
@@ -322,7 +315,7 @@ const AdminSingleOrder = () => {
             </div>
             <select
               className="select select-bordered"
-              value={order?.status}
+              value={order?.status || "processing"}
               onChange={(e) =>
                 setOrder({
                   ...order,
@@ -353,67 +346,85 @@ const AdminSingleOrder = () => {
             ></textarea>
           </label>
         </div>
-        <div>
-          {orderProducts?.map((product) => (
-            <div className="flex items-center gap-x-4" key={product?.id}>
+        <div className="flex gap-x-6 items-start">
+          {/* Left Side - Product Images */}
+          <div className="flex flex-col gap-y-4">
+            {orderProducts?.map((product) => (
               <Image
-                src={product?.product?.mainImage ? `/${product?.product?.mainImage}` : "/product_placeholder.jpg"}
+                key={product?.id}
+                src={
+                  product?.product?.mainImage
+                    ? product?.product?.mainImage.startsWith('http')
+                      ? product?.product?.mainImage
+                      : `/${product?.product?.mainImage}`
+                    : "/product_placeholder.jpg"
+                }
                 alt={product?.product?.title}
-                width={50}
-                height={50}
-                className="w-auto h-auto"
+                width={120}
+                height={120}
+                className="object-cover rounded-lg"
+                unoptimized={product?.product?.mainImage?.startsWith('http')}
               />
-              <div>
-                <Link href={`/product/${product?.product?.slug}`}>
+            ))}
+          </div>
+
+          {/* Right Side - Product Details and Pricing */}
+          <div className="flex-1">
+            {/* Product Details */}
+            {orderProducts?.map((product) => (
+              <div key={product?.id} className="mb-4">
+                <Link href={`/product/${product?.product?.slug}`} className="text-lg font-semibold hover:text-custom-red">
                   {product?.product?.title}
                 </Link>
-                <p>
+                <p className="text-gray-600 mt-1">
                   Rp. {formatCurrency(product?.product?.price)} * {product?.quantity} items
                 </p>
               </div>
+            ))}
+
+            {/* Pricing Summary */}
+            <div className="flex flex-col gap-y-2 mt-6 pt-6 border-t border-gray-200">
+              <p className="text-xl">Subtotal: Rp. {formatCurrency(order?.total)}</p>
+              <p className="text-xl">Pajak 20%: Rp. {formatCurrency(order?.total / 5)}</p>
+              <p className="text-xl">Pengiriman: Rp. {formatCurrency(5)}</p>
+              <p className="text-2xl font-semibold mt-2 pt-2 border-t border-gray-300">
+                Total: Rp. {formatCurrency(order?.total + order?.total / 5 + 5)}
+              </p>
             </div>
-          ))}
-          <div className="flex flex-col gap-y-2 mt-10">
-            <p className="text-2xl">Subtotal: Rp. {formatCurrency(order?.total)}</p>
-            <p className="text-2xl">Pajak 20%: Rp. {formatCurrency(order?.total / 5)}</p>
-            <p className="text-2xl">Pengiriman: Rp. {formatCurrency(5)}</p>
-            <p className="text-3xl font-semibold">
-              Total: Rp. {formatCurrency(order?.total + order?.total / 5 + 5)}
-            </p>
-          </div>
-          <div className="flex gap-x-2 max-sm:flex-col mt-5">
-            <button
-              type="button"
-              className="uppercase bg-blue-600 px-10 py-5 text-lg border border-gray-300 font-bold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2"
-              onClick={handlePrint}
-            >
-              Print Invoice
-            </button>
-            <button
-              type="button"
-              className="uppercase bg-custom-red px-10 py-5 text-lg border border-gray-300 font-bold text-white shadow-sm hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2"
-              onClick={updateOrder}
-            >
-              Update order
-            </button>
-            <button
-              type="button"
-              className="uppercase bg-red-600 px-10 py-5 text-lg border border-gray-300 font-bold text-white shadow-sm hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2"
-              onClick={deleteOrder}
-            >
-              Delete order
-            </button>
           </div>
         </div>
-        
-        {/* Hidden Invoice Template for Printing */}
-        <div className="hidden">
-          <InvoiceTemplate 
-            ref={invoiceRef}
-            order={order}
-            orderProducts={orderProducts || []}
-          />
+        <div className="flex gap-x-2 max-sm:flex-col mt-5">
+          <button
+            type="button"
+            className="uppercase bg-blue-600 px-10 py-5 text-lg border border-gray-300 font-bold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2"
+            onClick={handlePrint}
+          >
+            Print Invoice
+          </button>
+          <button
+            type="button"
+            className="uppercase bg-custom-red px-10 py-5 text-lg border border-gray-300 font-bold text-white shadow-sm hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2"
+            onClick={updateOrder}
+          >
+            Update order
+          </button>
+          <button
+            type="button"
+            className="uppercase bg-red-600 px-10 py-5 text-lg border border-gray-300 font-bold text-white shadow-sm hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2"
+            onClick={deleteOrder}
+          >
+            Delete order
+          </button>
         </div>
+      </div>
+
+      {/* Hidden Invoice Template for Printing */}
+      <div className="hidden">
+        <InvoiceTemplate
+          ref={invoiceRef}
+          order={order}
+          orderProducts={orderProducts || []}
+        />
       </div>
     </div>
   );

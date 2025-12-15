@@ -31,10 +31,10 @@ async function setupDesignTokens() {
 
   // Create color styles
   createColorStyles();
-  
+
   // Create text styles
   createTextStyles();
-  
+
   // Create effect styles (shadows)
   createEffectStyles();
 }
@@ -45,11 +45,11 @@ function createColorStyles() {
     'Primary/500': { r: 0.23, g: 0.51, b: 0.96 }, // #3B82F6
     'Primary/600': { r: 0.15, g: 0.39, b: 0.92 }, // #2563EB
     'Primary/700': { r: 0.11, g: 0.31, b: 0.85 }, // #1D4ED8
-    
+
     // Secondary Colors
     'Secondary/500': { r: 0.06, g: 0.72, b: 0.51 }, // #10B981
     'Secondary/600': { r: 0.02, g: 0.59, b: 0.41 }, // #059669
-    
+
     // Neutral Colors
     'Gray/50': { r: 0.98, g: 0.98, b: 0.98 },
     'Gray/100': { r: 0.95, g: 0.96, b: 0.96 },
@@ -61,13 +61,13 @@ function createColorStyles() {
     'Gray/700': { r: 0.22, g: 0.26, b: 0.31 },
     'Gray/800': { r: 0.12, g: 0.16, b: 0.22 },
     'Gray/900': { r: 0.07, g: 0.11, b: 0.15 },
-    
+
     // Semantic Colors
     'Success': { r: 0.06, g: 0.72, b: 0.51 },
     'Warning': { r: 0.96, g: 0.62, b: 0.04 },
     'Error': { r: 0.94, g: 0.27, b: 0.27 },
     'Info': { r: 0.23, g: 0.51, b: 0.96 },
-    
+
     // Base Colors
     'White': { r: 1, g: 1, b: 1 },
     'Black': { r: 0, g: 0, b: 0 },
@@ -142,19 +142,19 @@ async function generateAtoms() {
 
   // Generate Button Component
   yOffset = await generateButtonComponent(frame, 40, yOffset);
-  
+
   // Generate Input Component
   yOffset = await generateInputComponent(frame, 40, yOffset + 60);
-  
+
   // Generate Badge Component
   yOffset = await generateBadgeComponent(frame, 40, yOffset + 60);
-  
+
   figma.viewport.scrollAndZoomIntoView([frame]);
 }
 
 async function generateButtonComponent(parent, x, y) {
   await figma.loadFontAsync({ family: 'Inter', style: 'Medium' });
-  
+
   const variants = [
     { name: 'Primary', bg: { r: 0.23, g: 0.51, b: 0.96 }, text: { r: 1, g: 1, b: 1 } },
     { name: 'Secondary', bg: { r: 0.06, g: 0.72, b: 0.51 }, text: { r: 1, g: 1, b: 1 } },
@@ -213,7 +213,7 @@ function createButton(label, bgColor, textColor, hasStroke = false) {
 
 async function generateInputComponent(parent, x, y) {
   await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
-  
+
   const label = figma.createText();
   label.characters = "Input Component";
   label.fontSize = 20;
@@ -252,7 +252,7 @@ async function generateInputComponent(parent, x, y) {
 
 async function generateBadgeComponent(parent, x, y) {
   await figma.loadFontAsync({ family: 'Inter', style: 'Medium' });
-  
+
   const label = figma.createText();
   label.characters = "Badge Component";
   label.fontSize = 20;
@@ -684,7 +684,7 @@ async function generateAllPages() {
     homepage.y = 0;
     page.appendChild(homepage);
     console.log('Homepage created and appended');
-    
+
     // Generate Shop Page
     figma.notify('Generating Shop Page... (2/5)');
     const shopPage = await createShopPageFrame();
@@ -720,7 +720,7 @@ async function generateAllPages() {
     // Zoom to fit all pages
     figma.notify('Finalizing...');
     figma.viewport.scrollAndZoomIntoView([homepage, shopPage, productDetailPage, loginPage, registerPage]);
-    
+
     console.log('All 5 pages generated successfully');
   } catch (error) {
     console.error('Error in generateAllPages:', error);
@@ -1961,7 +1961,7 @@ function createProductInfoSection() {
   infoSection.name = "Additional Info Section";
   infoSection.resize(840, 1);
   infoSection.fills = [];
-  
+
   return infoSection;
 }
 
@@ -2187,7 +2187,7 @@ function createDescriptionCard() {
 
   const specs1 = [
     { label: "Merek", value: "Diamond Electronic" },
-    { label: "Model", value: "DE-2024" },
+    { label: "Model", value: "DE-2025" },
     { label: "Garansi", value: "1 Tahun" }
   ];
 

@@ -21,10 +21,9 @@ const NavItem = ({ href, icon, label, isActive }: NavItemProps) => {
       <div
         className={`
           flex items-center gap-3 px-4 py-3 mx-2 my-1 rounded-lg cursor-pointer transition-all duration-200
-          ${
-            isActive
-              ? "bg-custom-red text-white shadow-md"
-              : "text-gray-700 hover:bg-gray-100"
+          ${isActive
+            ? "bg-custom-red text-white shadow-md"
+            : "text-gray-700 hover:bg-gray-100"
           }
         `}
       >
@@ -89,7 +88,7 @@ const DashboardSidebar = () => {
         {/* Sidebar Footer */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gray-50">
           <p className="text-xs text-gray-500 text-center">
-            v1.0.0 © 2024 Nasional Elektronik
+            v1.0.0 © 2025 Nasional Elektronik
           </p>
         </div>
       </div>

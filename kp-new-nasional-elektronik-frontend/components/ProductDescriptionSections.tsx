@@ -61,7 +61,7 @@ const ProductDescriptionSections = ({ product }: ProductDescriptionSectionsProps
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Model</span>
-                <span>DE-2024</span>
+                <span>DE-2025</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Garansi</span>

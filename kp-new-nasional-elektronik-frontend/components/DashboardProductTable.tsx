@@ -93,7 +93,7 @@ const DashboardProductTable = () => {
                   </td>
 
                   <td>
-                    { product?.inStock ? (<span className="badge badge-success text-white badge-sm">
+                    { !product.inStock ? (<span className="badge badge-success text-white badge-sm">
                       Stock tersedia
                     </span>) : (<span className="badge badge-error text-white badge-sm">
                       Stock habis
