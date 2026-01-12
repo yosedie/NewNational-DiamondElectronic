@@ -5,33 +5,26 @@ import { getCategoryIdBySlug } from "@/lib/utils";
 
 const Products = async ({ params, searchParams }: { params: { slug?: string[] }, searchParams: { [key: string]: string | string[] | undefined } }) => {
   // getting all data from URL slug and preparing everything for sending GET request
-  const inStockNum = searchParams?.inStock === "true" ? 1 : 0;
-  const outOfStockNum = searchParams?.outOfStock === "true" ? 1 : 0;
+  const inStockParam = searchParams?.inStock === "true";
+  const outOfStockParam = searchParams?.outOfStock === "true";
   const page = searchParams?.page ? Number(searchParams?.page) : 1;
 
   // Build query parameters
   const queryParams = new URLSearchParams();
   
-  // Price filter
-  queryParams.append('filters[price][$lte]', searchParams?.price?.toString() || '3000');
-  
-  // Rating filter
-  queryParams.append('filters[rating][$gte]', (Number(searchParams?.rating) || 0).toString());
-  
-  // Stock filters
-  if (inStockNum === 1 && outOfStockNum === 0) {
-    // Only in stock
-    queryParams.append('filters[inStock][$equals]', '1');
-  } else if (inStockNum === 0 && outOfStockNum === 1) {
-    // Only out of stock
-    queryParams.append('filters[outOfStock][$equals]', '1');
-  } else if (inStockNum === 1 && outOfStockNum === 1) {
-    // Both in stock and out of stock
-    queryParams.append('filters[inStock][$lte]', '1');
-  } else {
-    // Default: show in stock items only
-    queryParams.append('filters[inStock][$equals]', '1');
+  // Price filter - use simple parameter
+  if (searchParams?.price) {
+    queryParams.append('price', searchParams.price.toString());
   }
+  
+  // Rating filter - use simple parameter
+  if (searchParams?.rating) {
+    queryParams.append('rating', searchParams.rating.toString());
+  }
+  
+  // Stock filters - use simple parameters
+  queryParams.append('inStock', inStockParam.toString());
+  queryParams.append('outOfStock', outOfStockParam.toString());
   
   // Category filter
   if (params?.slug && params.slug.length > 0) {

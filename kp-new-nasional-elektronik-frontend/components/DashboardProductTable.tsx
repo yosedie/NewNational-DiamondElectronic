@@ -61,14 +61,21 @@ const DashboardProductTable = () => {
                             height={48}
                             src={
                               product?.mainImage
-                                ? product.mainImage.startsWith('http')
+                                ? product.mainImage.startsWith("http")
                                   ? product.mainImage
-                                  : `/${product.mainImage}`
+                                  : product.mainImage.startsWith("//")
+                                    ? `https:${product.mainImage}`
+                                    : product.mainImage.startsWith("/")
+                                      ? product.mainImage
+                                      : `/${product.mainImage}`
                                 : "/product_placeholder.jpg"
                             }
                             alt={sanitize(product?.title) || "Product image"}
                             className="w-auto h-auto"
-                            unoptimized={product?.mainImage?.startsWith('http')}
+                            unoptimized={
+                              product?.mainImage?.startsWith("http") ||
+                              product?.mainImage?.startsWith("//")
+                            }
                           />
                         </div>
                       </div>

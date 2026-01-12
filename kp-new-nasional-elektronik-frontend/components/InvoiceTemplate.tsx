@@ -27,8 +27,15 @@ interface InvoiceTemplateProps {
 
 export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateProps>(
   ({ order, orderProducts }, ref) => {
-    const subtotal = order?.total || 0;
-    const tax = subtotal / 5;
+    // Calculate subtotal from actual product prices and quantities
+    const subtotal = orderProducts?.reduce((sum, item) => {
+      // Ensure we convert to number in case price comes as string
+      const price = Number(item?.product?.price) || 0;
+      const quantity = Number(item?.quantity) || 0;
+      return sum + (price * quantity);
+    }, 0) || 0;
+    
+    const tax = subtotal * 0.2; // 20% tax
     const shipping = 5;
     const total = subtotal + tax + shipping;
 
@@ -123,8 +130,8 @@ export const InvoiceTemplate = React.forwardRef<HTMLDivElement, InvoiceTemplateP
                   </div>
                 </td>
                 <td className="text-center py-3 px-2">{product?.quantity}</td>
-                <td className="text-right py-3 px-2">Rp. {formatCurrency(product?.product?.price)}</td>
-                <td className="text-right py-3 px-2">Rp. {formatCurrency(product?.product?.price * product?.quantity)}</td>
+                <td className="text-right py-3 px-2">Rp. {formatCurrency(Number(product?.product?.price) || 0)}</td>
+                <td className="text-right py-3 px-2">Rp. {formatCurrency((Number(product?.product?.price) || 0) * (Number(product?.quantity) || 0))}</td>
               </tr>
             ))}
           </tbody>

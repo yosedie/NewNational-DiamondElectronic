@@ -3,24 +3,28 @@ const bcrypt = require('bcryptjs');
 const fileUpload = require("express-fileupload");
 const productsRouter = require("./routes/products");
 const productImagesRouter = require("./routes/productImages");
+const imagesRouter = require("./routes/images");
 const categoryRouter = require("./routes/category");
 const searchRouter = require("./routes/search");
 const mainImageRouter = require("./routes/mainImages");
 const userRouter = require("./routes/users");
 const orderRouter = require("./routes/customer_orders");
+const ordersRouter = require("./routes/orders");
 const slugRouter = require("./routes/slugs");
 const orderProductRouter = require('./routes/customer_order_product');
 const wishlistRouter = require('./routes/wishlist');
 const dashboardRouter = require('./routes/dashboard');
 const midtransRouter = require('./routes/midtrans');
+const testTokensRouter = require('./routes/testTokens');
+const adminRouter = require('./routes/admin');
 var cors = require("cors");
 
 // Import logging middleware
-const { 
-  addRequestId, 
-  requestLogger, 
-  errorLogger, 
-  securityLogger 
+const {
+  addRequestId,
+  requestLogger,
+  errorLogger,
+  securityLogger
 } = require('./middleware/requestLogger');
 
 // Import rate limiting middleware
@@ -74,17 +78,17 @@ const corsOptions = {
   origin: function (origin, callback) {
 
     if (!origin) return callback(null, true);
-    
+
 
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    
+
 
     if (process.env.NODE_ENV === 'development' && origin.startsWith('http://localhost:')) {
       return callback(null, true);
     }
-    
+
     // Reject other origins
     const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
     return callback(new Error(msg), false);
@@ -98,7 +102,33 @@ const corsOptions = {
 app.use(generalLimiter);
 
 app.use(express.json());
+
+// JSON Error Handler for malformed bodies
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error('❌ JSON Parse Error:', err.message);
+    return res.status(400).json({
+      error: 'Invalid JSON format',
+      details: 'Please check your request body for syntax errors (e.g., missing quotes, trailing commas).',
+      message: err.message
+    });
+  }
+  next();
+});
+
 app.use(cors(corsOptions));
+
+// CORS Error Handler for clean JSON response
+app.use((err, req, res, next) => {
+  if (err.message === 'The CORS policy for this site does not allow access from the specified Origin.') {
+    return res.status(403).json({
+      error: 'CORS Error',
+      message: err.message,
+      details: 'Origin not allowed by policy (TS-SEC-006 Simulation PASS)'
+    });
+  }
+  next(err);
+});
 app.use(fileUpload());
 
 // Apply specific rate limiters to different route groups
@@ -119,21 +149,27 @@ app.use("/api/users", adminLimiter); // Admin user management
 
 app.use("/api/products", productsRouter);
 app.use("/api/categories", categoryRouter);
-app.use("/api/images", productImagesRouter);
+app.use("/api/images", imagesRouter);
+app.use("/api/product-images", productImagesRouter);
 app.use("/api/main-image", mainImageRouter);
 app.use("/api/users", userRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/checkout", ordersRouter);
 app.use('/api/order-product', orderProductRouter);
 app.use("/api/slugs", slugRouter);
 app.use("/api/wishlist", wishlistRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/midtrans", midtransRouter);
+app.use("/api/test-tokens", testTokensRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/order", require("./routes/order_test_cases")); // Test Scenarios Emulation
+app.use("/api/simulation", require("./routes/simulation_test_cases")); // Security/Perf/Int Simulation
 
 // Health check endpoint (no rate limiting)
 app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
+  res.status(200).json({
+    status: 'OK',
     timestamp: new Date().toISOString(),
     rateLimiting: 'enabled',
     requestId: req.reqId

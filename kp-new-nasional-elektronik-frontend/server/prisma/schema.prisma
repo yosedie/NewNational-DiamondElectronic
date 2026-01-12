@@ -64,7 +64,7 @@ model customer_order_product {
   id              String         @id @default(uuid())
   customerOrder   Customer_order @relation(fields: [customerOrderId], references: [id])
   customerOrderId String
-  product         Product        @relation(fields: [productId], references: [id])
+  product         Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId       String
   quantity        Int
 
@@ -83,4 +83,6 @@ model Wishlist {
   productId String
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
+
+  @@unique([userId, productId])
 }

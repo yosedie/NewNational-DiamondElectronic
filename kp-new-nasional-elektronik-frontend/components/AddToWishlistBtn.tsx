@@ -17,116 +17,120 @@ const AddToWishlistBtn = ({ product, slug }: AddToWishlistBtnProps) => {
   const { data: session, status } = useSession();
   const { addToWishlist, removeFromWishlist, wishlist } = useWishlistStore();
   const [isProductInWishlist, setIsProductInWishlist] = useState<boolean>();
+  const [userId, setUserId] = useState<string>();
+
+  // Fetch user ID from backend
+  const getUserId = async () => {
+    if (!session?.user?.email) return;
+
+    try {
+      const response = await apiClient.get(`/api/users/email/${session.user.email}`);
+      if (response.ok) {
+        const data = await response.json();
+        setUserId(data.id);
+      }
+    } catch (error) {
+      console.error("Error fetching user ID:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      getUserId();
+    }
+  }, [session?.user?.email]);
 
   const addToWishlistFun = async () => {
-    // getting user by email so I can get his user id
-    if (session?.user?.email) {
-      try {
-        // sending fetch request to get user id because we will need it for saving wish item
-        const userResponse = await apiClient.get(`/api/users/email/${session?.user?.email}`, {
-          cache: "no-store",
-        });
-        const userData = await userResponse.json();
-
-        // Validate that we have a valid user ID
-        if (!userData?.id) {
-          toast.error("User tidak ditemukan. Silakan logout dan login kembali.");
-          return;
-        }
-
-        // Add product to wishlist
-        const wishlistResponse = await apiClient.post("/api/wishlist", {
-          productId: product?.id,
-          userId: userData.id
-        });
-
-        if (wishlistResponse.ok) {
-          addToWishlist({
-            id: product?.id,
-            title: product?.title,
-            price: product?.price,
-            image: product?.mainImage,
-            slug: product?.slug,
-            stockAvailabillity: product?.inStock,
-          });
-          toast.success("Produk berhasil ditambahkan ke daftar keinginan");
-        } else {
-          const errorData = await wishlistResponse.json();
-          toast.error(errorData.message || "Gagal menambahkan produk ke daftar keinginan");
-        }
-      } catch (error) {
-        console.error("Error adding to wishlist:", error);
-        toast.error("Gagal menambahkan produk ke daftar keinginan");
-      }
-    } else {
+    // Check if user is logged in
+    if (!session) {
       toast.error("Anda harus masuk untuk menambahkan produk ke daftar keinginan");
+      return;
+    }
+
+    if (!userId) {
+      toast.error("Gagal mendapatkan informasi pengguna");
+      return;
+    }
+
+    try {
+      // Add product to wishlist using public endpoint
+      const wishlistResponse = await apiClient.post("/api/wishlist/public", {
+        productId: product?.id,
+        userId: userId,
+      });
+
+      if (wishlistResponse.ok) {
+        addToWishlist({
+          id: product?.id,
+          title: product?.title,
+          price: product?.price,
+          image: product?.mainImage,
+          slug: product?.slug,
+          stockAvailabillity: product?.inStock,
+        });
+        toast.success("Produk berhasil ditambahkan ke daftar keinginan");
+      } else {
+        const errorData = await wishlistResponse.json();
+        toast.error(errorData.error || "Gagal menambahkan produk ke daftar keinginan");
+      }
+    } catch (error) {
+      console.error("Error adding to wishlist:", error);
+      toast.error("Gagal menambahkan produk ke daftar keinginan");
     }
   };
 
   const removeFromWishlistFun = async () => {
-    if (session?.user?.email) {
-      try {
-        // sending fetch request to get user id because we will need to delete wish item
-        const userResponse = await apiClient.get(`/api/users/email/${session?.user?.email}`, {
-          cache: "no-store",
-        });
-        const userData = await userResponse.json();
+    if (!session) {
+      toast.error("Anda harus masuk untuk menghapus produk dari daftar keinginan");
+      return;
+    }
 
-        // Validate that we have a valid user ID
-        if (!userData?.id) {
-          toast.error("User tidak ditemukan. Silakan logout dan login kembali.");
-          return;
-        }
+    if (!userId) {
+      toast.error("Gagal mendapatkan informasi pengguna");
+      return;
+    }
 
-        // Remove product from wishlist
-        const deleteResponse = await apiClient.delete(
-          `/api/wishlist/${userData.id}/${product?.id}`
-        );
+    try {
+      // Remove product from wishlist using public endpoint
+      const deleteResponse = await apiClient.delete(
+        `/api/wishlist/user/${userId}/${product?.id}`
+      );
 
-        if (deleteResponse.ok) {
-          removeFromWishlist(product?.id);
-          toast.success("Produk berhasil dihapus dari daftar keinginan");
-        } else {
-          const errorData = await deleteResponse.json();
-          toast.error(errorData.message || "Gagal menghapus produk dari daftar keinginan");
-        }
-      } catch (error) {
-        console.error("Error removing from wishlist:", error);
-        toast.error("Gagal menghapus produk dari daftar keinginan");
+      if (deleteResponse.ok) {
+        removeFromWishlist(product?.id);
+        toast.success("Produk berhasil dihapus dari daftar keinginan");
+      } else {
+        const errorData = await deleteResponse.json();
+        toast.error(errorData.error || "Gagal menghapus produk dari daftar keinginan");
       }
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+      toast.error("Gagal menghapus produk dari daftar keinginan");
     }
   };
 
   const isInWishlist = async () => {
-    // sending fetch request to get user id because we will need it for checking whether the product is in wishlist
-    if (session?.user?.email) {
-      try {
-        const userResponse = await apiClient.get(`/api/users/email/${session?.user?.email}`, {
-          cache: "no-store",
-        });
-        const userData = await userResponse.json();
+    // Check if user is logged in
+    if (!session) {
+      setIsProductInWishlist(false);
+      return;
+    }
 
-        // Validate that we have a valid user ID
-        if (!userData?.id) {
-          setIsProductInWishlist(false);
-          return;
-        }
+    try {
+      // Check if product is in wishlist (userId extracted from JWT token on backend)
+      const wishlistResponse = await apiClient.get(
+        `/api/wishlist/check/${product?.id}`
+      );
+      const wishlistData = await wishlistResponse.json();
 
-        // checking is product in wishlist
-        const wishlistResponse = await apiClient.get(
-          `/api/wishlist/${userData.id}/${product?.id}`
-        );
-        const wishlistData = await wishlistResponse.json();
-
-        if (wishlistData[0]?.id) {
-          setIsProductInWishlist(true);
-        } else {
-          setIsProductInWishlist(false);
-        }
-      } catch (error) {
-        console.error("Error checking wishlist status:", error);
+      if (wishlistData?.inWishlist) {
+        setIsProductInWishlist(true);
+      } else {
         setIsProductInWishlist(false);
       }
+    } catch (error) {
+      console.error("Error checking wishlist status:", error);
+      setIsProductInWishlist(false);
     }
   };
 

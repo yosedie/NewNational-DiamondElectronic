@@ -52,13 +52,24 @@ const WishItem = ({
   };
 
   const deleteItemFromWishlist = async (productId: string) => {
-    if (userId) {
-      apiClient.delete(`/api/wishlist/${userId}/${productId}`, {method: "DELETE"}).then(
-        (response) => {
-          removeFromWishlist(productId);
-          toast.success("Item berhasil dihapus dari daftar keinginan Anda");
-        }
-      );
+    if (!userId) {
+      toast.error("User tidak ditemukan");
+      return;
+    }
+
+    try {
+      const response = await apiClient.delete(`/api/wishlist/user/${userId}/${productId}`);
+
+      if (response.ok) {
+        removeFromWishlist(productId);
+        toast.success("Item berhasil dihapus dari daftar keinginan Anda");
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Gagal menghapus item dari wishlist");
+      }
+    } catch (error) {
+      console.error("Error deleting wishlist item:", error);
+      toast.error("Terjadi kesalahan saat menghapus item");
     }
   };
 

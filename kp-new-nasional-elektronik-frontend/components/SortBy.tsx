@@ -20,6 +20,8 @@ const SortBy = () => {
         <option value="titleDesc">Urutkan Z-A</option>
         <option value="lowPrice">Lowest Harga</option>
         <option value="highPrice">Highest Harga</option>
+        <option value="newest">Terbaru</option>
+        <option value="oldest">Terlama</option>
       </select>
     </div>
   );

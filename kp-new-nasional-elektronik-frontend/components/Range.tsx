@@ -15,10 +15,20 @@ const Range = ({ min, max, priceValue, setInputCategory } : RangeProps) => {
         setCurrentRangeValue(parseInt(e.target.value));
     }
 
+    // Format currency to Indonesian Rupiah
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(price);
+    };
+
   return (
     <div>
         <input type="range" min={min} max={max} value={priceValue} className="range range-warning" />
-        <span>{ `Harga maksimal: $${currentRangeValue}` }</span>
+        <span>{ `Harga maksimal: ${formatPrice(currentRangeValue)}` }</span>
     </div>
   )
 }

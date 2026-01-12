@@ -23,6 +23,9 @@ model Product {
   description    String
   manufacturer   String
   inStock        Int                      @default(1)
+  status         String                   @default("ACTIVE")
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
   categoryId     String
   category       Category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   customerOrders customer_order_product[]
@@ -66,7 +69,7 @@ model customer_order_product {
   id              String         @id @default(uuid())
   customerOrder   Customer_order @relation(fields: [customerOrderId], references: [id])
   customerOrderId String
-  product         Product        @relation(fields: [productId], references: [id])
+  product         Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId       String
   quantity        Int
 }

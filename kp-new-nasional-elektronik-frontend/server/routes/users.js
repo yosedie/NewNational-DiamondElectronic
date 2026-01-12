@@ -8,12 +8,16 @@ const {
     updateUser,
     deleteUser,
     getAllUsers, 
-    getUserByEmail
+    getUserByEmail,
+    login
   } = require('../controllers/users');
 
   router.route('/')
   .get(getAllUsers)
   .post(createUser);
+
+  router.route('/login')
+  .post(login);
 
   router.route('/:id')
   .get(getUser)

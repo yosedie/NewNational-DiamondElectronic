@@ -54,6 +54,17 @@ const AdminSingleOrder = () => {
   const router = useRouter();
   const invoiceRef = useRef<HTMLDivElement>(null);
 
+  // Calculate subtotal from actual product prices and quantities
+  const subtotal = orderProducts?.reduce((sum, item) => {
+    const price = Number(item?.product?.price) || 0;
+    const quantity = Number(item?.quantity) || 0;
+    return sum + (price * quantity);
+  }, 0) || 0;
+  
+  const tax = subtotal * 0.2; // 20% tax
+  const shipping = 5;
+  const total = subtotal + tax + shipping;
+
   const handlePrint = useReactToPrint({
     contentRef: invoiceRef,
     documentTitle: `Invoice-${order?.id}`,
@@ -377,18 +388,18 @@ const AdminSingleOrder = () => {
                   {product?.product?.title}
                 </Link>
                 <p className="text-gray-600 mt-1">
-                  Rp. {formatCurrency(product?.product?.price)} * {product?.quantity} items
+                  Rp. {formatCurrency(Number(product?.product?.price) || 0)} * {product?.quantity} items
                 </p>
               </div>
             ))}
 
             {/* Pricing Summary */}
             <div className="flex flex-col gap-y-2 mt-6 pt-6 border-t border-gray-200">
-              <p className="text-xl">Subtotal: Rp. {formatCurrency(order?.total)}</p>
-              <p className="text-xl">Pajak 20%: Rp. {formatCurrency(order?.total / 5)}</p>
-              <p className="text-xl">Pengiriman: Rp. {formatCurrency(5)}</p>
+              <p className="text-xl">Subtotal: Rp. {formatCurrency(subtotal)}</p>
+              <p className="text-xl">Pajak 20%: Rp. {formatCurrency(tax)}</p>
+              <p className="text-xl">Pengiriman: Rp. {formatCurrency(shipping)}</p>
               <p className="text-2xl font-semibold mt-2 pt-2 border-t border-gray-300">
-                Total: Rp. {formatCurrency(order?.total + order?.total / 5 + 5)}
+                Total: Rp. {formatCurrency(total)}
               </p>
             </div>
           </div>

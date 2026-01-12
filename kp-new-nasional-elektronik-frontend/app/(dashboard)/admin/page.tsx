@@ -49,7 +49,7 @@ const AdminDashboardPage = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch all dashboard data
         const [ordersRes, membersRes, productsRes] = await Promise.all([
           apiClient.get("/api/dashboard/order-stats"),
@@ -119,7 +119,7 @@ const AdminDashboardPage = () => {
       {/* Order History Chart */}
       <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">
-          Order History (Last 30 Days)
+          Order History (Last 90 Days)
         </h3>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={orderStats?.chartData || []}>

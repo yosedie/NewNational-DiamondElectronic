@@ -1,5 +1,6 @@
 const prisma = require("../utills/db");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const { asyncHandler, AppError } = require("../utills/errorHandler");
 
 // Helper function to exclude password from user object
@@ -33,6 +34,15 @@ const createUser = asyncHandler(async (request, response) => {
   // Password validation
   if (password.length < 8) {
     throw new AppError("Password must be at least 8 characters long", 400);
+  }
+
+  // Check if email already exists
+  const existingUser = await prisma.user.findUnique({
+    where: { email }
+  });
+
+  if (existingUser) {
+    throw new AppError("Email already registered. Please use a different email or try logging in.", 409);
   }
 
   const hashedPassword = await bcrypt.hash(password, 14);
@@ -163,6 +173,44 @@ const getUserByEmail = asyncHandler(async (request, response) => {
   return response.status(200).json(excludePassword(user));
 });
 
+const login = asyncHandler(async (request, response) => {
+  const { email, password } = request.body;
+
+  // Basic validation
+  if (!email || !password) {
+    throw new AppError("Email and password are required", 400);
+  }
+
+  // Find user by email
+  const user = await prisma.user.findUnique({
+    where: { email }
+  });
+
+  if (!user) {
+    throw new AppError("Invalid credentials", 401);
+  }
+
+  // Verify password
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    throw new AppError("Invalid credentials", 401);
+  }
+
+  // Generate JWT token
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET || 'your-secret-key',
+    { expiresIn: '24h' }
+  );
+
+  // Exclude password from response
+  return response.status(200).json({
+    token,
+    user: excludePassword(user),
+    message: "Login successful"
+  });
+});
+
 module.exports = {
   createUser,
   updateUser,
@@ -170,4 +218,5 @@ module.exports = {
   getUser,
   getAllUsers,
   getUserByEmail,
+  login,
 };

@@ -10,7 +10,7 @@ figma.ui.onmessage = async (msg) => {
     try {
       await generateAllPages();
       figma.ui.postMessage({ type: 'generation-complete' });
-      figma.notify('🎉 All 5 pages generated successfully!');
+      figma.notify('🎉 5 Admin pages generated successfully!');
     } catch (error) {
       console.error('Error generating pages:', error);
       figma.notify('❌ Error: ' + error.message, { error: true });
@@ -661,7 +661,7 @@ async function generatePages() {
 }
 
 // ==========================================
-// GENERATE ALL PAGES (HOMEPAGE + SHOP PAGE + PRODUCT DETAIL PAGE + LOGIN + REGISTER)
+// GENERATE ALL PAGES (ADMIN: DASHBOARD + ORDERS + PRODUCTS + CATEGORIES + USERS)
 // ==========================================
 async function generateAllPages() {
   try {
@@ -674,54 +674,54 @@ async function generateAllPages() {
     // Create main page
     figma.notify('Creating page...');
     const page = figma.createPage();
-    page.name = "📄 Pages - Nasional Elektronik";
+    page.name = "📄 Admin Pages - Nasional Elektronik";
     figma.currentPage = page;
 
-    // Generate Homepage
-    figma.notify('Generating Homepage... (1/5)');
-    const homepage = await createHomepageFrame();
-    homepage.x = 0;
-    homepage.y = 0;
-    page.appendChild(homepage);
-    console.log('Homepage created and appended');
+    // Generate Admin Dashboard
+    figma.notify('Generating Admin Dashboard... (1/5)');
+    const adminDashboard = await createAdminDashboardFrame();
+    adminDashboard.x = 0;
+    adminDashboard.y = 0;
+    page.appendChild(adminDashboard);
+    console.log('Admin Dashboard created and appended');
 
-    // Generate Shop Page
-    figma.notify('Generating Shop Page... (2/5)');
-    const shopPage = await createShopPageFrame();
-    shopPage.x = 1600; // Position to the right of homepage
-    shopPage.y = 0;
-    page.appendChild(shopPage);
-    console.log('Shop Page created and appended');
+    // Generate Admin Orders
+    figma.notify('Generating Admin Orders... (2/5)');
+    const adminOrders = await createAdminOrdersFrame();
+    adminOrders.x = 1600;
+    adminOrders.y = 0;
+    page.appendChild(adminOrders);
+    console.log('Admin Orders created and appended');
 
-    // Generate Product Detail Page
-    figma.notify('Generating Product Detail Page... (3/5)');
-    const productDetailPage = await createProductDetailFrame();
-    productDetailPage.x = 3200; // Position to the right of shop page
-    productDetailPage.y = 0;
-    page.appendChild(productDetailPage);
-    console.log('Product Detail Page created and appended');
+    // Generate Admin Products
+    figma.notify('Generating Admin Products... (3/5)');
+    const adminProducts = await createAdminProductsFrame();
+    adminProducts.x = 3200;
+    adminProducts.y = 0;
+    page.appendChild(adminProducts);
+    console.log('Admin Products created and appended');
 
-    // Generate Login Page
-    figma.notify('Generating Login Page... (4/5)');
-    const loginPage = await createLoginFrame();
-    loginPage.x = 4800; // Position to the right of product detail page
-    loginPage.y = 0;
-    page.appendChild(loginPage);
-    console.log('Login Page created and appended');
+    // Generate Admin Categories
+    figma.notify('Generating Admin Categories... (4/5)');
+    const adminCategories = await createAdminCategoriesFrame();
+    adminCategories.x = 4800;
+    adminCategories.y = 0;
+    page.appendChild(adminCategories);
+    console.log('Admin Categories created and appended');
 
-    // Generate Register Page
-    figma.notify('Generating Register Page... (5/5)');
-    const registerPage = await createRegisterFrame();
-    registerPage.x = 6400; // Position to the right of login page
-    registerPage.y = 0;
-    page.appendChild(registerPage);
-    console.log('Register Page created and appended');
+    // Generate Admin Users
+    figma.notify('Generating Admin Users... (5/5)');
+    const adminUsers = await createAdminUsersFrame();
+    adminUsers.x = 6400;
+    adminUsers.y = 0;
+    page.appendChild(adminUsers);
+    console.log('Admin Users created and appended');
 
     // Zoom to fit all pages
     figma.notify('Finalizing...');
-    figma.viewport.scrollAndZoomIntoView([homepage, shopPage, productDetailPage, loginPage, registerPage]);
+    figma.viewport.scrollAndZoomIntoView([adminDashboard, adminOrders, adminProducts, adminCategories, adminUsers]);
 
-    console.log('All 5 pages generated successfully');
+    console.log('All 5 admin pages generated successfully');
   } catch (error) {
     console.error('Error in generateAllPages:', error);
     throw error;
@@ -2671,4 +2671,2610 @@ function createFormInput(label, inputType, name) {
   inputGroup.appendChild(inputField);
 
   return inputGroup;
+}
+
+// ==========================================
+// HELPER FUNCTIONS FOR CART PAGE
+// ==========================================
+
+// Create Cart Page Frame
+async function createCartPageFrame() {
+  try {
+    const cartPage = figma.createFrame();
+    cartPage.name = "Cart Page - Desktop";
+    cartPage.resize(1440, 1800);
+    cartPage.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    cartPage.layoutMode = 'VERTICAL';
+
+    // Add header
+    const header = await createHeader();
+    cartPage.appendChild(header);
+
+    // Section Title Area
+    const sectionTitle = createSectionTitleComponent("Keranjang", "Home | Keranjang");
+    cartPage.appendChild(sectionTitle);
+
+    // Main Content Container
+    const mainContent = figma.createFrame();
+    mainContent.name = "Main Content";
+    mainContent.resize(1440, 1200);
+    mainContent.fills = [];
+    mainContent.layoutMode = 'HORIZONTAL';
+    mainContent.paddingTop = 48;
+    mainContent.paddingBottom = 48;
+    mainContent.paddingLeft = 80;
+    mainContent.paddingRight = 80;
+    mainContent.itemSpacing = 48;
+
+    // Left Column - Cart Items (lg:col-span-7)
+    const cartItemsSection = figma.createFrame();
+    cartItemsSection.name = "Cart Items Section";
+    cartItemsSection.resize(760, 1100);
+    cartItemsSection.fills = [];
+    cartItemsSection.layoutMode = 'VERTICAL';
+    cartItemsSection.itemSpacing = 0;
+
+    // Cart Items Header
+    const cartHeader = figma.createText();
+    cartHeader.fontName = { family: 'Inter', style: 'Bold' };
+    cartHeader.fontSize = 20;
+    cartHeader.characters = "Items in your shopping cart";
+    cartHeader.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    cartItemsSection.appendChild(cartHeader);
+
+    // Divider Top
+    const dividerTop = figma.createRectangle();
+    dividerTop.name = "Divider Top";
+    dividerTop.resize(760, 1);
+    dividerTop.fills = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+    cartItemsSection.appendChild(dividerTop);
+
+    // Cart Items (3 sample items)
+    for (let i = 0; i < 3; i++) {
+      const cartItem = createCartItemRow(`Produk Contoh ${i + 1}`, `Rp ${(1299000 * (i + 1)).toLocaleString('id-ID')}`, i + 1);
+      cartItemsSection.appendChild(cartItem);
+    }
+
+    // Divider Bottom
+    const dividerBottom = figma.createRectangle();
+    dividerBottom.name = "Divider Bottom";
+    dividerBottom.resize(760, 1);
+    dividerBottom.fills = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+    cartItemsSection.appendChild(dividerBottom);
+
+    mainContent.appendChild(cartItemsSection);
+
+    // Right Column - Order Summary (lg:col-span-5)
+    const orderSummary = createCartOrderSummary();
+    mainContent.appendChild(orderSummary);
+
+    cartPage.appendChild(mainContent);
+
+    // Add footer
+    const footer = await createFooter();
+    cartPage.appendChild(footer);
+
+    console.log('Cart Page frame created successfully');
+    return cartPage;
+  } catch (error) {
+    console.error('Error in createCartPageFrame:', error);
+    throw new Error('Failed to create Cart Page: ' + error.message);
+  }
+}
+
+// Create Cart Item Row
+function createCartItemRow(productName, price, quantity) {
+  const cartItem = figma.createFrame();
+  cartItem.name = "Cart Item";
+  cartItem.resize(760, 200);
+  cartItem.fills = [];
+  cartItem.layoutMode = 'HORIZONTAL';
+  cartItem.paddingTop = 24;
+  cartItem.paddingBottom = 24;
+  cartItem.itemSpacing = 24;
+  cartItem.strokeBottomWeight = 1;
+  cartItem.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+
+  // Product Image
+  const productImage = figma.createFrame();
+  productImage.name = "Product Image";
+  productImage.resize(150, 150);
+  productImage.fills = [{ type: 'SOLID', color: { r: 0.95, g: 0.96, b: 0.96 } }];
+  productImage.cornerRadius = 8;
+  productImage.layoutMode = 'VERTICAL';
+  productImage.primaryAxisAlignItems = 'CENTER';
+  productImage.counterAxisAlignItems = 'CENTER';
+
+  const imageLabel = figma.createText();
+  imageLabel.fontName = { family: 'Inter', style: 'Medium' };
+  imageLabel.fontSize = 12;
+  imageLabel.characters = "192x192";
+  imageLabel.textAlignHorizontal = 'CENTER';
+  imageLabel.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  productImage.appendChild(imageLabel);
+
+  cartItem.appendChild(productImage);
+
+  // Product Details
+  const productDetails = figma.createFrame();
+  productDetails.name = "Product Details";
+  productDetails.resize(400, 150);
+  productDetails.fills = [];
+  productDetails.layoutMode = 'VERTICAL';
+  productDetails.itemSpacing = 8;
+
+  // Product Name (Link Style)
+  const productNameText = figma.createText();
+  productNameText.fontName = { family: 'Inter', style: 'Medium' };
+  productNameText.fontSize = 14;
+  productNameText.characters = productName;
+  productNameText.fills = [{ type: 'SOLID', color: { r: 0.22, g: 0.26, b: 0.31 } }];
+  productDetails.appendChild(productNameText);
+
+  // Price
+  const priceText = figma.createText();
+  priceText.fontName = { family: 'Inter', style: 'Medium' };
+  priceText.fontSize = 14;
+  priceText.characters = price;
+  priceText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  productDetails.appendChild(priceText);
+
+  // Quantity Input
+  const quantityRow = figma.createFrame();
+  quantityRow.name = "Quantity Row";
+  quantityRow.resize(120, 36);
+  quantityRow.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  quantityRow.strokeWeight = 1;
+  quantityRow.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+  quantityRow.cornerRadius = 6;
+  quantityRow.layoutMode = 'HORIZONTAL';
+  quantityRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  quantityRow.counterAxisAlignItems = 'CENTER';
+  quantityRow.paddingLeft = 12;
+  quantityRow.paddingRight = 12;
+
+  const minusBtn = figma.createText();
+  minusBtn.fontName = { family: 'Inter', style: 'Bold' };
+  minusBtn.fontSize = 16;
+  minusBtn.characters = "−";
+  minusBtn.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  quantityRow.appendChild(minusBtn);
+
+  const quantityValue = figma.createText();
+  quantityValue.fontName = { family: 'Inter', style: 'Medium' };
+  quantityValue.fontSize = 14;
+  quantityValue.characters = String(quantity);
+  quantityValue.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+  quantityRow.appendChild(quantityValue);
+
+  const plusBtn = figma.createText();
+  plusBtn.fontName = { family: 'Inter', style: 'Bold' };
+  plusBtn.fontSize = 16;
+  plusBtn.characters = "+";
+  plusBtn.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  quantityRow.appendChild(plusBtn);
+
+  productDetails.appendChild(quantityRow);
+
+  // Stock Status
+  const stockStatus = figma.createFrame();
+  stockStatus.name = "Stock Status";
+  stockStatus.resize(200, 20);
+  stockStatus.fills = [];
+  stockStatus.layoutMode = 'HORIZONTAL';
+  stockStatus.itemSpacing = 8;
+
+  const checkIcon = figma.createText();
+  checkIcon.fontName = { family: 'Inter', style: 'Regular' };
+  checkIcon.fontSize = 14;
+  checkIcon.characters = "✓";
+  checkIcon.fills = [{ type: 'SOLID', color: { r: 0.06, g: 0.72, b: 0.51 } }];
+  stockStatus.appendChild(checkIcon);
+
+  const stockText = figma.createText();
+  stockText.fontName = { family: 'Inter', style: 'Regular' };
+  stockText.fontSize = 14;
+  stockText.characters = "Stock tersedia";
+  stockText.fills = [{ type: 'SOLID', color: { r: 0.22, g: 0.26, b: 0.31 } }];
+  stockStatus.appendChild(stockText);
+
+  productDetails.appendChild(stockStatus);
+
+  cartItem.appendChild(productDetails);
+
+  // Remove Button
+  const removeBtn = figma.createFrame();
+  removeBtn.name = "Remove Button";
+  removeBtn.resize(36, 36);
+  removeBtn.fills = [{ type: 'SOLID', color: { r: 0.95, g: 0.96, b: 0.96 } }];
+  removeBtn.cornerRadius = 18;
+  removeBtn.layoutMode = 'VERTICAL';
+  removeBtn.primaryAxisAlignItems = 'CENTER';
+  removeBtn.counterAxisAlignItems = 'CENTER';
+
+  const removeIcon = figma.createText();
+  removeIcon.fontName = { family: 'Inter', style: 'Regular' };
+  removeIcon.fontSize = 16;
+  removeIcon.characters = "✕";
+  removeIcon.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  removeBtn.appendChild(removeIcon);
+
+  cartItem.appendChild(removeBtn);
+
+  return cartItem;
+}
+
+// Create Cart Order Summary
+function createCartOrderSummary() {
+  const summaryCard = figma.createFrame();
+  summaryCard.name = "Order Summary";
+  summaryCard.resize(420, 500);
+  summaryCard.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.97 } }];
+  summaryCard.cornerRadius = 8;
+  summaryCard.layoutMode = 'VERTICAL';
+  summaryCard.paddingTop = 24;
+  summaryCard.paddingBottom = 24;
+  summaryCard.paddingLeft = 24;
+  summaryCard.paddingRight = 24;
+  summaryCard.itemSpacing = 16;
+
+  // Summary Title
+  const summaryTitle = figma.createText();
+  summaryTitle.fontName = { family: 'Inter', style: 'Medium' };
+  summaryTitle.fontSize = 18;
+  summaryTitle.characters = "Ringkasan pesanan";
+  summaryTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  summaryCard.appendChild(summaryTitle);
+
+  // Summary Items
+  const summaryItems = [
+    { label: "Subtotal", value: "Rp 7.794.000" },
+    { label: "Estimasi pengiriman", value: "Rp 5" },
+    { label: "Estimasi pajak", value: "Rp 1.558.800" }
+  ];
+
+  summaryItems.forEach((item, index) => {
+    const summaryRow = figma.createFrame();
+    summaryRow.name = item.label;
+    summaryRow.resize(372, 40);
+    summaryRow.fills = [];
+    summaryRow.layoutMode = 'HORIZONTAL';
+    summaryRow.primaryAxisSizingMode = 'FIXED';
+    summaryRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+    summaryRow.counterAxisAlignItems = 'CENTER';
+
+    if (index > 0) {
+      summaryRow.strokeTopWeight = 1;
+      summaryRow.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+      summaryRow.paddingTop = 16;
+    }
+
+    const label = figma.createText();
+    label.fontName = { family: 'Inter', style: 'Regular' };
+    label.fontSize = 14;
+    label.characters = item.label;
+    label.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    summaryRow.appendChild(label);
+
+    const value = figma.createText();
+    value.fontName = { family: 'Inter', style: 'Medium' };
+    value.fontSize = 14;
+    value.characters = item.value;
+    value.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    summaryRow.appendChild(value);
+
+    summaryCard.appendChild(summaryRow);
+  });
+
+  // Total Row
+  const totalRow = figma.createFrame();
+  totalRow.name = "Total Row";
+  totalRow.resize(372, 50);
+  totalRow.fills = [];
+  totalRow.layoutMode = 'HORIZONTAL';
+  totalRow.primaryAxisSizingMode = 'FIXED';
+  totalRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  totalRow.counterAxisAlignItems = 'CENTER';
+  totalRow.strokeTopWeight = 1;
+  totalRow.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+  totalRow.paddingTop = 16;
+
+  const totalLabel = figma.createText();
+  totalLabel.fontName = { family: 'Inter', style: 'Medium' };
+  totalLabel.fontSize = 16;
+  totalLabel.characters = "Total pesanan";
+  totalLabel.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  totalRow.appendChild(totalLabel);
+
+  const totalValue = figma.createText();
+  totalValue.fontName = { family: 'Inter', style: 'Medium' };
+  totalValue.fontSize = 16;
+  totalValue.characters = "Rp 9.352.805";
+  totalValue.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  totalRow.appendChild(totalValue);
+
+  summaryCard.appendChild(totalRow);
+
+  // Checkout Button
+  const checkoutBtn = figma.createFrame();
+  checkoutBtn.name = "Checkout Button";
+  checkoutBtn.resize(372, 46);
+  checkoutBtn.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  checkoutBtn.strokeWeight = 1;
+  checkoutBtn.strokes = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
+  checkoutBtn.cornerRadius = 0;
+  checkoutBtn.layoutMode = 'HORIZONTAL';
+  checkoutBtn.primaryAxisAlignItems = 'CENTER';
+  checkoutBtn.counterAxisAlignItems = 'CENTER';
+  checkoutBtn.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.05 },
+    offset: { x: 0, y: 2 },
+    radius: 4,
+    visible: true,
+    blendMode: 'NORMAL'
+  }];
+
+  const checkoutText = figma.createText();
+  checkoutText.fontName = { family: 'Inter', style: 'Bold' };
+  checkoutText.fontSize = 14;
+  checkoutText.characters = "CHECKOUT";
+  checkoutText.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  checkoutBtn.appendChild(checkoutText);
+
+  summaryCard.appendChild(checkoutBtn);
+
+  return summaryCard;
+}
+
+// ==========================================
+// HELPER FUNCTIONS FOR CHECKOUT PAGE
+// ==========================================
+
+// Create Checkout Page Frame
+async function createCheckoutPageFrame() {
+  try {
+    const checkoutPage = figma.createFrame();
+    checkoutPage.name = "Checkout Page - Desktop";
+    checkoutPage.resize(1440, 2400);
+    checkoutPage.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    checkoutPage.layoutMode = 'VERTICAL';
+
+    // Add header
+    const header = await createHeader();
+    checkoutPage.appendChild(header);
+
+    // Section Title Area
+    const sectionTitle = createSectionTitleComponent("Checkout", "Home | Cart | Checkout");
+    checkoutPage.appendChild(sectionTitle);
+
+    // Main Content Container (Two columns)
+    const mainContent = figma.createFrame();
+    mainContent.name = "Main Content";
+    mainContent.resize(1440, 1800);
+    mainContent.fills = [];
+    mainContent.layoutMode = 'HORIZONTAL';
+    mainContent.paddingTop = 48;
+    mainContent.paddingBottom = 48;
+    mainContent.paddingLeft = 80;
+    mainContent.paddingRight = 80;
+    mainContent.itemSpacing = 64;
+
+    // Left Column - Form Section
+    const formSection = createCheckoutFormSection();
+    mainContent.appendChild(formSection);
+
+    // Right Column - Order Summary
+    const orderSummary = createCheckoutOrderSummary();
+    mainContent.appendChild(orderSummary);
+
+    checkoutPage.appendChild(mainContent);
+
+    // Add footer
+    const footer = await createFooter();
+    checkoutPage.appendChild(footer);
+
+    console.log('Checkout Page frame created successfully');
+    return checkoutPage;
+  } catch (error) {
+    console.error('Error in createCheckoutPageFrame:', error);
+    throw new Error('Failed to create Checkout Page: ' + error.message);
+  }
+}
+
+// Create Checkout Form Section (Left Column)
+function createCheckoutFormSection() {
+  const formSection = figma.createFrame();
+  formSection.name = "Form Section";
+  formSection.resize(700, 1700);
+  formSection.fills = [];
+  formSection.layoutMode = 'VERTICAL';
+  formSection.itemSpacing = 32;
+
+  // Contact Information Section
+  const contactSection = figma.createFrame();
+  contactSection.name = "Contact Information";
+  contactSection.resize(700, 400);
+  contactSection.fills = [];
+  contactSection.layoutMode = 'VERTICAL';
+  contactSection.itemSpacing = 16;
+
+  const contactTitle = figma.createText();
+  contactTitle.fontName = { family: 'Inter', style: 'Medium' };
+  contactTitle.fontSize = 18;
+  contactTitle.characters = "Contact information";
+  contactTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  contactSection.appendChild(contactTitle);
+
+  // Name inputs row
+  const nameRow = figma.createFrame();
+  nameRow.name = "Name Row";
+  nameRow.resize(700, 70);
+  nameRow.fills = [];
+  nameRow.layoutMode = 'HORIZONTAL';
+  nameRow.itemSpacing = 16;
+
+  const firstNameInput = createCheckoutFormInput("Nama Depan *", "John", 342);
+  nameRow.appendChild(firstNameInput);
+
+  const lastNameInput = createCheckoutFormInput("Nama Belakang *", "Doe", 342);
+  nameRow.appendChild(lastNameInput);
+
+  contactSection.appendChild(nameRow);
+
+  // Phone input
+  const phoneInput = createCheckoutFormInput("Phone number *", "+62 812 3456 7890", 700);
+  contactSection.appendChild(phoneInput);
+
+  // Email input
+  const emailInput = createCheckoutFormInput("Alamat email *", "john.doe@example.com", 700);
+  contactSection.appendChild(emailInput);
+
+  formSection.appendChild(contactSection);
+
+  // Payment Methods Section
+  const paymentSection = createPaymentMethodsSection();
+  formSection.appendChild(paymentSection);
+
+  // Shipping Address Section
+  const shippingSection = figma.createFrame();
+  shippingSection.name = "Shipping Address";
+  shippingSection.resize(700, 500);
+  shippingSection.fills = [];
+  shippingSection.layoutMode = 'VERTICAL';
+  shippingSection.itemSpacing = 16;
+
+  const shippingTitle = figma.createText();
+  shippingTitle.fontName = { family: 'Inter', style: 'Medium' };
+  shippingTitle.fontSize = 18;
+  shippingTitle.characters = "Alamat pengiriman";
+  shippingTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  shippingSection.appendChild(shippingTitle);
+
+  // Address input
+  const addressInput = createCheckoutFormInput("Address *", "Jl. Raya Darmo No. 123", 700);
+  shippingSection.appendChild(addressInput);
+
+  // City, Country, Postal Code row
+  const locationRow = figma.createFrame();
+  locationRow.name = "Location Row";
+  locationRow.resize(700, 70);
+  locationRow.fills = [];
+  locationRow.layoutMode = 'HORIZONTAL';
+  locationRow.itemSpacing = 16;
+
+  const cityInput = createCheckoutFormInput("City *", "Surabaya", 224);
+  locationRow.appendChild(cityInput);
+
+  const countryInput = createCheckoutFormInput("Country *", "Indonesia", 224);
+  locationRow.appendChild(countryInput);
+
+  const postalInput = createCheckoutFormInput("Postal code *", "60241", 224);
+  locationRow.appendChild(postalInput);
+
+  shippingSection.appendChild(locationRow);
+
+  // Order Notice textarea
+  const noticeSection = figma.createFrame();
+  noticeSection.name = "Order Notice";
+  noticeSection.resize(700, 120);
+  noticeSection.fills = [];
+  noticeSection.layoutMode = 'VERTICAL';
+  noticeSection.itemSpacing = 8;
+
+  const noticeLabel = figma.createText();
+  noticeLabel.fontName = { family: 'Inter', style: 'Medium' };
+  noticeLabel.fontSize = 14;
+  noticeLabel.characters = "Order notice";
+  noticeLabel.fills = [{ type: 'SOLID', color: { r: 0.22, g: 0.26, b: 0.31 } }];
+  noticeSection.appendChild(noticeLabel);
+
+  const noticeInput = figma.createFrame();
+  noticeInput.name = "Textarea";
+  noticeInput.resize(700, 80);
+  noticeInput.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  noticeInput.strokeWeight = 1;
+  noticeInput.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+  noticeInput.cornerRadius = 6;
+  noticeInput.paddingTop = 12;
+  noticeInput.paddingLeft = 12;
+
+  const noticePlaceholder = figma.createText();
+  noticePlaceholder.fontName = { family: 'Inter', style: 'Regular' };
+  noticePlaceholder.fontSize = 14;
+  noticePlaceholder.characters = "Catatan khusus untuk pesanan Anda...";
+  noticePlaceholder.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  noticeInput.appendChild(noticePlaceholder);
+
+  noticeSection.appendChild(noticeInput);
+  shippingSection.appendChild(noticeSection);
+
+  formSection.appendChild(shippingSection);
+
+  // Place Order Button
+  const placeOrderBtn = figma.createFrame();
+  placeOrderBtn.name = "Place Order Button";
+  placeOrderBtn.resize(700, 50);
+  placeOrderBtn.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  placeOrderBtn.cornerRadius = 6;
+  placeOrderBtn.layoutMode = 'HORIZONTAL';
+  placeOrderBtn.primaryAxisAlignItems = 'CENTER';
+  placeOrderBtn.counterAxisAlignItems = 'CENTER';
+  placeOrderBtn.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.1 },
+    offset: { x: 0, y: 2 },
+    radius: 4,
+    visible: true,
+    blendMode: 'NORMAL'
+  }];
+
+  const placeOrderText = figma.createText();
+  placeOrderText.fontName = { family: 'Inter', style: 'Bold' };
+  placeOrderText.fontSize = 16;
+  placeOrderText.characters = "Place Order";
+  placeOrderText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  placeOrderBtn.appendChild(placeOrderText);
+
+  formSection.appendChild(placeOrderBtn);
+
+  return formSection;
+}
+
+// Create Payment Methods Section
+function createPaymentMethodsSection() {
+  const paymentSection = figma.createFrame();
+  paymentSection.name = "Payment Methods";
+  paymentSection.resize(700, 250);
+  paymentSection.fills = [];
+  paymentSection.layoutMode = 'VERTICAL';
+  paymentSection.itemSpacing = 16;
+
+  const paymentTitle = figma.createText();
+  paymentTitle.fontName = { family: 'Inter', style: 'Medium' };
+  paymentTitle.fontSize = 18;
+  paymentTitle.characters = "Metode pembayaran";
+  paymentTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  paymentSection.appendChild(paymentTitle);
+
+  // Payment options
+  const paymentOptions = [
+    { name: "Bank Transfer", description: "Transfer melalui Bank BCA, Mandiri, BNI", selected: true },
+    { name: "E-Wallet", description: "GoPay, OVO, Dana, ShopeePay", selected: false },
+    { name: "Cash on Delivery", description: "Bayar saat barang diterima", selected: false }
+  ];
+
+  paymentOptions.forEach(option => {
+    const optionRow = figma.createFrame();
+    optionRow.name = option.name;
+    optionRow.resize(700, 56);
+    optionRow.fills = [{ type: 'SOLID', color: option.selected ? { r: 0.95, g: 0.97, b: 1 } : { r: 1, g: 1, b: 1 } }];
+    optionRow.strokeWeight = option.selected ? 2 : 1;
+    optionRow.strokes = [{ type: 'SOLID', color: option.selected ? { r: 0.23, g: 0.51, b: 0.96 } : { r: 0.82, g: 0.84, b: 0.86 } }];
+    optionRow.cornerRadius = 8;
+    optionRow.layoutMode = 'HORIZONTAL';
+    optionRow.paddingLeft = 16;
+    optionRow.paddingRight = 16;
+    optionRow.counterAxisAlignItems = 'CENTER';
+    optionRow.itemSpacing = 12;
+
+    // Radio button
+    const radio = figma.createFrame();
+    radio.name = "Radio";
+    radio.resize(20, 20);
+    radio.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    radio.strokeWeight = 2;
+    radio.strokes = [{ type: 'SOLID', color: option.selected ? { r: 0.23, g: 0.51, b: 0.96 } : { r: 0.82, g: 0.84, b: 0.86 } }];
+    radio.cornerRadius = 10;
+
+    if (option.selected) {
+      radio.layoutMode = 'VERTICAL';
+      radio.primaryAxisAlignItems = 'CENTER';
+      radio.counterAxisAlignItems = 'CENTER';
+
+      const radioInner = figma.createEllipse();
+      radioInner.name = "Inner Circle";
+      radioInner.resize(10, 10);
+      radioInner.fills = [{ type: 'SOLID', color: { r: 0.23, g: 0.51, b: 0.96 } }];
+      radio.appendChild(radioInner);
+    }
+
+    optionRow.appendChild(radio);
+
+    // Text content
+    const textContent = figma.createFrame();
+    textContent.name = "Text Content";
+    textContent.resize(640, 40);
+    textContent.fills = [];
+    textContent.layoutMode = 'VERTICAL';
+    textContent.itemSpacing = 4;
+
+    const optionName = figma.createText();
+    optionName.fontName = { family: 'Inter', style: 'Medium' };
+    optionName.fontSize = 14;
+    optionName.characters = option.name;
+    optionName.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    textContent.appendChild(optionName);
+
+    const optionDesc = figma.createText();
+    optionDesc.fontName = { family: 'Inter', style: 'Regular' };
+    optionDesc.fontSize = 12;
+    optionDesc.characters = option.description;
+    optionDesc.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+    textContent.appendChild(optionDesc);
+
+    optionRow.appendChild(textContent);
+    paymentSection.appendChild(optionRow);
+  });
+
+  return paymentSection;
+}
+
+// Create Checkout Form Input
+function createCheckoutFormInput(label, placeholder, width) {
+  const inputGroup = figma.createFrame();
+  inputGroup.name = `${label} Input`;
+  inputGroup.resize(width, 70);
+  inputGroup.fills = [];
+  inputGroup.layoutMode = 'VERTICAL';
+  inputGroup.itemSpacing = 8;
+
+  const labelText = figma.createText();
+  labelText.fontName = { family: 'Inter', style: 'Medium' };
+  labelText.fontSize = 14;
+  labelText.characters = label;
+  labelText.fills = [{ type: 'SOLID', color: { r: 0.22, g: 0.26, b: 0.31 } }];
+  inputGroup.appendChild(labelText);
+
+  const inputField = figma.createFrame();
+  inputField.name = "Input Field";
+  inputField.resize(width, 46);
+  inputField.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  inputField.strokeWeight = 1;
+  inputField.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+  inputField.cornerRadius = 6;
+  inputField.layoutMode = 'HORIZONTAL';
+  inputField.paddingLeft = 12;
+  inputField.paddingRight = 12;
+  inputField.primaryAxisAlignItems = 'MIN';
+  inputField.counterAxisAlignItems = 'CENTER';
+
+  const placeholderText = figma.createText();
+  placeholderText.fontName = { family: 'Inter', style: 'Regular' };
+  placeholderText.fontSize = 14;
+  placeholderText.characters = placeholder;
+  placeholderText.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  inputField.appendChild(placeholderText);
+
+  inputGroup.appendChild(inputField);
+
+  return inputGroup;
+}
+
+// Create Checkout Order Summary (Right Column)
+function createCheckoutOrderSummary() {
+  const summarySection = figma.createFrame();
+  summarySection.name = "Order Summary";
+  summarySection.resize(480, 800);
+  summarySection.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.97 } }];
+  summarySection.cornerRadius = 8;
+  summarySection.layoutMode = 'VERTICAL';
+  summarySection.paddingTop = 24;
+  summarySection.paddingBottom = 24;
+  summarySection.paddingLeft = 24;
+  summarySection.paddingRight = 24;
+  summarySection.itemSpacing = 16;
+
+  // Summary Title
+  const summaryTitle = figma.createText();
+  summaryTitle.fontName = { family: 'Inter', style: 'Medium' };
+  summaryTitle.fontSize = 18;
+  summaryTitle.characters = "Ringkasan pesanan";
+  summaryTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  summarySection.appendChild(summaryTitle);
+
+  // Product List
+  const productList = figma.createFrame();
+  productList.name = "Product List";
+  productList.resize(432, 350);
+  productList.fills = [];
+  productList.layoutMode = 'VERTICAL';
+  productList.itemSpacing = 0;
+
+  // Sample products
+  const products = [
+    { name: "Smart TV LED 55 inch", quantity: 1, price: "Rp 5.999.000" },
+    { name: "Wireless Speaker", quantity: 2, price: "Rp 1.299.000" },
+    { name: "Smart Watch Pro", quantity: 1, price: "Rp 2.499.000" }
+  ];
+
+  products.forEach(product => {
+    const productItem = figma.createFrame();
+    productItem.name = product.name;
+    productItem.resize(432, 100);
+    productItem.fills = [];
+    productItem.layoutMode = 'HORIZONTAL';
+    productItem.paddingTop = 16;
+    productItem.paddingBottom = 16;
+    productItem.itemSpacing = 16;
+    productItem.strokeBottomWeight = 1;
+    productItem.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+
+    // Product Image
+    const productImage = figma.createFrame();
+    productImage.name = "Image";
+    productImage.resize(60, 60);
+    productImage.fills = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+    productImage.cornerRadius = 8;
+    productItem.appendChild(productImage);
+
+    // Product Info
+    const productInfo = figma.createFrame();
+    productInfo.name = "Info";
+    productInfo.resize(280, 60);
+    productInfo.fills = [];
+    productInfo.layoutMode = 'VERTICAL';
+    productInfo.itemSpacing = 4;
+
+    const productName = figma.createText();
+    productName.fontName = { family: 'Inter', style: 'Medium' };
+    productName.fontSize = 14;
+    productName.characters = product.name;
+    productName.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    productInfo.appendChild(productName);
+
+    const productQty = figma.createText();
+    productQty.fontName = { family: 'Inter', style: 'Regular' };
+    productQty.fontSize = 12;
+    productQty.characters = `x${product.quantity}`;
+    productQty.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+    productInfo.appendChild(productQty);
+
+    productItem.appendChild(productInfo);
+
+    // Price
+    const priceText = figma.createText();
+    priceText.fontName = { family: 'Inter', style: 'Medium' };
+    priceText.fontSize = 14;
+    priceText.characters = product.price;
+    priceText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    productItem.appendChild(priceText);
+
+    productList.appendChild(productItem);
+  });
+
+  summarySection.appendChild(productList);
+
+  // Price Breakdown
+  const priceBreakdown = figma.createFrame();
+  priceBreakdown.name = "Price Breakdown";
+  priceBreakdown.resize(432, 180);
+  priceBreakdown.fills = [];
+  priceBreakdown.layoutMode = 'VERTICAL';
+  priceBreakdown.itemSpacing = 12;
+  priceBreakdown.strokeTopWeight = 1;
+  priceBreakdown.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+  priceBreakdown.paddingTop = 16;
+
+  const breakdownItems = [
+    { label: "Subtotal", value: "Rp 11.096.000" },
+    { label: "Pengiriman", value: "Rp 5" },
+    { label: "Taxes", value: "Rp 2.219.200" }
+  ];
+
+  breakdownItems.forEach(item => {
+    const row = figma.createFrame();
+    row.name = item.label;
+    row.resize(432, 24);
+    row.fills = [];
+    row.layoutMode = 'HORIZONTAL';
+    row.primaryAxisSizingMode = 'FIXED';
+    row.primaryAxisAlignItems = 'SPACE_BETWEEN';
+
+    const label = figma.createText();
+    label.fontName = { family: 'Inter', style: 'Regular' };
+    label.fontSize = 14;
+    label.characters = item.label;
+    label.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    row.appendChild(label);
+
+    const value = figma.createText();
+    value.fontName = { family: 'Inter', style: 'Regular' };
+    value.fontSize = 14;
+    value.characters = item.value;
+    value.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    row.appendChild(value);
+
+    priceBreakdown.appendChild(row);
+  });
+
+  // Total
+  const totalRow = figma.createFrame();
+  totalRow.name = "Total";
+  totalRow.resize(432, 40);
+  totalRow.fills = [];
+  totalRow.layoutMode = 'HORIZONTAL';
+  totalRow.primaryAxisSizingMode = 'FIXED';
+  totalRow.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  totalRow.strokeTopWeight = 1;
+  totalRow.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+  totalRow.paddingTop = 16;
+
+  const totalLabel = figma.createText();
+  totalLabel.fontName = { family: 'Inter', style: 'Medium' };
+  totalLabel.fontSize = 16;
+  totalLabel.characters = "Total";
+  totalLabel.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  totalRow.appendChild(totalLabel);
+
+  const totalValue = figma.createText();
+  totalValue.fontName = { family: 'Inter', style: 'Medium' };
+  totalValue.fontSize = 16;
+  totalValue.characters = "Rp 13.315.205";
+  totalValue.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  totalRow.appendChild(totalValue);
+
+  priceBreakdown.appendChild(totalRow);
+  summarySection.appendChild(priceBreakdown);
+
+  return summarySection;
+}
+
+// ==========================================
+// HELPER FUNCTIONS FOR ADMIN DASHBOARD
+// ==========================================
+
+// Create Admin Dashboard Frame
+async function createAdminDashboardFrame() {
+  try {
+    const adminDashboard = figma.createFrame();
+    adminDashboard.name = "Admin Dashboard - Desktop";
+    adminDashboard.resize(1440, 1200);
+    adminDashboard.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+    adminDashboard.layoutMode = 'HORIZONTAL';
+
+    // Sidebar
+    const sidebar = createAdminSidebar();
+    adminDashboard.appendChild(sidebar);
+
+    // Main Area (Top Bar + Content)
+    const mainArea = figma.createFrame();
+    mainArea.name = "Main Area";
+    mainArea.resize(1176, 1200);
+    mainArea.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+    mainArea.layoutMode = 'VERTICAL';
+
+    // Top Bar
+    const topBar = createAdminTopBar();
+    mainArea.appendChild(topBar);
+
+    // Content Area
+    const contentArea = figma.createFrame();
+    contentArea.name = "Content Area";
+    contentArea.resize(1176, 1136);
+    contentArea.fills = [];
+    contentArea.layoutMode = 'VERTICAL';
+    contentArea.paddingTop = 24;
+    contentArea.paddingBottom = 24;
+    contentArea.paddingLeft = 24;
+    contentArea.paddingRight = 24;
+    contentArea.itemSpacing = 24;
+
+    // Page Header
+    const pageHeader = figma.createFrame();
+    pageHeader.name = "Page Header";
+    pageHeader.resize(1128, 60);
+    pageHeader.fills = [];
+    pageHeader.layoutMode = 'VERTICAL';
+    pageHeader.itemSpacing = 4;
+
+    const pageTitle = figma.createText();
+    pageTitle.fontName = { family: 'Inter', style: 'Bold' };
+    pageTitle.fontSize = 24;
+    pageTitle.characters = "Dashboard";
+    pageTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    pageHeader.appendChild(pageTitle);
+
+    const pageSubtitle = figma.createText();
+    pageSubtitle.fontName = { family: 'Inter', style: 'Regular' };
+    pageSubtitle.fontSize = 14;
+    pageSubtitle.characters = "Welcome back! Here's what's happening today.";
+    pageSubtitle.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    pageHeader.appendChild(pageSubtitle);
+
+    contentArea.appendChild(pageHeader);
+
+    // Stats Cards
+    const statsCards = createDashboardStatsCards();
+    contentArea.appendChild(statsCards);
+
+    // Order History Chart
+    const orderChart = createDashboardChart("Order History (Last 30 Days)", false);
+    contentArea.appendChild(orderChart);
+
+    // Member Growth Chart
+    const memberChart = createDashboardChart("Member Growth", true);
+    contentArea.appendChild(memberChart);
+
+    // Most Sold Products
+    const topProducts = createMostSoldProducts();
+    contentArea.appendChild(topProducts);
+
+    mainArea.appendChild(contentArea);
+    adminDashboard.appendChild(mainArea);
+
+    console.log('Admin Dashboard frame created successfully');
+    return adminDashboard;
+  } catch (error) {
+    console.error('Error in createAdminDashboardFrame:', error);
+    throw new Error('Failed to create Admin Dashboard: ' + error.message);
+  }
+}
+
+// Create Admin Sidebar
+function createAdminSidebar() {
+  const sidebar = figma.createFrame();
+  sidebar.name = "Sidebar";
+  sidebar.resize(264, 1200);
+  sidebar.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  sidebar.strokeWeight = 1;
+  sidebar.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  sidebar.layoutMode = 'VERTICAL';
+
+  // Sidebar Header
+  const sidebarHeader = figma.createFrame();
+  sidebarHeader.name = "Sidebar Header";
+  sidebarHeader.resize(264, 64);
+  sidebarHeader.fills = [];
+  sidebarHeader.layoutMode = 'HORIZONTAL';
+  sidebarHeader.paddingLeft = 16;
+  sidebarHeader.counterAxisAlignItems = 'CENTER';
+  sidebarHeader.strokeBottomWeight = 1;
+  sidebarHeader.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+
+  const menuLabel = figma.createText();
+  menuLabel.fontName = { family: 'Inter', style: 'Bold' };
+  menuLabel.fontSize = 11;
+  menuLabel.characters = "MAIN MENU";
+  menuLabel.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  menuLabel.letterSpacing = { value: 1, unit: 'PIXELS' };
+  sidebarHeader.appendChild(menuLabel);
+
+  sidebar.appendChild(sidebarHeader);
+
+  // Navigation Items
+  const navItems = [
+    { label: "Dashboard", icon: "□", active: true },
+    { label: "Orders", icon: "📦", active: false },
+    { label: "Products", icon: "📋", active: false },
+    { label: "Categories", icon: "📁", active: false },
+    { label: "Users", icon: "👤", active: false }
+  ];
+
+  const navContainer = figma.createFrame();
+  navContainer.name = "Navigation";
+  navContainer.resize(264, 300);
+  navContainer.fills = [];
+  navContainer.layoutMode = 'VERTICAL';
+  navContainer.paddingTop = 16;
+  navContainer.itemSpacing = 4;
+
+  navItems.forEach(item => {
+    const navItem = figma.createFrame();
+    navItem.name = item.label;
+    navItem.resize(248, 44);
+    navItem.fills = item.active
+      ? [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }]
+      : [];
+    navItem.cornerRadius = 8;
+    navItem.layoutMode = 'HORIZONTAL';
+    navItem.paddingLeft = 16;
+    navItem.paddingRight = 16;
+    navItem.counterAxisAlignItems = 'CENTER';
+    navItem.itemSpacing = 12;
+
+    const navIcon = figma.createText();
+    navIcon.fontName = { family: 'Inter', style: 'Regular' };
+    navIcon.fontSize = 16;
+    navIcon.characters = item.icon;
+    navIcon.fills = [{ type: 'SOLID', color: item.active ? { r: 1, g: 1, b: 1 } : { r: 0.42, g: 0.45, b: 0.50 } }];
+    navItem.appendChild(navIcon);
+
+    const navLabel = figma.createText();
+    navLabel.fontName = { family: 'Inter', style: 'Medium' };
+    navLabel.fontSize = 14;
+    navLabel.characters = item.label;
+    navLabel.fills = [{ type: 'SOLID', color: item.active ? { r: 1, g: 1, b: 1 } : { r: 0.22, g: 0.26, b: 0.31 } }];
+    navItem.appendChild(navLabel);
+
+    navContainer.appendChild(navItem);
+  });
+
+  sidebar.appendChild(navContainer);
+
+  // Sidebar Footer
+  const sidebarFooter = figma.createFrame();
+  sidebarFooter.name = "Sidebar Footer";
+  sidebarFooter.resize(264, 50);
+  sidebarFooter.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+  sidebarFooter.layoutMode = 'VERTICAL';
+  sidebarFooter.primaryAxisAlignItems = 'CENTER';
+  sidebarFooter.counterAxisAlignItems = 'CENTER';
+  sidebarFooter.strokeTopWeight = 1;
+  sidebarFooter.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+
+  const versionText = figma.createText();
+  versionText.fontName = { family: 'Inter', style: 'Regular' };
+  versionText.fontSize = 11;
+  versionText.characters = "v1.0.0 © 2025 Nasional Elektronik";
+  versionText.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  sidebarFooter.appendChild(versionText);
+
+  sidebar.appendChild(sidebarFooter);
+
+  return sidebar;
+}
+
+// Create Admin Top Bar
+function createAdminTopBar() {
+  const topBar = figma.createFrame();
+  topBar.name = "Top Bar";
+  topBar.resize(1176, 64);
+  topBar.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  topBar.strokeBottomWeight = 1;
+  topBar.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  topBar.layoutMode = 'HORIZONTAL';
+  topBar.primaryAxisAlignItems = 'SPACE_BETWEEN';
+  topBar.counterAxisAlignItems = 'CENTER';
+  topBar.paddingLeft = 24;
+  topBar.paddingRight = 24;
+
+  // Left - Logo
+  const logo = figma.createText();
+  logo.fontName = { family: 'Inter', style: 'Bold' };
+  logo.fontSize = 18;
+  logo.characters = "Nasional Elektronik";
+  logo.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  topBar.appendChild(logo);
+
+  // Right - Search + User
+  const rightSection = figma.createFrame();
+  rightSection.name = "Right Section";
+  rightSection.resize(300, 40);
+  rightSection.fills = [];
+  rightSection.layoutMode = 'HORIZONTAL';
+  rightSection.itemSpacing = 16;
+  rightSection.counterAxisAlignItems = 'CENTER';
+
+  // Search Bar
+  const searchBar = figma.createFrame();
+  searchBar.name = "Search Bar";
+  searchBar.resize(200, 40);
+  searchBar.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+  searchBar.cornerRadius = 8;
+  searchBar.layoutMode = 'HORIZONTAL';
+  searchBar.paddingLeft = 12;
+  searchBar.counterAxisAlignItems = 'CENTER';
+
+  const searchText = figma.createText();
+  searchText.fontName = { family: 'Inter', style: 'Regular' };
+  searchText.fontSize = 14;
+  searchText.characters = "Search...";
+  searchText.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  searchBar.appendChild(searchText);
+
+  rightSection.appendChild(searchBar);
+
+  // User Avatar
+  const userAvatar = figma.createFrame();
+  userAvatar.name = "User Avatar";
+  userAvatar.resize(40, 40);
+  userAvatar.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  userAvatar.cornerRadius = 20;
+  userAvatar.layoutMode = 'VERTICAL';
+  userAvatar.primaryAxisAlignItems = 'CENTER';
+  userAvatar.counterAxisAlignItems = 'CENTER';
+
+  const avatarText = figma.createText();
+  avatarText.fontName = { family: 'Inter', style: 'Bold' };
+  avatarText.fontSize = 14;
+  avatarText.characters = "A";
+  avatarText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  userAvatar.appendChild(avatarText);
+
+  rightSection.appendChild(userAvatar);
+  topBar.appendChild(rightSection);
+
+  return topBar;
+}
+
+// Create Dashboard Stats Cards
+function createDashboardStatsCards() {
+  const statsRow = figma.createFrame();
+  statsRow.name = "Stats Cards";
+  statsRow.resize(1128, 120);
+  statsRow.fills = [];
+  statsRow.layoutMode = 'HORIZONTAL';
+  statsRow.itemSpacing = 24;
+
+  const stats = [
+    { label: "Total Orders", value: "1,234" },
+    { label: "Total Revenue", value: "Rp 125.680.000" },
+    { label: "Total Members", value: "856" }
+  ];
+
+  stats.forEach(stat => {
+    const card = figma.createFrame();
+    card.name = stat.label;
+    card.resize(360, 120);
+    card.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    card.cornerRadius = 12;
+    card.strokeWeight = 1;
+    card.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+    card.layoutMode = 'VERTICAL';
+    card.paddingTop = 24;
+    card.paddingBottom = 24;
+    card.paddingLeft = 24;
+    card.paddingRight = 24;
+    card.itemSpacing = 8;
+    card.effects = [{
+      type: 'DROP_SHADOW',
+      color: { r: 0, g: 0, b: 0, a: 0.05 },
+      offset: { x: 0, y: 2 },
+      radius: 8,
+      visible: true,
+      blendMode: 'NORMAL'
+    }];
+
+    const cardLabel = figma.createText();
+    cardLabel.fontName = { family: 'Inter', style: 'Medium' };
+    cardLabel.fontSize = 14;
+    cardLabel.characters = stat.label;
+    cardLabel.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    card.appendChild(cardLabel);
+
+    const cardValue = figma.createText();
+    cardValue.fontName = { family: 'Inter', style: 'Bold' };
+    cardValue.fontSize = 28;
+    cardValue.characters = stat.value;
+    cardValue.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    card.appendChild(cardValue);
+
+    statsRow.appendChild(card);
+  });
+
+  return statsRow;
+}
+
+// Create Dashboard Chart
+function createDashboardChart(title, isGradient) {
+  const chartCard = figma.createFrame();
+  chartCard.name = title;
+  chartCard.resize(1128, 280);
+
+  if (isGradient) {
+    // Gradient background (red color scheme)
+    chartCard.fills = [{
+      type: 'GRADIENT_LINEAR',
+      gradientTransform: [[1, 0, 0], [0, 1, 0]],
+      gradientStops: [
+        { color: { r: 0.94, g: 0.27, b: 0.27, a: 1 }, position: 0 },
+        { color: { r: 0.8, g: 0.2, b: 0.2, a: 1 }, position: 1 }
+      ]
+    }];
+  } else {
+    chartCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    chartCard.strokeWeight = 1;
+    chartCard.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  }
+
+  chartCard.cornerRadius = 12;
+  chartCard.layoutMode = 'VERTICAL';
+  chartCard.paddingTop = 24;
+  chartCard.paddingBottom = 24;
+  chartCard.paddingLeft = 24;
+  chartCard.paddingRight = 24;
+  chartCard.itemSpacing = 16;
+  chartCard.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.08 },
+    offset: { x: 0, y: 4 },
+    radius: 12,
+    visible: true,
+    blendMode: 'NORMAL'
+  }];
+
+  const chartTitle = figma.createText();
+  chartTitle.fontName = { family: 'Inter', style: 'Bold' };
+  chartTitle.fontSize = 18;
+  chartTitle.characters = title;
+  chartTitle.fills = [{ type: 'SOLID', color: isGradient ? { r: 1, g: 1, b: 1 } : { r: 0.07, g: 0.11, b: 0.15 } }];
+  chartCard.appendChild(chartTitle);
+
+  // Chart Placeholder
+  const chartArea = figma.createFrame();
+  chartArea.name = "Chart Area";
+  chartArea.resize(1080, 180);
+  chartArea.fills = isGradient
+    ? [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 }, opacity: 0.1 }]
+    : [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+  chartArea.cornerRadius = 8;
+  chartArea.layoutMode = 'VERTICAL';
+  chartArea.primaryAxisAlignItems = 'CENTER';
+  chartArea.counterAxisAlignItems = 'CENTER';
+
+  const chartPlaceholder = figma.createText();
+  chartPlaceholder.fontName = { family: 'Inter', style: 'Medium' };
+  chartPlaceholder.fontSize = 14;
+  chartPlaceholder.characters = "📊 Chart Visualization";
+  chartPlaceholder.fills = [{ type: 'SOLID', color: isGradient ? { r: 1, g: 1, b: 1 } : { r: 0.61, g: 0.64, b: 0.69 } }];
+  if (isGradient) {
+    chartPlaceholder.opacity = 0.7;
+  }
+  chartArea.appendChild(chartPlaceholder);
+
+  chartCard.appendChild(chartArea);
+
+  return chartCard;
+}
+
+// Create Most Sold Products
+function createMostSoldProducts() {
+  const productsCard = figma.createFrame();
+  productsCard.name = "Most Sold Products";
+  productsCard.resize(1128, 350);
+  productsCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  productsCard.cornerRadius = 12;
+  productsCard.strokeWeight = 1;
+  productsCard.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  productsCard.layoutMode = 'VERTICAL';
+  productsCard.paddingTop = 24;
+  productsCard.paddingBottom = 24;
+  productsCard.paddingLeft = 24;
+  productsCard.paddingRight = 24;
+  productsCard.itemSpacing = 16;
+  productsCard.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.05 },
+    offset: { x: 0, y: 2 },
+    radius: 8,
+    visible: true,
+    blendMode: 'NORMAL'
+  }];
+
+  const sectionTitle = figma.createText();
+  sectionTitle.fontName = { family: 'Inter', style: 'Bold' };
+  sectionTitle.fontSize = 18;
+  sectionTitle.characters = "Most Sold Products";
+  sectionTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+  productsCard.appendChild(sectionTitle);
+
+  // Product Items
+  const products = [
+    { rank: 1, name: "Smart TV LED 55 inch", price: "Rp 5.999.000", sold: 156 },
+    { rank: 2, name: "Wireless Bluetooth Speaker", price: "Rp 1.299.000", sold: 134 },
+    { rank: 3, name: "Smart Watch Pro Max", price: "Rp 2.499.000", sold: 98 }
+  ];
+
+  products.forEach(product => {
+    const productRow = figma.createFrame();
+    productRow.name = product.name;
+    productRow.resize(1080, 80);
+    productRow.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+    productRow.cornerRadius = 8;
+    productRow.layoutMode = 'HORIZONTAL';
+    productRow.paddingLeft = 16;
+    productRow.paddingRight = 16;
+    productRow.counterAxisAlignItems = 'CENTER';
+    productRow.itemSpacing = 16;
+
+    // Rank Badge
+    const rankBadge = figma.createFrame();
+    rankBadge.name = "Rank";
+    rankBadge.resize(48, 48);
+    rankBadge.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+    rankBadge.cornerRadius = 24;
+    rankBadge.layoutMode = 'VERTICAL';
+    rankBadge.primaryAxisAlignItems = 'CENTER';
+    rankBadge.counterAxisAlignItems = 'CENTER';
+
+    const rankText = figma.createText();
+    rankText.fontName = { family: 'Inter', style: 'Bold' };
+    rankText.fontSize = 16;
+    rankText.characters = `#${product.rank}`;
+    rankText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    rankBadge.appendChild(rankText);
+
+    productRow.appendChild(rankBadge);
+
+    // Product Image Placeholder
+    const productImage = figma.createFrame();
+    productImage.name = "Image";
+    productImage.resize(56, 56);
+    productImage.fills = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+    productImage.cornerRadius = 8;
+    productRow.appendChild(productImage);
+
+    // Product Info
+    const productInfo = figma.createFrame();
+    productInfo.name = "Info";
+    productInfo.resize(700, 50);
+    productInfo.fills = [];
+    productInfo.layoutMode = 'VERTICAL';
+    productInfo.itemSpacing = 4;
+
+    const productName = figma.createText();
+    productName.fontName = { family: 'Inter', style: 'Bold' };
+    productName.fontSize = 14;
+    productName.characters = product.name;
+    productName.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    productInfo.appendChild(productName);
+
+    const productPrice = figma.createText();
+    productPrice.fontName = { family: 'Inter', style: 'Regular' };
+    productPrice.fontSize = 12;
+    productPrice.characters = product.price;
+    productPrice.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    productInfo.appendChild(productPrice);
+
+    productRow.appendChild(productInfo);
+
+    // Sold Count
+    const soldSection = figma.createFrame();
+    soldSection.name = "Sold";
+    soldSection.resize(100, 50);
+    soldSection.fills = [];
+    soldSection.layoutMode = 'VERTICAL';
+    soldSection.counterAxisAlignItems = 'MAX';
+    soldSection.itemSpacing = 4;
+
+    const soldValue = figma.createText();
+    soldValue.fontName = { family: 'Inter', style: 'Bold' };
+    soldValue.fontSize = 20;
+    soldValue.characters = String(product.sold);
+    soldValue.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+    soldSection.appendChild(soldValue);
+
+    const soldLabel = figma.createText();
+    soldLabel.fontName = { family: 'Inter', style: 'Regular' };
+    soldLabel.fontSize = 12;
+    soldLabel.characters = "Units Sold";
+    soldLabel.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    soldSection.appendChild(soldLabel);
+
+    productRow.appendChild(soldSection);
+    productsCard.appendChild(productRow);
+  });
+
+  return productsCard;
+}
+
+// ==========================================
+// HELPER FUNCTIONS FOR ADMIN ORDERS PAGE
+// ==========================================
+
+// Create Admin Orders Frame
+async function createAdminOrdersFrame() {
+  try {
+    const ordersPage = figma.createFrame();
+    ordersPage.name = "Admin Orders - Desktop";
+    ordersPage.resize(1440, 1000);
+    ordersPage.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+    ordersPage.layoutMode = 'HORIZONTAL';
+
+    // Sidebar (Orders active)
+    const sidebar = createAdminSidebarWithActive("Orders");
+    ordersPage.appendChild(sidebar);
+
+    // Main Area
+    const mainArea = figma.createFrame();
+    mainArea.name = "Main Area";
+    mainArea.resize(1176, 1000);
+    mainArea.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+    mainArea.layoutMode = 'VERTICAL';
+
+    // Top Bar
+    const topBar = createAdminTopBar();
+    mainArea.appendChild(topBar);
+
+    // Content Area
+    const contentArea = figma.createFrame();
+    contentArea.name = "Content Area";
+    contentArea.resize(1176, 936);
+    contentArea.fills = [];
+    contentArea.layoutMode = 'VERTICAL';
+    contentArea.paddingTop = 24;
+    contentArea.paddingBottom = 24;
+    contentArea.paddingLeft = 24;
+    contentArea.paddingRight = 24;
+    contentArea.itemSpacing = 24;
+
+    // Page Header
+    const pageHeader = figma.createFrame();
+    pageHeader.name = "Page Header";
+    pageHeader.resize(1128, 60);
+    pageHeader.fills = [];
+    pageHeader.layoutMode = 'HORIZONTAL';
+    pageHeader.primaryAxisAlignItems = 'SPACE_BETWEEN';
+    pageHeader.counterAxisAlignItems = 'CENTER';
+
+    const headerText = figma.createFrame();
+    headerText.name = "Header Text";
+    headerText.resize(400, 60);
+    headerText.fills = [];
+    headerText.layoutMode = 'VERTICAL';
+    headerText.itemSpacing = 4;
+
+    const pageTitle = figma.createText();
+    pageTitle.fontName = { family: 'Inter', style: 'Bold' };
+    pageTitle.fontSize = 24;
+    pageTitle.characters = "Order Management";
+    pageTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    headerText.appendChild(pageTitle);
+
+    const pageSubtitle = figma.createText();
+    pageSubtitle.fontName = { family: 'Inter', style: 'Regular' };
+    pageSubtitle.fontSize = 14;
+    pageSubtitle.characters = "View and manage customer orders";
+    pageSubtitle.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    headerText.appendChild(pageSubtitle);
+
+    pageHeader.appendChild(headerText);
+
+    // Print Button
+    const printBtn = figma.createFrame();
+    printBtn.name = "Print Button";
+    printBtn.resize(160, 44);
+    printBtn.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    printBtn.strokeWeight = 1;
+    printBtn.strokes = [{ type: 'SOLID', color: { r: 0.82, g: 0.84, b: 0.86 } }];
+    printBtn.cornerRadius = 6;
+    printBtn.layoutMode = 'HORIZONTAL';
+    printBtn.primaryAxisAlignItems = 'CENTER';
+    printBtn.counterAxisAlignItems = 'CENTER';
+    printBtn.itemSpacing = 8;
+
+    const printIcon = figma.createText();
+    printIcon.fontName = { family: 'Inter', style: 'Regular' };
+    printIcon.fontSize = 16;
+    printIcon.characters = "🖨️";
+    printBtn.appendChild(printIcon);
+
+    const printText = figma.createText();
+    printText.fontName = { family: 'Inter', style: 'Bold' };
+    printText.fontSize = 14;
+    printText.characters = "Print All Orders";
+    printText.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+    printBtn.appendChild(printText);
+
+    pageHeader.appendChild(printBtn);
+    contentArea.appendChild(pageHeader);
+
+    // Orders Table Card
+    const ordersCard = createOrdersTable();
+    contentArea.appendChild(ordersCard);
+
+    mainArea.appendChild(contentArea);
+    ordersPage.appendChild(mainArea);
+
+    console.log('Admin Orders frame created successfully');
+    return ordersPage;
+  } catch (error) {
+    console.error('Error in createAdminOrdersFrame:', error);
+    throw new Error('Failed to create Admin Orders: ' + error.message);
+  }
+}
+
+// Create Admin Sidebar with Active Item
+function createAdminSidebarWithActive(activeItem) {
+  const sidebar = figma.createFrame();
+  sidebar.name = "Sidebar";
+  sidebar.resize(264, 1000);
+  sidebar.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  sidebar.strokeWeight = 1;
+  sidebar.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  sidebar.layoutMode = 'VERTICAL';
+
+  // Sidebar Header
+  const sidebarHeader = figma.createFrame();
+  sidebarHeader.name = "Sidebar Header";
+  sidebarHeader.resize(264, 64);
+  sidebarHeader.fills = [];
+  sidebarHeader.layoutMode = 'HORIZONTAL';
+  sidebarHeader.paddingLeft = 16;
+  sidebarHeader.counterAxisAlignItems = 'CENTER';
+  sidebarHeader.strokeBottomWeight = 1;
+  sidebarHeader.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+
+  const menuLabel = figma.createText();
+  menuLabel.fontName = { family: 'Inter', style: 'Bold' };
+  menuLabel.fontSize = 11;
+  menuLabel.characters = "MAIN MENU";
+  menuLabel.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  menuLabel.letterSpacing = { value: 1, unit: 'PIXELS' };
+  sidebarHeader.appendChild(menuLabel);
+
+  sidebar.appendChild(sidebarHeader);
+
+  // Navigation Items
+  const navItems = [
+    { label: "Dashboard", icon: "□" },
+    { label: "Orders", icon: "📦" },
+    { label: "Products", icon: "📋" },
+    { label: "Categories", icon: "📁" },
+    { label: "Users", icon: "👤" }
+  ];
+
+  const navContainer = figma.createFrame();
+  navContainer.name = "Navigation";
+  navContainer.resize(264, 300);
+  navContainer.fills = [];
+  navContainer.layoutMode = 'VERTICAL';
+  navContainer.paddingTop = 16;
+  navContainer.itemSpacing = 4;
+
+  navItems.forEach(item => {
+    const isActive = item.label === activeItem;
+    const navItem = figma.createFrame();
+    navItem.name = item.label;
+    navItem.resize(248, 44);
+    navItem.fills = isActive
+      ? [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }]
+      : [];
+    navItem.cornerRadius = 8;
+    navItem.layoutMode = 'HORIZONTAL';
+    navItem.paddingLeft = 16;
+    navItem.paddingRight = 16;
+    navItem.counterAxisAlignItems = 'CENTER';
+    navItem.itemSpacing = 12;
+
+    const navIcon = figma.createText();
+    navIcon.fontName = { family: 'Inter', style: 'Regular' };
+    navIcon.fontSize = 16;
+    navIcon.characters = item.icon;
+    navIcon.fills = [{ type: 'SOLID', color: isActive ? { r: 1, g: 1, b: 1 } : { r: 0.42, g: 0.45, b: 0.50 } }];
+    navItem.appendChild(navIcon);
+
+    const navLabel = figma.createText();
+    navLabel.fontName = { family: 'Inter', style: 'Medium' };
+    navLabel.fontSize = 14;
+    navLabel.characters = item.label;
+    navLabel.fills = [{ type: 'SOLID', color: isActive ? { r: 1, g: 1, b: 1 } : { r: 0.22, g: 0.26, b: 0.31 } }];
+    navItem.appendChild(navLabel);
+
+    navContainer.appendChild(navItem);
+  });
+
+  sidebar.appendChild(navContainer);
+
+  // Sidebar Footer
+  const sidebarFooter = figma.createFrame();
+  sidebarFooter.name = "Sidebar Footer";
+  sidebarFooter.resize(264, 50);
+  sidebarFooter.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+  sidebarFooter.layoutMode = 'VERTICAL';
+  sidebarFooter.primaryAxisAlignItems = 'CENTER';
+  sidebarFooter.counterAxisAlignItems = 'CENTER';
+  sidebarFooter.strokeTopWeight = 1;
+  sidebarFooter.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+
+  const versionText = figma.createText();
+  versionText.fontName = { family: 'Inter', style: 'Regular' };
+  versionText.fontSize = 11;
+  versionText.characters = "v1.0.0 © 2025 Nasional Elektronik";
+  versionText.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+  sidebarFooter.appendChild(versionText);
+
+  sidebar.appendChild(sidebarFooter);
+
+  return sidebar;
+}
+
+// Create Orders Table
+function createOrdersTable() {
+  const tableCard = figma.createFrame();
+  tableCard.name = "Orders Table";
+  tableCard.resize(1128, 600);
+  tableCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  tableCard.cornerRadius = 12;
+  tableCard.strokeWeight = 1;
+  tableCard.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  tableCard.layoutMode = 'VERTICAL';
+  tableCard.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.05 },
+    offset: { x: 0, y: 2 },
+    radius: 8,
+    visible: true,
+    blendMode: 'NORMAL'
+  }];
+
+  // Table Header
+  const tableHeader = figma.createFrame();
+  tableHeader.name = "Table Header";
+  tableHeader.resize(1128, 48);
+  tableHeader.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+  tableHeader.layoutMode = 'HORIZONTAL';
+  tableHeader.paddingLeft = 24;
+  tableHeader.paddingRight = 24;
+  tableHeader.counterAxisAlignItems = 'CENTER';
+
+  const headers = [
+    { label: "Order ID", width: 150 },
+    { label: "Name", width: 200 },
+    { label: "Status", width: 120 },
+    { label: "Subtotal", width: 180 },
+    { label: "Date", width: 180 },
+    { label: "", width: 100 }
+  ];
+
+  headers.forEach(header => {
+    const headerCell = figma.createFrame();
+    headerCell.name = header.label || "Action";
+    headerCell.resize(header.width, 48);
+    headerCell.fills = [];
+    headerCell.layoutMode = 'HORIZONTAL';
+    headerCell.counterAxisAlignItems = 'CENTER';
+
+    const headerText = figma.createText();
+    headerText.fontName = { family: 'Inter', style: 'Bold' };
+    headerText.fontSize = 12;
+    headerText.characters = header.label;
+    headerText.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    headerCell.appendChild(headerText);
+
+    tableHeader.appendChild(headerCell);
+  });
+
+  tableCard.appendChild(tableHeader);
+
+  // Sample Orders Data
+  const orders = [
+    { id: "ORD-001", name: "John Doe", status: "Paid", subtotal: "Rp 5.999.000", date: "Dec 15, 2024" },
+    { id: "ORD-002", name: "Jane Smith", status: "Pending", subtotal: "Rp 2.499.000", date: "Dec 14, 2024" },
+    { id: "ORD-003", name: "Bob Wilson", status: "Cancelled", subtotal: "Rp 1.299.000", date: "Dec 13, 2024" },
+    { id: "ORD-004", name: "Alice Brown", status: "Paid", subtotal: "Rp 8.750.000", date: "Dec 12, 2024" },
+    { id: "ORD-005", name: "Charlie Davis", status: "Pending", subtotal: "Rp 3.450.000", date: "Dec 11, 2024" }
+  ];
+
+  orders.forEach((order, index) => {
+    const row = figma.createFrame();
+    row.name = order.id;
+    row.resize(1128, 56);
+    row.fills = index % 2 === 0 ? [] : [{ type: 'SOLID', color: { r: 0.99, g: 0.99, b: 0.99 } }];
+    row.layoutMode = 'HORIZONTAL';
+    row.paddingLeft = 24;
+    row.paddingRight = 24;
+    row.counterAxisAlignItems = 'CENTER';
+    row.strokeBottomWeight = 1;
+    row.strokes = [{ type: 'SOLID', color: { r: 0.95, g: 0.95, b: 0.96 } }];
+
+    // Order ID
+    const idCell = figma.createFrame();
+    idCell.resize(150, 56);
+    idCell.fills = [];
+    idCell.layoutMode = 'HORIZONTAL';
+    idCell.counterAxisAlignItems = 'CENTER';
+
+    const idText = figma.createText();
+    idText.fontName = { family: 'Inter', style: 'Bold' };
+    idText.fontSize = 14;
+    idText.characters = `#${order.id}`;
+    idText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    idCell.appendChild(idText);
+    row.appendChild(idCell);
+
+    // Name
+    const nameCell = figma.createFrame();
+    nameCell.resize(200, 56);
+    nameCell.fills = [];
+    nameCell.layoutMode = 'HORIZONTAL';
+    nameCell.counterAxisAlignItems = 'CENTER';
+
+    const nameText = figma.createText();
+    nameText.fontName = { family: 'Inter', style: 'Medium' };
+    nameText.fontSize = 14;
+    nameText.characters = order.name;
+    nameText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    nameCell.appendChild(nameText);
+    row.appendChild(nameCell);
+
+    // Status Badge
+    const statusCell = figma.createFrame();
+    statusCell.resize(120, 56);
+    statusCell.fills = [];
+    statusCell.layoutMode = 'HORIZONTAL';
+    statusCell.counterAxisAlignItems = 'CENTER';
+
+    const statusBadge = figma.createFrame();
+    statusBadge.name = "Status Badge";
+    statusBadge.resize(70, 24);
+
+    // Status colors
+    let statusColor;
+    if (order.status === "Paid") {
+      statusColor = { r: 0.06, g: 0.72, b: 0.51 }; // Green
+    } else if (order.status === "Pending") {
+      statusColor = { r: 0.96, g: 0.62, b: 0.04 }; // Yellow/Orange
+    } else {
+      statusColor = { r: 0.94, g: 0.27, b: 0.27 }; // Red
+    }
+
+    statusBadge.fills = [{ type: 'SOLID', color: statusColor }];
+    statusBadge.cornerRadius = 12;
+    statusBadge.layoutMode = 'HORIZONTAL';
+    statusBadge.primaryAxisAlignItems = 'CENTER';
+    statusBadge.counterAxisAlignItems = 'CENTER';
+
+    const statusText = figma.createText();
+    statusText.fontName = { family: 'Inter', style: 'Medium' };
+    statusText.fontSize = 11;
+    statusText.characters = order.status;
+    statusText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    statusBadge.appendChild(statusText);
+
+    statusCell.appendChild(statusBadge);
+    row.appendChild(statusCell);
+
+    // Subtotal
+    const subtotalCell = figma.createFrame();
+    subtotalCell.resize(180, 56);
+    subtotalCell.fills = [];
+    subtotalCell.layoutMode = 'HORIZONTAL';
+    subtotalCell.counterAxisAlignItems = 'CENTER';
+
+    const subtotalText = figma.createText();
+    subtotalText.fontName = { family: 'Inter', style: 'Regular' };
+    subtotalText.fontSize = 14;
+    subtotalText.characters = order.subtotal;
+    subtotalText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    subtotalCell.appendChild(subtotalText);
+    row.appendChild(subtotalCell);
+
+    // Date
+    const dateCell = figma.createFrame();
+    dateCell.resize(180, 56);
+    dateCell.fills = [];
+    dateCell.layoutMode = 'HORIZONTAL';
+    dateCell.counterAxisAlignItems = 'CENTER';
+
+    const dateText = figma.createText();
+    dateText.fontName = { family: 'Inter', style: 'Regular' };
+    dateText.fontSize = 14;
+    dateText.characters = order.date;
+    dateText.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    dateCell.appendChild(dateText);
+    row.appendChild(dateCell);
+
+    // Details Button
+    const actionCell = figma.createFrame();
+    actionCell.resize(100, 56);
+    actionCell.fills = [];
+    actionCell.layoutMode = 'HORIZONTAL';
+    actionCell.counterAxisAlignItems = 'CENTER';
+
+    const detailsBtn = figma.createText();
+    detailsBtn.fontName = { family: 'Inter', style: 'Medium' };
+    detailsBtn.fontSize = 14;
+    detailsBtn.characters = "Details";
+    detailsBtn.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    actionCell.appendChild(detailsBtn);
+    row.appendChild(actionCell);
+
+    tableCard.appendChild(row);
+  });
+
+  return tableCard;
+}
+
+// ==========================================
+// HELPER FUNCTIONS FOR ADMIN PRODUCTS PAGE
+// ==========================================
+
+// Create Admin Products Frame
+async function createAdminProductsFrame() {
+  try {
+    const productsPage = figma.createFrame();
+    productsPage.name = "Admin Products - Desktop";
+    productsPage.resize(1440, 1000);
+    productsPage.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+    productsPage.layoutMode = 'HORIZONTAL';
+
+    // Sidebar (Products active)
+    const sidebar = createAdminSidebarWithActive("Products");
+    productsPage.appendChild(sidebar);
+
+    // Main Area
+    const mainArea = figma.createFrame();
+    mainArea.name = "Main Area";
+    mainArea.resize(1176, 1000);
+    mainArea.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+    mainArea.layoutMode = 'VERTICAL';
+
+    // Top Bar
+    const topBar = createAdminTopBar();
+    mainArea.appendChild(topBar);
+
+    // Content Area
+    const contentArea = figma.createFrame();
+    contentArea.name = "Content Area";
+    contentArea.resize(1176, 936);
+    contentArea.fills = [];
+    contentArea.layoutMode = 'VERTICAL';
+    contentArea.paddingTop = 24;
+    contentArea.paddingBottom = 24;
+    contentArea.paddingLeft = 24;
+    contentArea.paddingRight = 24;
+    contentArea.itemSpacing = 24;
+
+    // Page Header
+    const pageHeader = figma.createFrame();
+    pageHeader.name = "Page Header";
+    pageHeader.resize(1128, 60);
+    pageHeader.fills = [];
+    pageHeader.layoutMode = 'HORIZONTAL';
+    pageHeader.primaryAxisAlignItems = 'SPACE_BETWEEN';
+    pageHeader.counterAxisAlignItems = 'CENTER';
+
+    const headerText = figma.createFrame();
+    headerText.name = "Header Text";
+    headerText.resize(400, 60);
+    headerText.fills = [];
+    headerText.layoutMode = 'VERTICAL';
+    headerText.itemSpacing = 4;
+
+    const pageTitle = figma.createText();
+    pageTitle.fontName = { family: 'Inter', style: 'Bold' };
+    pageTitle.fontSize = 24;
+    pageTitle.characters = "Product Management";
+    pageTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    headerText.appendChild(pageTitle);
+
+    const pageSubtitle = figma.createText();
+    pageSubtitle.fontName = { family: 'Inter', style: 'Regular' };
+    pageSubtitle.fontSize = 14;
+    pageSubtitle.characters = "Manage your product inventory";
+    pageSubtitle.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    headerText.appendChild(pageSubtitle);
+
+    pageHeader.appendChild(headerText);
+
+    // Add New Product Button
+    const addBtn = figma.createFrame();
+    addBtn.name = "Add Product Button";
+    addBtn.resize(160, 44);
+    addBtn.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+    addBtn.cornerRadius = 6;
+    addBtn.layoutMode = 'HORIZONTAL';
+    addBtn.primaryAxisAlignItems = 'CENTER';
+    addBtn.counterAxisAlignItems = 'CENTER';
+    addBtn.itemSpacing = 8;
+
+    const addIcon = figma.createText();
+    addIcon.fontName = { family: 'Inter', style: 'Bold' };
+    addIcon.fontSize = 16;
+    addIcon.characters = "+";
+    addIcon.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    addBtn.appendChild(addIcon);
+
+    const addText = figma.createText();
+    addText.fontName = { family: 'Inter', style: 'Bold' };
+    addText.fontSize = 14;
+    addText.characters = "Add new product";
+    addText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    addBtn.appendChild(addText);
+
+    pageHeader.appendChild(addBtn);
+    contentArea.appendChild(pageHeader);
+
+    // Products Table Card
+    const productsCard = createProductsTable();
+    contentArea.appendChild(productsCard);
+
+    mainArea.appendChild(contentArea);
+    productsPage.appendChild(mainArea);
+
+    console.log('Admin Products frame created successfully');
+    return productsPage;
+  } catch (error) {
+    console.error('Error in createAdminProductsFrame:', error);
+    throw new Error('Failed to create Admin Products: ' + error.message);
+  }
+}
+
+// Create Products Table
+function createProductsTable() {
+  const tableCard = figma.createFrame();
+  tableCard.name = "Products Table";
+  tableCard.resize(1128, 600);
+  tableCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  tableCard.cornerRadius = 12;
+  tableCard.strokeWeight = 1;
+  tableCard.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  tableCard.layoutMode = 'VERTICAL';
+  tableCard.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.05 },
+    offset: { x: 0, y: 2 },
+    radius: 8,
+    visible: true,
+    blendMode: 'NORMAL'
+  }];
+
+  // Table Header
+  const tableHeader = figma.createFrame();
+  tableHeader.name = "Table Header";
+  tableHeader.resize(1128, 48);
+  tableHeader.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+  tableHeader.layoutMode = 'HORIZONTAL';
+  tableHeader.paddingLeft = 24;
+  tableHeader.paddingRight = 24;
+  tableHeader.counterAxisAlignItems = 'CENTER';
+
+  const headers = [
+    { label: "Product", width: 400 },
+    { label: "Ketersediaan Stock", width: 200 },
+    { label: "Harga", width: 250 },
+    { label: "", width: 100 }
+  ];
+
+  headers.forEach(header => {
+    const headerCell = figma.createFrame();
+    headerCell.name = header.label || "Action";
+    headerCell.resize(header.width, 48);
+    headerCell.fills = [];
+    headerCell.layoutMode = 'HORIZONTAL';
+    headerCell.counterAxisAlignItems = 'CENTER';
+
+    const headerText = figma.createText();
+    headerText.fontName = { family: 'Inter', style: 'Bold' };
+    headerText.fontSize = 12;
+    headerText.characters = header.label;
+    headerText.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    headerCell.appendChild(headerText);
+
+    tableHeader.appendChild(headerCell);
+  });
+
+  tableCard.appendChild(tableHeader);
+
+  // Sample Products Data
+  const products = [
+    { title: "Smart TV LED 55 inch", manufacturer: "Samsung", inStock: true, price: "Rp 5.999.000" },
+    { title: "Wireless Bluetooth Speaker", manufacturer: "JBL", inStock: true, price: "Rp 1.299.000" },
+    { title: "Smart Watch Pro Max", manufacturer: "Apple", inStock: false, price: "Rp 2.499.000" },
+    { title: "Laptop Gaming 15.6 inch", manufacturer: "ASUS", inStock: true, price: "Rp 15.999.000" },
+    { title: "Wireless Earbuds Pro", manufacturer: "Sony", inStock: false, price: "Rp 899.000" }
+  ];
+
+  products.forEach((product, index) => {
+    const row = figma.createFrame();
+    row.name = product.title;
+    row.resize(1128, 72);
+    row.fills = index % 2 === 0 ? [] : [{ type: 'SOLID', color: { r: 0.99, g: 0.99, b: 0.99 } }];
+    row.layoutMode = 'HORIZONTAL';
+    row.paddingLeft = 24;
+    row.paddingRight = 24;
+    row.counterAxisAlignItems = 'CENTER';
+    row.strokeBottomWeight = 1;
+    row.strokes = [{ type: 'SOLID', color: { r: 0.95, g: 0.95, b: 0.96 } }];
+
+    // Product Cell (Image + Title + Manufacturer)
+    const productCell = figma.createFrame();
+    productCell.name = "Product Cell";
+    productCell.resize(400, 72);
+    productCell.fills = [];
+    productCell.layoutMode = 'HORIZONTAL';
+    productCell.counterAxisAlignItems = 'CENTER';
+    productCell.itemSpacing = 12;
+
+    // Product Image Placeholder
+    const productImage = figma.createFrame();
+    productImage.name = "Image";
+    productImage.resize(48, 48);
+    productImage.fills = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+    productImage.cornerRadius = 8;
+    productCell.appendChild(productImage);
+
+    // Product Info
+    const productInfo = figma.createFrame();
+    productInfo.name = "Info";
+    productInfo.resize(320, 48);
+    productInfo.fills = [];
+    productInfo.layoutMode = 'VERTICAL';
+    productInfo.itemSpacing = 4;
+    productInfo.primaryAxisAlignItems = 'CENTER';
+
+    const productTitle = figma.createText();
+    productTitle.fontName = { family: 'Inter', style: 'Bold' };
+    productTitle.fontSize = 14;
+    productTitle.characters = product.title;
+    productTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    productInfo.appendChild(productTitle);
+
+    const productManufacturer = figma.createText();
+    productManufacturer.fontName = { family: 'Inter', style: 'Regular' };
+    productManufacturer.fontSize = 12;
+    productManufacturer.characters = product.manufacturer;
+    productManufacturer.fills = [{ type: 'SOLID', color: { r: 0.61, g: 0.64, b: 0.69 } }];
+    productInfo.appendChild(productManufacturer);
+
+    productCell.appendChild(productInfo);
+    row.appendChild(productCell);
+
+    // Stock Status Cell
+    const stockCell = figma.createFrame();
+    stockCell.name = "Stock Cell";
+    stockCell.resize(200, 72);
+    stockCell.fills = [];
+    stockCell.layoutMode = 'HORIZONTAL';
+    stockCell.counterAxisAlignItems = 'CENTER';
+
+    const stockBadge = figma.createFrame();
+    stockBadge.name = "Stock Badge";
+    stockBadge.resize(100, 24);
+    stockBadge.fills = [{
+      type: 'SOLID',
+      color: product.inStock
+        ? { r: 0.06, g: 0.72, b: 0.51 } // Green
+        : { r: 0.94, g: 0.27, b: 0.27 } // Red
+    }];
+    stockBadge.cornerRadius = 12;
+    stockBadge.layoutMode = 'HORIZONTAL';
+    stockBadge.primaryAxisAlignItems = 'CENTER';
+    stockBadge.counterAxisAlignItems = 'CENTER';
+
+    const stockText = figma.createText();
+    stockText.fontName = { family: 'Inter', style: 'Medium' };
+    stockText.fontSize = 11;
+    stockText.characters = product.inStock ? "Stock tersedia" : "Stock habis";
+    stockText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    stockBadge.appendChild(stockText);
+
+    stockCell.appendChild(stockBadge);
+    row.appendChild(stockCell);
+
+    // Price Cell
+    const priceCell = figma.createFrame();
+    priceCell.name = "Price Cell";
+    priceCell.resize(250, 72);
+    priceCell.fills = [];
+    priceCell.layoutMode = 'HORIZONTAL';
+    priceCell.counterAxisAlignItems = 'CENTER';
+
+    const priceText = figma.createText();
+    priceText.fontName = { family: 'Inter', style: 'Medium' };
+    priceText.fontSize = 14;
+    priceText.characters = product.price;
+    priceText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    priceCell.appendChild(priceText);
+    row.appendChild(priceCell);
+
+    // Edit Button Cell
+    const actionCell = figma.createFrame();
+    actionCell.name = "Action Cell";
+    actionCell.resize(100, 72);
+    actionCell.fills = [];
+    actionCell.layoutMode = 'HORIZONTAL';
+    actionCell.counterAxisAlignItems = 'CENTER';
+
+    const editBtn = figma.createText();
+    editBtn.fontName = { family: 'Inter', style: 'Medium' };
+    editBtn.fontSize = 14;
+    editBtn.characters = "Edit";
+    editBtn.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    actionCell.appendChild(editBtn);
+    row.appendChild(actionCell);
+
+    tableCard.appendChild(row);
+  });
+
+  return tableCard;
+}
+
+// ==========================================
+// HELPER FUNCTIONS FOR ADMIN CATEGORIES PAGE
+// ==========================================
+
+// Create Admin Categories Frame
+async function createAdminCategoriesFrame() {
+  try {
+    const categoriesPage = figma.createFrame();
+    categoriesPage.name = "Admin Categories - Desktop";
+    categoriesPage.resize(1440, 900);
+    categoriesPage.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+    categoriesPage.layoutMode = 'HORIZONTAL';
+
+    // Sidebar (Categories active)
+    const sidebar = createAdminSidebarWithActive("Categories");
+    categoriesPage.appendChild(sidebar);
+
+    // Main Area
+    const mainArea = figma.createFrame();
+    mainArea.name = "Main Area";
+    mainArea.resize(1176, 900);
+    mainArea.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+    mainArea.layoutMode = 'VERTICAL';
+
+    // Top Bar
+    const topBar = createAdminTopBar();
+    mainArea.appendChild(topBar);
+
+    // Content Area
+    const contentArea = figma.createFrame();
+    contentArea.name = "Content Area";
+    contentArea.resize(1176, 836);
+    contentArea.fills = [];
+    contentArea.layoutMode = 'VERTICAL';
+    contentArea.paddingTop = 24;
+    contentArea.paddingBottom = 24;
+    contentArea.paddingLeft = 24;
+    contentArea.paddingRight = 24;
+    contentArea.itemSpacing = 24;
+
+    // Page Header
+    const pageHeader = figma.createFrame();
+    pageHeader.name = "Page Header";
+    pageHeader.resize(1128, 60);
+    pageHeader.fills = [];
+    pageHeader.layoutMode = 'VERTICAL';
+    pageHeader.itemSpacing = 4;
+
+    const pageTitle = figma.createText();
+    pageTitle.fontName = { family: 'Inter', style: 'Bold' };
+    pageTitle.fontSize = 24;
+    pageTitle.characters = "Category Management";
+    pageTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    pageHeader.appendChild(pageTitle);
+
+    const pageSubtitle = figma.createText();
+    pageSubtitle.fontName = { family: 'Inter', style: 'Regular' };
+    pageSubtitle.fontSize = 14;
+    pageSubtitle.characters = "Manage product categories";
+    pageSubtitle.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    pageHeader.appendChild(pageSubtitle);
+
+    contentArea.appendChild(pageHeader);
+
+    // Categories Table Card
+    const categoriesCard = createCategoriesTable();
+    contentArea.appendChild(categoriesCard);
+
+    mainArea.appendChild(contentArea);
+    categoriesPage.appendChild(mainArea);
+
+    console.log('Admin Categories frame created successfully');
+    return categoriesPage;
+  } catch (error) {
+    console.error('Error in createAdminCategoriesFrame:', error);
+    throw new Error('Failed to create Admin Categories: ' + error.message);
+  }
+}
+
+// Create Categories Table
+function createCategoriesTable() {
+  const tableCard = figma.createFrame();
+  tableCard.name = "Categories Table";
+  tableCard.resize(1128, 500);
+  tableCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  tableCard.cornerRadius = 12;
+  tableCard.strokeWeight = 1;
+  tableCard.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  tableCard.layoutMode = 'VERTICAL';
+  tableCard.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.05 },
+    offset: { x: 0, y: 2 },
+    radius: 8,
+    visible: true,
+    blendMode: 'NORMAL'
+  }];
+
+  // Add Button Row
+  const buttonRow = figma.createFrame();
+  buttonRow.name = "Button Row";
+  buttonRow.resize(1128, 60);
+  buttonRow.fills = [];
+  buttonRow.layoutMode = 'HORIZONTAL';
+  buttonRow.primaryAxisAlignItems = 'MAX';
+  buttonRow.counterAxisAlignItems = 'CENTER';
+  buttonRow.paddingRight = 24;
+  buttonRow.paddingTop = 16;
+
+  const addBtn = figma.createFrame();
+  addBtn.name = "Add Category Button";
+  addBtn.resize(170, 40);
+  addBtn.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  addBtn.cornerRadius = 6;
+  addBtn.layoutMode = 'HORIZONTAL';
+  addBtn.primaryAxisAlignItems = 'CENTER';
+  addBtn.counterAxisAlignItems = 'CENTER';
+  addBtn.itemSpacing = 6;
+
+  const addText = figma.createText();
+  addText.fontName = { family: 'Inter', style: 'Bold' };
+  addText.fontSize = 13;
+  addText.characters = "+ Add New Category";
+  addText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  addBtn.appendChild(addText);
+
+  buttonRow.appendChild(addBtn);
+  tableCard.appendChild(buttonRow);
+
+  // Table Header
+  const tableHeader = figma.createFrame();
+  tableHeader.name = "Table Header";
+  tableHeader.resize(1128, 48);
+  tableHeader.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+  tableHeader.layoutMode = 'HORIZONTAL';
+  tableHeader.paddingLeft = 24;
+  tableHeader.paddingRight = 24;
+  tableHeader.counterAxisAlignItems = 'CENTER';
+
+  const nameHeader = figma.createFrame();
+  nameHeader.resize(900, 48);
+  nameHeader.fills = [];
+  nameHeader.layoutMode = 'HORIZONTAL';
+  nameHeader.counterAxisAlignItems = 'CENTER';
+
+  const nameHeaderText = figma.createText();
+  nameHeaderText.fontName = { family: 'Inter', style: 'Bold' };
+  nameHeaderText.fontSize = 12;
+  nameHeaderText.characters = "Name";
+  nameHeaderText.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+  nameHeader.appendChild(nameHeaderText);
+  tableHeader.appendChild(nameHeader);
+
+  const actionHeader = figma.createFrame();
+  actionHeader.resize(100, 48);
+  actionHeader.fills = [];
+  tableHeader.appendChild(actionHeader);
+
+  tableCard.appendChild(tableHeader);
+
+  // Sample Categories Data
+  const categories = [
+    "Televisions",
+    "Audio & Speakers",
+    "Smartphones",
+    "Laptops & Computers",
+    "Kitchen Appliances",
+    "Air Conditioners",
+    "Refrigerators",
+    "Washing Machines"
+  ];
+
+  categories.forEach((category, index) => {
+    const row = figma.createFrame();
+    row.name = category;
+    row.resize(1128, 52);
+    row.fills = index % 2 === 0 ? [] : [{ type: 'SOLID', color: { r: 0.99, g: 0.99, b: 0.99 } }];
+    row.layoutMode = 'HORIZONTAL';
+    row.paddingLeft = 24;
+    row.paddingRight = 24;
+    row.counterAxisAlignItems = 'CENTER';
+    row.strokeBottomWeight = 1;
+    row.strokes = [{ type: 'SOLID', color: { r: 0.95, g: 0.95, b: 0.96 } }];
+
+    // Category Name Cell
+    const nameCell = figma.createFrame();
+    nameCell.name = "Name Cell";
+    nameCell.resize(900, 52);
+    nameCell.fills = [];
+    nameCell.layoutMode = 'HORIZONTAL';
+    nameCell.counterAxisAlignItems = 'CENTER';
+
+    const nameText = figma.createText();
+    nameText.fontName = { family: 'Inter', style: 'Medium' };
+    nameText.fontSize = 14;
+    nameText.characters = category;
+    nameText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    nameCell.appendChild(nameText);
+    row.appendChild(nameCell);
+
+    // Edit Button Cell
+    const actionCell = figma.createFrame();
+    actionCell.name = "Action Cell";
+    actionCell.resize(100, 52);
+    actionCell.fills = [];
+    actionCell.layoutMode = 'HORIZONTAL';
+    actionCell.counterAxisAlignItems = 'CENTER';
+
+    const editBtn = figma.createText();
+    editBtn.fontName = { family: 'Inter', style: 'Medium' };
+    editBtn.fontSize = 14;
+    editBtn.characters = "Edit";
+    editBtn.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    actionCell.appendChild(editBtn);
+    row.appendChild(actionCell);
+
+    tableCard.appendChild(row);
+  });
+
+  return tableCard;
+}
+
+// ==========================================
+// HELPER FUNCTIONS FOR ADMIN USERS PAGE
+// ==========================================
+
+// Create Admin Users Frame
+async function createAdminUsersFrame() {
+  try {
+    const usersPage = figma.createFrame();
+    usersPage.name = "Admin Users - Desktop";
+    usersPage.resize(1440, 900);
+    usersPage.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+    usersPage.layoutMode = 'HORIZONTAL';
+
+    // Sidebar (Users active)
+    const sidebar = createAdminSidebarWithActive("Users");
+    usersPage.appendChild(sidebar);
+
+    // Main Area
+    const mainArea = figma.createFrame();
+    mainArea.name = "Main Area";
+    mainArea.resize(1176, 900);
+    mainArea.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+    mainArea.layoutMode = 'VERTICAL';
+
+    // Top Bar
+    const topBar = createAdminTopBar();
+    mainArea.appendChild(topBar);
+
+    // Content Area
+    const contentArea = figma.createFrame();
+    contentArea.name = "Content Area";
+    contentArea.resize(1176, 836);
+    contentArea.fills = [];
+    contentArea.layoutMode = 'VERTICAL';
+    contentArea.paddingTop = 24;
+    contentArea.paddingBottom = 24;
+    contentArea.paddingLeft = 24;
+    contentArea.paddingRight = 24;
+    contentArea.itemSpacing = 24;
+
+    // Page Header
+    const pageHeader = figma.createFrame();
+    pageHeader.name = "Page Header";
+    pageHeader.resize(1128, 60);
+    pageHeader.fills = [];
+    pageHeader.layoutMode = 'VERTICAL';
+    pageHeader.itemSpacing = 4;
+
+    const pageTitle = figma.createText();
+    pageTitle.fontName = { family: 'Inter', style: 'Bold' };
+    pageTitle.fontSize = 24;
+    pageTitle.characters = "User Management";
+    pageTitle.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    pageHeader.appendChild(pageTitle);
+
+    const pageSubtitle = figma.createText();
+    pageSubtitle.fontName = { family: 'Inter', style: 'Regular' };
+    pageSubtitle.fontSize = 14;
+    pageSubtitle.characters = "Manage all system users";
+    pageSubtitle.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    pageHeader.appendChild(pageSubtitle);
+
+    contentArea.appendChild(pageHeader);
+
+    // Users Table Card
+    const usersCard = createUsersTable();
+    contentArea.appendChild(usersCard);
+
+    mainArea.appendChild(contentArea);
+    usersPage.appendChild(mainArea);
+
+    console.log('Admin Users frame created successfully');
+    return usersPage;
+  } catch (error) {
+    console.error('Error in createAdminUsersFrame:', error);
+    throw new Error('Failed to create Admin Users: ' + error.message);
+  }
+}
+
+// Create Users Table
+function createUsersTable() {
+  const tableCard = figma.createFrame();
+  tableCard.name = "Users Table";
+  tableCard.resize(1128, 500);
+  tableCard.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  tableCard.cornerRadius = 12;
+  tableCard.strokeWeight = 1;
+  tableCard.strokes = [{ type: 'SOLID', color: { r: 0.90, g: 0.91, b: 0.92 } }];
+  tableCard.layoutMode = 'VERTICAL';
+  tableCard.effects = [{
+    type: 'DROP_SHADOW',
+    color: { r: 0, g: 0, b: 0, a: 0.05 },
+    offset: { x: 0, y: 2 },
+    radius: 8,
+    visible: true,
+    blendMode: 'NORMAL'
+  }];
+
+  // Add Button Row
+  const buttonRow = figma.createFrame();
+  buttonRow.name = "Button Row";
+  buttonRow.resize(1128, 60);
+  buttonRow.fills = [];
+  buttonRow.layoutMode = 'HORIZONTAL';
+  buttonRow.primaryAxisAlignItems = 'MAX';
+  buttonRow.counterAxisAlignItems = 'CENTER';
+  buttonRow.paddingRight = 24;
+  buttonRow.paddingTop = 16;
+
+  const addBtn = figma.createFrame();
+  addBtn.name = "Add User Button";
+  addBtn.resize(140, 40);
+  addBtn.fills = [{ type: 'SOLID', color: { r: 0.94, g: 0.27, b: 0.27 } }];
+  addBtn.cornerRadius = 6;
+  addBtn.layoutMode = 'HORIZONTAL';
+  addBtn.primaryAxisAlignItems = 'CENTER';
+  addBtn.counterAxisAlignItems = 'CENTER';
+  addBtn.itemSpacing = 6;
+
+  const addText = figma.createText();
+  addText.fontName = { family: 'Inter', style: 'Bold' };
+  addText.fontSize = 13;
+  addText.characters = "+ Add New User";
+  addText.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  addBtn.appendChild(addText);
+
+  buttonRow.appendChild(addBtn);
+  tableCard.appendChild(buttonRow);
+
+  // Table Header
+  const tableHeader = figma.createFrame();
+  tableHeader.name = "Table Header";
+  tableHeader.resize(1128, 48);
+  tableHeader.fills = [{ type: 'SOLID', color: { r: 0.97, g: 0.97, b: 0.98 } }];
+  tableHeader.layoutMode = 'HORIZONTAL';
+  tableHeader.paddingLeft = 24;
+  tableHeader.paddingRight = 24;
+  tableHeader.counterAxisAlignItems = 'CENTER';
+
+  const headers = [
+    { label: "Email", width: 500 },
+    { label: "Role", width: 300 },
+    { label: "", width: 100 }
+  ];
+
+  headers.forEach(header => {
+    const headerCell = figma.createFrame();
+    headerCell.name = header.label || "Action";
+    headerCell.resize(header.width, 48);
+    headerCell.fills = [];
+    headerCell.layoutMode = 'HORIZONTAL';
+    headerCell.counterAxisAlignItems = 'CENTER';
+
+    const headerText = figma.createText();
+    headerText.fontName = { family: 'Inter', style: 'Bold' };
+    headerText.fontSize = 12;
+    headerText.characters = header.label;
+    headerText.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    headerCell.appendChild(headerText);
+
+    tableHeader.appendChild(headerCell);
+  });
+
+  tableCard.appendChild(tableHeader);
+
+  // Sample Users Data
+  const users = [
+    { email: "admin@nasionalelektronik.com", role: "Admin" },
+    { email: "john.doe@email.com", role: "User" },
+    { email: "jane.smith@email.com", role: "User" },
+    { email: "superadmin@nasionalelektronik.com", role: "Admin" },
+    { email: "bob.wilson@email.com", role: "User" },
+    { email: "alice.brown@email.com", role: "User" }
+  ];
+
+  users.forEach((user, index) => {
+    const row = figma.createFrame();
+    row.name = user.email;
+    row.resize(1128, 52);
+    row.fills = index % 2 === 0 ? [] : [{ type: 'SOLID', color: { r: 0.99, g: 0.99, b: 0.99 } }];
+    row.layoutMode = 'HORIZONTAL';
+    row.paddingLeft = 24;
+    row.paddingRight = 24;
+    row.counterAxisAlignItems = 'CENTER';
+    row.strokeBottomWeight = 1;
+    row.strokes = [{ type: 'SOLID', color: { r: 0.95, g: 0.95, b: 0.96 } }];
+
+    // Email Cell
+    const emailCell = figma.createFrame();
+    emailCell.name = "Email Cell";
+    emailCell.resize(500, 52);
+    emailCell.fills = [];
+    emailCell.layoutMode = 'HORIZONTAL';
+    emailCell.counterAxisAlignItems = 'CENTER';
+
+    const emailText = figma.createText();
+    emailText.fontName = { family: 'Inter', style: 'Regular' };
+    emailText.fontSize = 14;
+    emailText.characters = user.email;
+    emailText.fills = [{ type: 'SOLID', color: { r: 0.07, g: 0.11, b: 0.15 } }];
+    emailCell.appendChild(emailText);
+    row.appendChild(emailCell);
+
+    // Role Badge Cell
+    const roleCell = figma.createFrame();
+    roleCell.name = "Role Cell";
+    roleCell.resize(300, 52);
+    roleCell.fills = [];
+    roleCell.layoutMode = 'HORIZONTAL';
+    roleCell.counterAxisAlignItems = 'CENTER';
+
+    const roleBadge = figma.createFrame();
+    roleBadge.name = "Role Badge";
+    roleBadge.resize(60, 26);
+
+    // Role colors: Admin = red background, User = blue background
+    const isAdmin = user.role === "Admin";
+    roleBadge.fills = [{
+      type: 'SOLID',
+      color: isAdmin
+        ? { r: 0.99, g: 0.89, b: 0.89 } // Light red for admin
+        : { r: 0.88, g: 0.93, b: 0.99 } // Light blue for user
+    }];
+    roleBadge.cornerRadius = 13;
+    roleBadge.layoutMode = 'HORIZONTAL';
+    roleBadge.primaryAxisAlignItems = 'CENTER';
+    roleBadge.counterAxisAlignItems = 'CENTER';
+
+    const roleText = figma.createText();
+    roleText.fontName = { family: 'Inter', style: 'Medium' };
+    roleText.fontSize = 12;
+    roleText.characters = user.role;
+    roleText.fills = [{
+      type: 'SOLID',
+      color: isAdmin
+        ? { r: 0.77, g: 0.16, b: 0.16 } // Dark red for admin
+        : { r: 0.12, g: 0.39, b: 0.72 } // Dark blue for user
+    }];
+    roleBadge.appendChild(roleText);
+
+    roleCell.appendChild(roleBadge);
+    row.appendChild(roleCell);
+
+    // Details Button Cell
+    const actionCell = figma.createFrame();
+    actionCell.name = "Action Cell";
+    actionCell.resize(100, 52);
+    actionCell.fills = [];
+    actionCell.layoutMode = 'HORIZONTAL';
+    actionCell.counterAxisAlignItems = 'CENTER';
+
+    const detailsBtn = figma.createText();
+    detailsBtn.fontName = { family: 'Inter', style: 'Medium' };
+    detailsBtn.fontSize = 14;
+    detailsBtn.characters = "Details";
+    detailsBtn.fills = [{ type: 'SOLID', color: { r: 0.42, g: 0.45, b: 0.50 } }];
+    actionCell.appendChild(detailsBtn);
+    row.appendChild(actionCell);
+
+    tableCard.appendChild(row);
+  });
+
+  return tableCard;
 }

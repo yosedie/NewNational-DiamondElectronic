@@ -22,7 +22,7 @@ const Filters = () => {
   const [inputCategory, setInputCategory] = useState<InputCategory>({
     inStock: { text: "instock", isChecked: true },
     outOfStock: { text: "outofstock", isChecked: true },
-    priceFilter: { text: "price", value: 3000 },
+    priceFilter: { text: "price", value: 3400000 },
     ratingFilter: { text: "rating", value: 0 },
   });
   const { sortBy } = useSortStore();
@@ -94,9 +94,9 @@ const Filters = () => {
         <div>
           <input
             type="range"
-            min={0}
-            max={3000}
-            step={10}
+            min={200000}
+            max={3400000}
+            step={100000}
             value={inputCategory.priceFilter.value}
             className="range"
             onChange={(e) =>
@@ -109,7 +109,7 @@ const Filters = () => {
               })
             }
           />
-          <span>{`Harga maksimal: $${inputCategory.priceFilter.value}`}</span>
+          <span>{`Harga minimal: Rp ${inputCategory.priceFilter.value.toLocaleString('id-ID')}`}</span>
         </div>
       </div>
 

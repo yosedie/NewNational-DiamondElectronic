@@ -40,6 +40,63 @@ async function createCustomerOrder(request, response) {
       });
     }
 
+    // ===== PRODUCT VALIDATION =====
+    const { productId, quantity } = request.body;
+
+    // Validate productId is provided
+    if (!productId) {
+      console.log("❌ Product ID is required");
+      return response.status(400).json({
+        error: "Validation failed",
+        details: [{ field: 'productId', message: 'Product ID is required' }]
+      });
+    }
+
+    // Validate quantity is provided and valid
+    if (!quantity || quantity <= 0) {
+      console.log("❌ Invalid quantity");
+      return response.status(400).json({
+        error: "Validation failed",
+        details: [{ field: 'quantity', message: 'Quantity must be greater than 0' }]
+      });
+    }
+
+    // Check if product exists
+    console.log(`Checking product: ${productId}`);
+    const product = await prisma.product.findUnique({
+      where: { id: productId }
+    });
+
+    if (!product) {
+      console.log("❌ Product not found");
+      return response.status(404).json({
+        error: "Product not found",
+        details: `Product with ID ${productId} does not exist`
+      });
+    }
+
+    console.log(`✅ Product found: ${product.title}, Stock: ${product.inStock}, Price: ${product.price}`);
+
+    // Check if product is in stock
+    if (product.inStock <= 0) {
+      console.log("❌ Product out of stock");
+      return response.status(400).json({
+        error: "Product out of stock",
+        details: `Product "${product.title}" is currently out of stock`
+      });
+    }
+
+    // Check if quantity exceeds available stock
+    if (quantity > product.inStock) {
+      console.log(`❌ Insufficient stock: requested ${quantity}, available ${product.inStock}`);
+      return response.status(400).json({
+        error: "Insufficient stock",
+        details: `Insufficient stock, only ${product.inStock} available`
+      });
+    }
+
+    console.log("✅ Product validation passed");
+
     // Check for duplicate orders (same email and total within last 5 minutes)
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     const duplicateOrder = await prisma.customer_order.findFirst({
@@ -61,7 +118,7 @@ async function createCustomerOrder(request, response) {
     }
 
     console.log("Creating order in database...");
-    // Create the order with validated data
+    // Create the order with validated data and product relationship
     const corder = await prisma.customer_order.create({
       data: {
         name: validatedData.name,
@@ -75,20 +132,40 @@ async function createCustomerOrder(request, response) {
         country: validatedData.country,
         orderNotice: validatedData.orderNotice,
         total: validatedData.total,
-        dateTime: new Date()
+        dateTime: new Date(),
+        products: {
+          create: {
+            productId: productId,
+            quantity: quantity
+          }
+        }
       },
+      include: {
+        products: {
+          include: {
+            product: true
+          }
+        }
+      }
     });
 
     console.log("✅ Order created successfully:", corder);
     console.log("Order ID:", corder.id);
 
     // Log successful order creation (for monitoring)
-    console.log(`Order created successfully: ID ${corder.id}, Email: ${validatedData.email}, Total: $${validatedData.total}`);
+    console.log(`Order created successfully: ID ${corder.id}, Email: ${validatedData.email}, Total: $${validatedData.total}, Product: ${product.title}, Quantity: ${quantity}`);
 
     const responseData = {
       id: corder.id,
       message: "Order created successfully",
-      orderNumber: corder.id
+      orderNumber: corder.id,
+      product: {
+        id: product.id,
+        title: product.title,
+        price: product.price
+      },
+      quantity: quantity,
+      total: validatedData.total
     };
     
     console.log("Sending response:", responseData);
@@ -337,10 +414,202 @@ async function getAllOrders(request, response) {
   }
 }
 
+// Get orders for a specific user by email (TS-ORD-009)
+async function getUserOrders(request, response) {
+  try {
+    const { email } = request.params;
+    
+    if (!email || typeof email !== 'string') {
+      return response.status(400).json({
+        error: "Invalid email",
+        details: "Email parameter is required"
+      });
+    }
+
+    // Add pagination
+    const page = parseInt(request.query.page) || 1;
+    const limit = parseInt(request.query.limit) || 20;
+    const offset = (page - 1) * limit;
+
+    const [orders, totalCount] = await Promise.all([
+      prisma.customer_order.findMany({
+        where: {
+          email: email
+        },
+        skip: offset,
+        take: limit,
+        orderBy: {
+          dateTime: 'desc'
+        },
+        include: {
+          customer_order_product: {
+            include: {
+              Product: {
+                select: {
+                  id: true,
+                  title: true,
+                  price: true,
+                  image: true
+                }
+              }
+            }
+          }
+        }
+      }),
+      prisma.customer_order.count({
+        where: {
+          email: email
+        }
+      })
+    ]);
+
+    console.log(`Retrieved ${orders.length} orders for user: ${email}`);
+
+    return response.status(200).json({
+      orders,
+      pagination: {
+        page,
+        limit,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit)
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching user orders:", error);
+    return response.status(500).json({ 
+      error: "Internal server error",
+      details: "Failed to fetch user orders. Please try again later."
+    });
+  }
+}
+
+// Get order details with product information (enhanced for TS-ORD-010)
+async function getOrderDetails(request, response) {
+  try {
+    const { id } = request.params;
+    
+    if (!id || typeof id !== 'string') {
+      return response.status(400).json({
+        error: "Invalid order ID",
+        details: "Order ID must be provided"
+      });
+    }
+
+    const order = await prisma.customer_order.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        customer_order_product: {
+          include: {
+            Product: {
+              select: {
+                id: true,
+                title: true,
+                price: true,
+                image: true,
+                description: true,
+                inStock: true
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    if (!order) {
+      return response.status(404).json({ 
+        error: "Order not found",
+        details: "The specified order does not exist"
+      });
+    }
+
+    console.log(`Order details retrieved: ID ${order.id}`);
+    
+    return response.status(200).json(order);
+  } catch (error) {
+    console.error("Error fetching order details:", error);
+    return response.status(500).json({ 
+      error: "Internal server error",
+      details: "Failed to fetch order details. Please try again later."
+    });
+  }
+}
+
+// Update order status (admin only - TS-ORD-011, TS-ORD-012)
+async function updateOrderStatus(request, response) {
+  try {
+    const { id } = request.params;
+    const { status } = request.body;
+    
+    if (!id || typeof id !== 'string') {
+      return response.status(400).json({
+        error: "Invalid order ID",
+        details: "Order ID must be provided"
+      });
+    }
+
+    // Validate status
+    const allowedStatuses = ['PENDING', 'PAID', 'SHIPPED', 'COMPLETED', 'CANCELLED'];
+    if (!status || !allowedStatuses.includes(status)) {
+      return response.status(400).json({
+        error: "Invalid status",
+        details: `Status must be one of: ${allowedStatuses.join(', ')}`
+      });
+    }
+
+    // Check if order exists
+    const existingOrder = await prisma.customer_order.findUnique({
+      where: { id: id },
+    });
+
+    if (!existingOrder) {
+      return response.status(404).json({ 
+        error: "Order not found",
+        details: "The specified order does not exist"
+      });
+    }
+
+    // Update only the status field
+    const updatedOrder = await prisma.customer_order.update({
+      where: {
+        id: id,
+      },
+      data: {
+        status: status,
+      },
+    });
+
+    console.log(`Order status updated: ID ${updatedOrder.id}, Status: ${status}`);
+
+    return response.status(200).json({
+      message: "Order status updated successfully",
+      order: updatedOrder
+    });
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    
+    if (error.code === 'P2025') {
+      return response.status(404).json({ 
+        error: "Order not found",
+        details: "The specified order does not exist"
+      });
+    }
+
+    return response.status(500).json({ 
+      error: "Internal server error",
+      details: "Failed to update order status. Please try again later."
+    });
+  }
+}
+
 module.exports = {
   createCustomerOrder,
   updateCustomerOrder,
   deleteCustomerOrder,
   getCustomerOrder,
   getAllOrders,
+  getUserOrders,
+  getOrderDetails,
+  updateOrderStatus,
 };

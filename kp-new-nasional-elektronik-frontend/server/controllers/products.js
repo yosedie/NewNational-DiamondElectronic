@@ -4,7 +4,7 @@ const { asyncHandler, handleServerError, AppError } = require("../utills/errorHa
 // Security: Define whitelists for allowed filter types and operators
 const ALLOWED_FILTER_TYPES = ['price', 'rating', 'category', 'inStock', 'outOfStock'];
 const ALLOWED_OPERATORS = ['gte', 'lte', 'gt', 'lt', 'equals', 'contains'];
-const ALLOWED_SORT_VALUES = ['defaultSort', 'titleAsc', 'titleDesc', 'lowPrice', 'highPrice'];
+const ALLOWED_SORT_VALUES = ['defaultSort', 'titleAsc', 'titleDesc', 'lowPrice', 'highPrice', 'newest', 'oldest'];
 
 // Security: Input validation functions
 function validateFilterType(filterType) {
@@ -192,6 +192,12 @@ const getAllProducts = asyncHandler(async (request, response) => {
       case "highPrice":
         sortObj = { price: "desc" };
         break;
+      case "newest":
+        sortObj = { createdAt: "desc" };
+        break;
+      case "oldest":
+        sortObj = { createdAt: "asc" };
+        break;
       default:
         sortObj = {};
     }
@@ -213,6 +219,38 @@ const getAllProducts = asyncHandler(async (request, response) => {
         },
       };
     }
+
+    // Add price filter from query params
+    if (request.query.price) {
+      const priceValue = Number(request.query.price);
+      if (!isNaN(priceValue) && priceValue > 0) {
+        finalWhereClause.price = { gte: priceValue };
+        console.log('Filtering by price (min):', priceValue);
+      }
+    }
+
+    // Add rating filter from query params
+    if (request.query.rating) {
+      const ratingValue = Number(request.query.rating);
+      if (!isNaN(ratingValue) && ratingValue >= 0) {
+        finalWhereClause.rating = { gte: ratingValue };
+        console.log('Filtering by rating (min):', ratingValue);
+      }
+    }
+
+    // Add stock filters from query params
+    const inStock = request.query.inStock === 'true';
+    const outOfStock = request.query.outOfStock === 'true';
+    
+    // Only filter by stock if one is explicitly excluded
+    if (inStock && !outOfStock) {
+      finalWhereClause.inStock = { gt: 0 };
+      console.log('Filtering: in stock only');
+    } else if (!inStock && outOfStock) {
+      finalWhereClause.inStock = { equals: 0 };
+      console.log('Filtering: out of stock only');
+    }
+    // If both true or both false, don't filter by stock
 
     // Only apply where clause if there are filters
     const hasFilters = Object.keys(finalWhereClause).length > 0;
@@ -334,6 +372,35 @@ const updateProduct = asyncHandler(async (request, response) => {
   return response.status(200).json(updatedProduct);
 });
 
+// Method for updating product status
+const updateProductStatus = asyncHandler(async (request, response) => {
+  const { id } = request.params;
+  const { status } = request.body;
+
+  if (!id) {
+    throw new AppError("Product ID is required", 400);
+  }
+
+  if (!status || !['ACTIVE', 'INACTIVE'].includes(status)) {
+    throw new AppError("Status must be either ACTIVE or INACTIVE", 400);
+  }
+
+  const existingProduct = await prisma.product.findUnique({
+    where: { id },
+  });
+
+  if (!existingProduct) {
+    throw new AppError("Product not found", 404);
+  }
+
+  const updatedProduct = await prisma.product.update({
+    where: { id },
+    data: { status },
+  });
+
+  return response.status(200).json(updatedProduct);
+});
+
 // Method for deleting a product
 const deleteProduct = asyncHandler(async (request, response) => {
   const { id } = request.params;
@@ -342,23 +409,21 @@ const deleteProduct = asyncHandler(async (request, response) => {
     throw new AppError("Product ID is required", 400);
   }
 
-  // Check for related records in order_product table
-  const relatedOrderProductItems = await prisma.customer_order_product.findMany({
-    where: {
-      productId: id,
-    },
-  });
-  
-  if(relatedOrderProductItems.length > 0){
-    throw new AppError("Cannot delete product because of foreign key constraint", 400);
+  try {
+    // Delete product - related records will be cascade deleted automatically
+    await prisma.product.delete({
+      where: {
+        id,
+      },
+    });
+    return response.status(204).send();
+  } catch (error) {
+    // Handle Prisma errors
+    if (error.code === 'P2025') {
+      throw new AppError("Product not found", 404);
+    }
+    throw error;
   }
-
-  await prisma.product.delete({
-    where: {
-      id,
-    },
-  });
-  return response.status(204).send();
 });
 
 const searchProducts = asyncHandler(async (request, response) => {
@@ -415,6 +480,7 @@ module.exports = {
   getAllProducts,
   createProduct,
   updateProduct,
+  updateProductStatus,
   deleteProduct,
   searchProducts,
   getProductById,

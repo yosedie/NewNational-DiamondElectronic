@@ -3,16 +3,33 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  getAllWishlistByUserId,
+  getMyWishlist,
+  getWishlistByUserId,
   getAllWishlist,
   createWishItem,
+  createWishItemPublic,
   deleteWishItem,
-  getSingleProductFromWishlist
+  deleteWishItemPublic,
+  checkWishlistItem,
+  clearMyWishlist,
+  getWishlistCount,
 } = require("../controllers/wishlist");
+const { verifyToken, verifyAdmin } = require("../middleware/auth");
 
-router.route("/").get(getAllWishlist).post(createWishItem);
+// Public routes (no authentication required)
+router.get("/count", getWishlistCount);
+router.get("/user/:userId", getWishlistByUserId);
+router.post("/public", createWishItemPublic);
+router.delete("/user/:userId/:productId", deleteWishItemPublic);
 
-router.route("/:userId").get(getAllWishlistByUserId);
-router.route("/:userId/:productId").get(getSingleProductFromWishlist).delete(deleteWishItem);
+// User routes (require authentication)
+router.get("/", verifyToken, getMyWishlist);
+router.post("/", verifyToken, createWishItem);
+router.delete("/clear", verifyToken, clearMyWishlist);
+router.get("/check/:productId", verifyToken, checkWishlistItem);
+router.delete("/:productId", verifyToken, deleteWishItem);
+
+// Admin routes
+router.get("/admin/all", verifyToken, verifyAdmin, getAllWishlist);
 
 module.exports = router;

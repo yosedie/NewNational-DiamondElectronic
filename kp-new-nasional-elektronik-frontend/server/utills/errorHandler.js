@@ -1,9 +1,10 @@
 // Server-side error handler for Express.js
 class AppError extends Error {
-  constructor(message, statusCode = 500, isOperational = true) {
+  constructor(message, statusCode = 500, isOperational = true, details = null) {
     super(message);
     this.statusCode = statusCode;
     this.isOperational = isOperational;
+    this.details = details;
 
     Error.captureStackTrace(this, this.constructor);
   }
@@ -43,9 +44,14 @@ const handlePrismaError = (error) => {
   
   switch (prismaError.code) {
     case 'P2002':
+      const targetFields = prismaError.meta?.target
+        ? Array.isArray(prismaError.meta.target)
+          ? prismaError.meta.target.join(', ')
+          : String(prismaError.meta.target)
+        : undefined;
       return {
         error: "A record with this information already exists",
-        details: prismaError.meta?.target ? `Field: ${prismaError.meta.target.join(', ')}` : undefined,
+        details: targetFields ? `Field: ${targetFields}` : undefined,
         timestamp: new Date().toISOString()
       };
     case 'P2025':
@@ -109,10 +115,14 @@ const handleServerError = (error, res, context = '') => {
 
   // Custom application errors
   if (error instanceof AppError) {
-    res.status(error.statusCode).json({
+    const response = {
       error: error.message,
       timestamp
-    });
+    };
+    if (error.details) {
+      response.details = error.details;
+    }
+    res.status(error.statusCode).json(response);
     return;
   }
 

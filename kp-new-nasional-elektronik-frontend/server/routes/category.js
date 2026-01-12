@@ -9,13 +9,18 @@ const {
   deleteCategory,
   getAllCategories,
 } = require("../controllers/category");
+const { verifyToken, verifyAdmin } = require("../middleware/auth");
 
-router.route("/").get(getAllCategories).post(createCategory);
+// Public route - get all categories
+router.route("/").get(getAllCategories);
+
+// Admin only routes - create category
+router.route("/").post(verifyToken, verifyAdmin, createCategory);
 
 router
   .route("/:id")
   .get(getCategory)
-  .put(updateCategory)
-  .delete(deleteCategory);
+  .put(verifyToken, verifyAdmin, updateCategory)
+  .delete(verifyToken, verifyAdmin, deleteCategory);
 
 module.exports = router;

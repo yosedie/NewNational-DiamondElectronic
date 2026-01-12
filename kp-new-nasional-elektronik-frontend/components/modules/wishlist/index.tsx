@@ -11,10 +11,17 @@ export const WishlistModule = () => {
   const { wishlist, setWishlist } = useWishlistStore();
 
   const getWishlistByUserId = async (id: string) => {
-    const response = await apiClient.get(`/api/wishlist/${id}`, {
+    const response = await apiClient.get(`/api/wishlist/user/${id}`, {
       cache: "no-store",
     });
-    const wishlist = await response.json();
+    
+    if (!response.ok) {
+      console.error("Failed to fetch wishlist:", response.status);
+      return;
+    }
+    
+    const wishlistData = await response.json();
+    const wishlistItems = wishlistData.data || [];
 
     const productArray: {
       id: string;
@@ -25,7 +32,14 @@ export const WishlistModule = () => {
       stockAvailabillity: number;
     }[] = [];
 
-    wishlist.map((item: any) => productArray.push({ id: item?.product?.id, title: item?.product?.title, price: item?.product?.price, image: item?.product?.mainImage, slug: item?.product?.slug, stockAvailabillity: item?.product?.inStock }));
+    wishlistItems.map((item: any) => productArray.push({ 
+      id: item?.product?.id, 
+      title: item?.product?.title, 
+      price: item?.product?.price, 
+      image: item?.product?.mainImage, 
+      slug: item?.product?.slug, 
+      stockAvailabillity: item?.product?.inStock 
+    }));
 
     setWishlist(productArray);
   };

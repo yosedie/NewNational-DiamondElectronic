@@ -16,7 +16,18 @@ const DashboardCategory = () => {
         return res.json();
       })
       .then((data) => {
-        setCategories(data);
+        if (Array.isArray(data)) {
+          setCategories(data);
+        } else if (data && Array.isArray(data.data)) {
+          setCategories(data.data);
+        } else {
+          console.error("Received invalid categories data:", data);
+          setCategories([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching categories:", err);
+        setCategories([]);
       });
   }, []);
 
@@ -54,7 +65,7 @@ const DashboardCategory = () => {
                 </tr>
               </thead>
               <tbody>
-                {categories &&
+                {Array.isArray(categories) &&
                   categories.map((category: Category) => (
                     <tr key={nanoid()} className="hover:bg-gray-50">
                       <td>
